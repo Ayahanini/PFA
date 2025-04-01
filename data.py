@@ -30,4 +30,4 @@ f1 = f1_score(y_test, y_pred, average='weighted')
 print(f'F1-Score: {f1:.2f}')
 
 # Rapport complet
-print(classification_report(y_test, y_pred))
+print(classification_report(y_test, y_pred)) 
