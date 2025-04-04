@@ -11,6 +11,12 @@ model = joblib.load("modele_heart.pkl")
 def home():
     return "Bienvenue sur l'API du chatbot médical !"
 
+def predict_heart_disease(data):
+    """Prend une liste de caractéristiques et retourne la prédiction."""
+    data_array = np.array(data).reshape(1, -1)
+    prediction = model.predict(data_array)
+    return int(prediction[0])
+
 @app.route("/chat", methods=["POST"])
 def chat():
     """Endpoint pour répondre aux questions générales sur les maladies cardiaques."""
