@@ -28,6 +28,15 @@ def chat():
     }
     response = responses.get(user_message, "Je ne suis pas sûr. Pouvez-vous préciser votre question ?")
     return jsonify({"response": response})
+@app.route("/predict", methods=["POST"])
+def predict():
+    """Endpoint pour prédire le risque de maladie cardiaque."""
+    try:
+        data = request.json["features"]  # Liste des valeurs d'entrée
+        result = predict_heart_disease(data)
+        return jsonify({"prediction": result})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 if __name__ == "_main_":
     app.run(debug=True,port=5001)
