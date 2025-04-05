@@ -9,6 +9,33 @@ CORS(app)  # Permet les requêtes cross-origin
 # Charger le modèle pré-entraîné
 model = joblib.load("modele_heart.pkl")
 
+@app.route("/predict", methods=["POST" , "GET"])
+def predict():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Le corps de la requête doit être en JSON"}), 400
+            
+        features = data.get("features")
+        if not features:
+            return jsonify({"error": "Le champ 'features' est manquant"}), 400
+            
+        # Vérifier que nous avons le bon nombre de caractéristiques
+        # Pour les modèles scikit-learn, on peut souvent obtenir cette information comme ceci:
+        if hasattr(model, 'n_features_in_'):
+            expected_features = model.n_features_in_
+        else:
+            # Fallback pour les anciens modèles ou types différents
+            expected_features = len(features)  # On suppose que la première requête est correcte
+            
+        if len(features) != expected_features:
+            return jsonify({"error": f"Attendu {expected_features} caractéristiques, mais reçu {len(features)}"}), 400
+            
+        result = predict_heart_disease(features)
+        return jsonify({"prediction": result})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 def predict_heart_disease(data):
     """Prend une liste de caractéristiques et retourne la prédiction."""
     data_array = np.array(data).reshape(1, -1)
