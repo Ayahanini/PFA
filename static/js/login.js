@@ -1,33 +1,55 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Gestion des onglets Patient/Médecin
-    const patientTab = document.getElementById('patient-tab');
-    const doctorTab = document.getElementById('doctor-tab');
-    
-    patientTab.addEventListener('click', function() {
-        patientTab.classList.add('active');
-        doctorTab.classList.remove('active');
-    });
-    
-    doctorTab.addEventListener('click', function() {
-        doctorTab.classList.add('active');
-        patientTab.classList.remove('active');
+// Gestion des onglets Patient/Médecin
+const patientBtn = document.getElementById('patient-btn');
+const medecinBtn = document.getElementById('medecin-btn');
+
+if (patientBtn && medecinBtn) {
+  patientBtn.addEventListener('click', () => {
+    patientBtn.classList.add('active');
+    medecinBtn.classList.remove('active');
+  });
+  
+  medecinBtn.addEventListener('click', () => {
+    medecinBtn.classList.add('active');
+    patientBtn.classList.remove('active');
+  });
+}
+
+// Gestion du formulaire de connexion
+document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const role = patientBtn?.classList.contains('active') ? 'patient' : 'medecin';
+
+  try {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, role })
     });
 
-    // Gestion du formulaire
-    const loginForm = document.getElementById('login-form');
-    
-    loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const role = patientTab.classList.contains('active') ? 'patient' : 'medecin';
-        
-        // Ici vous ajouterez la logique de connexion réelle
-        console.log('Tentative de connexion :', { email, password, role });
-        
-        // Simulation de redirection
-        alert(`Connexion réussie en tant que ${role} !`);
-        // window.location.href = role === 'patient' ? '/profile.html' : '/admin.html';
-    });
+    const data = await response.json();
+
+    if (data.success) {
+      // Stockage des données utilisateur (solution temporaire)
+      localStorage.setItem('userData', JSON.stringify(data.user));
+      window.location.href = data.redirect;
+    } else {
+      showAlert(data.message || "Erreur de connexion", 'error');
+    }
+  } catch (error) {
+    console.error("Erreur:", error);
+    showAlert("Erreur de connexion au serveur", 'error');
+  }
 });
+
+// Fonction d'affichage des alertes
+function showAlert(message, type = 'success') {
+  const alertDiv = document.createElement('div');
+  alertDiv.className = `alert ${type}`;
+  alertDiv.textContent = message;
+  document.body.prepend(alertDiv);
+  
+  setTimeout(() => alertDiv.remove(), 5000);
+}
