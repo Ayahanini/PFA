@@ -1,0 +1,65 @@
+:root {
+    --bleu-medical: #2A5C82;
+    --vert-confiance: #4CAF50;
+}
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.login-container {
+    max-width: 500px;
+    margin: 5% auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    overflow: hidden;
+}
+.login-header {
+    background-color: var(--bleu-medical);
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+.login-header img {
+    width: 80px;
+    margin-bottom: 10px;
+}
+.login-body {
+    padding: 30px;
+    background-color: white;
+}
+.role-selector {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+.role-btn {
+    border: 2px solid #ddd;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 50px;
+}
+.role-btn.active {
+    border-color: var(--bleu-medical);
+    background-color: rgba(42, 92, 130, 0.1);
+}
+.btn-login {
+    background-color: var(--bleu-medical);
+    color: white;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 50px;
+    font-weight: bold;
+}
+.btn-login:hover {
+    background-color: #1e4a6b;
+}
+.forgot-password {
+    color: var(--bleu-medical);
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+}
