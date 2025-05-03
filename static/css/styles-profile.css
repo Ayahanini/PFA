@@ -1,0 +1,341 @@
+/* ===== RESET ET BASES ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+:root {
+    --bleu-medical: #2a5c82;
+    --vert-clair: #4CAF50;
+    --rouge-alerte: #e74c3c;
+    --orange-risque: #f39c12;
+    --gris-fonce: #333;
+    --gris-moyen: #777;
+    --gris-clair: #f5f7fa;
+}
+
+body {
+    background-color: var(--gris-clair);
+    color: var(--gris-fonce);
+    line-height: 1.6;
+}
+
+/* ===== STRUCTURE PRINCIPALE ===== */
+.dashboard-container {
+    max-width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 70px; /* Espace pour la nav du bas */
+}
+
+.profile-content {
+    padding: 20px;
+}
+
+/* ===== EN-TÊTE ===== */
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: var(--bleu-medical);
+    color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255,255,255,0.3);
+}
+
+.user-info h1 {
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+}
+
+.user-info p {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.logout-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s;
+}
+
+.logout-btn:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* ===== CARTES ===== */
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+    color: var(--bleu-medical);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.text-btn {
+    background: none;
+    border: none;
+    color: var(--bleu-medical);
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+/* ===== DONNÉES MÉDICALES ===== */
+.data-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.data-item {
+    background: var(--gris-clair);
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.data-item label {
+    font-size: 0.8rem;
+    color: var(--gris-moyen);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.data-item .value {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.value.normal { color: var(--vert-clair); }
+.value.warning { color: var(--orange-risque); }
+.value.critical { color: var(--rouge-alerte); }
+
+/* ===== ÉVALUATION DU RISQUE ===== */
+.risk-level {
+    margin: 20px 0;
+}
+
+.risk-meter {
+    height: 10px;
+    background: #ecf0f1;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.risk-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--vert-clair), var(--orange-risque), var(--rouge-alerte));
+    width: var(--risk-level, 50%);
+}
+
+.risk-label {
+    font-weight: 600;
+    text-align: center;
+}
+
+.low-risk { color: var(--vert-clair); }
+.medium-risk { color: var(--orange-risque); }
+.high-risk { color: var(--rouge-alerte); }
+
+.recommendation {
+    background: rgba(75, 192, 192, 0.1);
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    border-left: 4px solid var(--bleu-medical);
+    margin-top: 15px;
+}
+
+/* ===== RAPPELS ===== */
+.reminder-list {
+    list-style: none;
+}
+
+.reminder-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reminder-list li:last-child {
+    border-bottom: none;
+}
+
+.med-name {
+    font-weight: 500;
+    flex: 1;
+}
+
+.med-time {
+    color: var(--gris-moyen);
+    font-size: 0.85rem;
+    min-width: 120px;
+    text-align: right;
+}
+
+.urgent {
+    color: var(--rouge-alerte);
+    font-weight: bold;
+}
+
+/* ===== FORMULAIRE D'ÉDITION ===== */
+.edit-form {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-row label {
+    flex: 1;
+    font-size: 0.9rem;
+}
+
+.form-row input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-top: 5px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.primary-btn {
+    background: var(--bleu-medical);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.outline-btn {
+    background: white;
+    color: var(--bleu-medical);
+    border: 1px solid var(--bleu-medical);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* ===== NAVIGATION INFÉRIEURE ===== */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 100;
+}
+
+.nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--gris-moyen);
+    text-decoration: none;
+    font-size: 0.8rem;
+    padding: 5px 10px;
+}
+
+.nav-btn.active {
+    color: var(--bleu-medical);
+    font-weight: 500;
+}
+
+/* ===== ICÔNES (sans Font Awesome) ===== */
+.icon-heart::before { content: "❤"; }
+.icon-alert::before { content: "⚠"; }
+.icon-bell::before { content: "🔔"; }
+.icon-profile::before { content: "👤"; }
+.icon-chat::before { content: "💬"; }
+.icon-history::before { content: "🕒"; }
+.icon-logout::before { content: "←"; }
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+    .data-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .logout-btn {
+        align-self: flex-end;
+    }
+}
