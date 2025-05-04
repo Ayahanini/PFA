@@ -12,3 +12,5 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+# Création du blueprint pour les erreurs
+errors = Blueprint('errors', __name__)
