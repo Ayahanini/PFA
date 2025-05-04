@@ -146,3 +146,13 @@ async def bot_logic(turn_context: TurnContext):
             if member.id != turn_context.activity.recipient.id:
                 welcome_message = "Bonjour! Je suis votre assistant médical spécialisé dans les maladies cardiaques. Je peux répondre à vos questions sur les symptômes, la prévention, et les facteurs de risque. Je peux également évaluer votre risque cardiaque. Comment puis-je vous aider aujourd'hui?"
                 await turn_context.send_activity(welcome_message)
+
+# Configuration de l'application aiohttp
+APP = web.Application()
+APP.router.add_post("/api/messages", messages)
+
+if __name__ == "__main__":
+    try:
+        web.run_app(APP, host="localhost", port=3978)
+    except Exception as error:
+        raise error
