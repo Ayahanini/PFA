@@ -154,3 +154,118 @@ QA_PROMPT = PromptTemplate(
             logger.error(f"Erreur lors de l'initialisation de la base de connaissances: {str(e)}")
             self.is_initialized = False
             return False
+         def answer_question(self, question: str, user_data: Optional[Dict] = None) -> Dict:
+        """
+        Répond à une question médicale en utilisant la base de connaissances.
+        
+        Args:
+            question (str): La question de l'utilisateur
+            user_data (Dict, optional): Données utilisateur pour personnaliser la réponse
+            
+        Returns:
+            Dict: Réponse contenant le texte et des métadonnées
+        """
+        if not self.is_initialized:
+            if not self.initialize_resources():
+                return {
+                    "response": "Je ne peux pas répondre à votre question actuellement car la base de connaissances n'est pas disponible.",
+                    "source": "error",
+                    "confidence": 0.0
+                }
+        
+        try:
+            # Limiter la taille de la question
+            if len(question) > 500:
+                question = question[:500]
+                logger.warning("Question tronquée car trop longue")
+            
+            # Enrichir la question avec le contexte utilisateur si disponible
+            enhanced_question = question
+            context = ""
+            if user_data and isinstance(user_data, dict) and "prediction" in user_data:
+                pred = user_data["prediction"]
+                risk = user_data.get("risk_percentage", 0)
+                context = f"Le patient a un {'risque' if pred == 1 else 'faible risque'} de maladie cardiaque (risque estimé: {risk}%)."
+                enhanced_question = f"Contexte patient: {context} Question: {question}"
+            
+            # Obtenir la réponse avec gestion des erreurs d'API
+            try:
+                result = self.qa_chain({"query": enhanced_question})
+            except Exception as api_error:
+                logger.error(f"Erreur API lors de la génération de la réponse: {str(api_error)}")
+                # Réessayer une fois avec une question plus simple
+                try:
+                    simplified_question = f"Version simplifiée: {question}"
+                    result = self.qa_chain({"query": simplified_question})
+                except:
+                    # Si ça échoue à nouveau, utiliser les réponses de secours
+                    raise
+            
+            # Extraire et nettoyer la réponse
+            response = result["result"]
+            
+            # Ajouter un avertissement médical si nécessaire
+            needs_warning = any(keyword in question.lower() for keyword in [
+                "traitement", "médicament", "guérir", "soigner", "prescription", 
+                "dose", "posologie", "ordonnance", "doser"
+            ])
+            
+            if needs_warning:
+                warning = "\n\nATTENTION: Ces informations sont générales. Veuillez consulter un professionnel de santé pour des conseils médicaux personnalisés."
+                response += warning
+            
+            # Calculer un score de confiance basé sur la similarité des documents
+            docs = result.get("source_documents", [])
+            confidence = 0.85 if docs else 0.3  # Valeur par défaut
+            
+            return {
+                "response": response,
+                "source": "knowledge_base",
+                "confidence": confidence
+            }
+            
+        except Exception as e:
+            logger.error(f"Erreur lors de la génération de la réponse: {str(e)}")
+            
+            # Réponses de secours pour les questions courantes
+            fallback_responses = {
+                "symptômes": "Les symptômes courants des maladies cardiaques incluent douleur thoracique, essoufflement, fatigue, palpitations et œdème. Consultez un médecin si vous ressentez ces symptômes.",
+                "prévention": "Pour prévenir les maladies cardiaques, adoptez une alimentation équilibrée, pratiquez une activité physique régulière, évitez de fumer, limitez l'alcool et contrôlez votre tension artérielle et cholestérol.",
+                "facteurs de risque": "Les principaux facteurs de risque incluent l'hypertension, l'hypercholestérolémie, le tabagisme, le diabète, l'obésité, la sédentarité, l'âge avancé et les antécédents familiaux.",
+                "traitement": "Les traitements des maladies cardiaques peuvent inclure des médicaments, des interventions chirurgicales et des changements de mode de vie. Consultez un médecin pour un traitement adapté à votre situation."
+            }
+            
+            # Trouver la meilleure réponse de secours
+            for keyword, response in fallback_responses.items():
+                if keyword in question.lower():
+                    return {
+                        "response": response + "\n\nDésolé pour les limitations de ma réponse, notre système rencontre actuellement des difficultés techniques.",
+                        "source": "fallback",
+                        "confidence": 0.5
+                    }
+            
+            return {
+                "response": "Je suis désolé, je ne peux pas répondre à cette question pour le moment. Veuillez contacter un professionnel de santé pour obtenir des informations médicales fiables.",
+                "source": "error",
+                "confidence": 0.0
+            }
+    
+    def cleanup_resources(self):
+        """
+        Nettoie les ressources utilisées par la base de connaissances.
+        À appeler lors de la fermeture de l'application.
+        """
+        try:
+            # Libérer les ressources si nécessaire
+            self.embeddings = None
+            self.vector_store = None
+            self.llm = None 
+            self.qa_chain = None
+            self.retriever = None
+            self.is_initialized = False
+            logger.info("Ressources de la base de connaissances libérées avec succès.")
+        except Exception as e:
+            logger.error(f"Erreur lors du nettoyage des ressources: {str(e)}")
+
+# Instance singleton pour utilisation dans l'application
+kb = MedicalKnowledgeBase()
