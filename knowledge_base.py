@@ -269,3 +269,22 @@ QA_PROMPT = PromptTemplate(
 
 # Instance singleton pour utilisation dans l'application
 kb = MedicalKnowledgeBase()
+
+# Fonction utilitaire pour l'application Flask
+def get_medical_response(query: str, user_data: Optional[Dict] = None) -> str:
+    """
+    Fonction d'aide pour obtenir une réponse médicale à partir de la base de connaissances.
+    
+    Args:
+        query (str): Question de l'utilisateur
+        user_data (Dict, optional): Données utilisateur pour personnaliser la réponse
+        
+    Returns:
+        str: Réponse textuelle
+    """
+    # Vérifier que la base de connaissances est initialisée
+    if not kb.is_initialized and not kb.initialize_resources():
+        return "La base de connaissances médicales n'est pas disponible actuellement. Veuillez réessayer plus tard."
+    
+    result = kb.answer_question(query, user_data)
+    return result["response"]
