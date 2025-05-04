@@ -33,7 +33,7 @@ MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB limite pour le fichier de connaissan
 class MedicalKnowledgeBase:
     """Classe pour gérer la base de connaissances médicales."""
     
-    def _init_(self):
+    def __init__(self):
         self.embeddings: Optional[Embeddings] = None
         self.vector_store: Optional[VectorStore] = None
         self.llm: Optional[LLM] = None
@@ -44,8 +44,7 @@ class MedicalKnowledgeBase:
         
         # Créer le dossier d'embeddings s'il n'existe pas
         os.makedirs(EMBEDDINGS_FOLDER, exist_ok=True)
-        
-         
+    
     def initialize_resources(self, force_reload: bool = False) -> bool:
         """
         Initialise la base de connaissances, soit en chargeant un index existant,
@@ -132,7 +131,8 @@ un traitement ou un diagnostic spécifique, rappelle toujours que tu n'es pas un
 et que le patient devrait consulter un professionnel de santé.
 
 Réponse:"""
-QA_PROMPT = PromptTemplate(
+            
+            QA_PROMPT = PromptTemplate(
                 template=qa_prompt_template,
                 input_variables=["context", "question"]
             )
@@ -154,7 +154,8 @@ QA_PROMPT = PromptTemplate(
             logger.error(f"Erreur lors de l'initialisation de la base de connaissances: {str(e)}")
             self.is_initialized = False
             return False
-         def answer_question(self, question: str, user_data: Optional[Dict] = None) -> Dict:
+    
+    def answer_question(self, question: str, user_data: Optional[Dict] = None) -> Dict:
         """
         Répond à une question médicale en utilisant la base de connaissances.
         
