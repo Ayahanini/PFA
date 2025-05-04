@@ -1,8 +1,16 @@
+#!/usr/bin/env python3
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 import sys
 import traceback
 import os
 from datetime import datetime
 import asyncio
+
+# Charger la configuration
+from config import load_configuration
+load_configuration()
 
 from aiohttp import web
 from aiohttp.web import Request, Response
@@ -13,7 +21,6 @@ from botbuilder.core import (
     MemoryStorage,
     TurnContext,
 )
-
 from botbuilder.schema import Activity, ActivityTypes
 
 # Import depuis votre application existante
@@ -91,6 +98,7 @@ async def get_best_response(user_message):
     
     # Par défaut, retourner la réponse du chatbot simple
     return simple_response
+
 # Route principale pour les activités du bot
 async def messages(req: Request) -> Response:
     if "application/json" in req.headers["Content-Type"]:
