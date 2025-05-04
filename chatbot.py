@@ -27,4 +27,4 @@ def analyser_question(question):
     elif any(m in mots for m in ['facteurs', 'risques', 'cause']):
         return "Les facteurs de risque incluent : hypertension, diabète, obésité, sédentarité, stress."
     else:
-        return "Je ne comprends pas cette question. Pouvez-vous reformuler?"
+        return "Je ne comprends pas cette question. Pouvez-vous reformuler?" 
