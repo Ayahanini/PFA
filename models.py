@@ -24,3 +24,13 @@ def entrainer_modele(fichier):
     print("Modèle entraîné et sauvegardé.")
 
 
+def predire_risque(modele, valeurs):
+    """Prédit le risque de maladie cardiaque à partir des données utilisateur."""
+    df_utilisateur = pd.DataFrame([valeurs])
+    prediction = modele.predict(df_utilisateur)[0]
+    return {
+        "prediction": int(prediction),
+        "message": "Maladie cardiaque détectée" if prediction == 1 else "Pas de maladie cardiaque"
+}
+
+
