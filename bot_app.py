@@ -67,3 +67,27 @@ async def on_error(context: TurnContext, error: Exception):
         await context.send_activity(trace_activity)
 
 ADAPTER.on_turn_error = on_error
+
+# Détermination de la meilleure réponse
+async def get_best_response(user_message):
+    """
+    Détermine la meilleure réponse entre le chatbot simple et la base de connaissances
+    """
+    # Réponse du chatbot simple
+    simple_response = analyser_question(user_message)
+    
+    # Si la base de connaissances est disponible, essayer de l'utiliser
+    if KB_INITIALIZED:
+        try:
+            kb_result = kb.answer_question(user_message)
+            kb_response = kb_result["response"]
+            kb_confidence = kb_result["confidence"]
+            
+            # Si la confiance de la base de connaissances est élevée, l'utiliser
+            if kb_confidence > 0.6:
+                return kb_response
+        except:
+            pass
+    
+    # Par défaut, retourner la réponse du chatbot simple
+    return simple_response
