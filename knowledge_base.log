@@ -1,0 +1,22 @@
+2025-05-04 15:53:56,934 - knowledge_base - ERROR - Clé API OpenAI non trouvée dans les variables d'environnement.
+2025-05-04 15:53:59,448 - app - INFO - Ressources NLTK initialisées avec succès
+2025-05-04 15:54:00,514 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.110.175:5000
+2025-05-04 15:54:00,516 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-04 15:54:00,520 - werkzeug - INFO -  * Restarting with stat
+2025-05-04 15:54:09,442 - knowledge_base - ERROR - Clé API OpenAI non trouvée dans les variables d'environnement.
+2025-05-04 15:54:11,398 - app - INFO - Ressources NLTK initialisées avec succès
+2025-05-04 15:54:11,443 - werkzeug - WARNING -  * Debugger is active!
+2025-05-04 15:54:11,453 - werkzeug - INFO -  * Debugger PIN: 565-512-572
+2025-05-04 15:54:14,667 - werkzeug - INFO - 127.0.0.1 - - [04/May/2025 15:54:14] "GET / HTTP/1.1" 200 -
+2025-05-04 15:54:15,428 - werkzeug - INFO - 127.0.0.1 - - [04/May/2025 15:54:15] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-04 16:10:32,554 - werkzeug - INFO -  * Detected change in 'c:\\Users\\poste\\Desktop\\pfa1\\utils.py', reloading
+2025-05-04 16:10:33,139 - werkzeug - INFO -  * Restarting with stat
+2025-05-04 16:10:41,935 - knowledge_base - ERROR - Clé API OpenAI non trouvée dans les variables d'environnement.
+2025-05-04 16:10:42,061 - app - INFO - Ressources NLTK initialisées avec succès
+2025-05-04 16:10:42,106 - werkzeug - WARNING -  * Debugger is active!
+2025-05-04 16:10:42,116 - werkzeug - INFO -  * Debugger PIN: 565-512-572
+2025-05-04 16:42:05,804 - werkzeug - INFO -  * Detected change in 'c:\\Users\\poste\\Desktop\\pfa1\\knowledge_base.py', reloading
+2025-05-04 16:42:06,530 - werkzeug - INFO -  * Restarting with stat
