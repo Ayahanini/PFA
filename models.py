@@ -23,6 +23,9 @@ def entrainer_modele(fichier):
     joblib.dump(modele, 'modele_heart.pkl')
     print("Modèle entraîné et sauvegardé.")
 
+def charger_modele():
+    """Charge le modèle sauvegardé."""
+    return joblib.load('modele_heart.pkl')
 
 def predire_risque(modele, valeurs):
     """Prédit le risque de maladie cardiaque à partir des données utilisateur."""
