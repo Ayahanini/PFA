@@ -48,3 +48,14 @@ def error_response(error_type, details=None, original_error=None):
         logger.error(traceback.format_exc())
     
     return jsonify(error_data), status_code
+
+def handle_model_prediction_error(e):
+    """Gère les erreurs de prédiction du modèle."""
+    error_msg = str(e)
+    if "could not convert string to float" in error_msg:
+        return error_response('DATA_TYPE', "Les caractéristiques doivent être numériques", e)
+    elif "has X features, but StandardScaler is expecting" in error_msg:
+        return error_response('FEATURE_COUNT_MISMATCH', "Le nombre de caractéristiques fournies ne correspond pas à celui attendu par le modèle", e)
+    else:
+        return error_response('SERVER',error_msg, e)
+
