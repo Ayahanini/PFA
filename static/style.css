@@ -28,3 +28,49 @@ h1 {
     background: #f9f9f9;
     margin-bottom: 10px;
 }
+
+#messages {
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.message.user {
+    background: #d1e7dd;
+    align-self: flex-end;
+}
+
+.message.bot {
+    background: #f8d7da;
+    align-self: flex-start;
+}
+
+.input-container {
+    display: flex;
+    gap: 10px;
+}
+
+#user-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#send-btn {
+    padding: 10px 20px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#send-btn:hover {
+    background: #0056b3;
+}
