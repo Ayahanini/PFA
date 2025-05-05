@@ -1,15 +1,12 @@
 from flask import Flask, request, jsonify, render_template
 from knowledge_base import kb
 
-# Initialisation de l'application Flask
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
-# Route pour la page d'accueil
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Route pour gérer les questions posées au chatbot
 @app.route('/ask', methods=['POST'])
 def ask_question():
     data = request.json
@@ -19,10 +16,8 @@ def ask_question():
     if not question:
         return jsonify({"response": "Aucune question fournie."}), 400
     
-    # Appel à la méthode de la base de connaissances pour obtenir une réponse
     response = kb.answer_question(question, user_data)
     return jsonify({"response": response["response"]})
 
-# Point d'entrée principal
 if __name__ == '__main__':
     app.run(debug=True)
