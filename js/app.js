@@ -20,3 +20,18 @@ sendBtn.addEventListener('click', async () => {
             body: JSON.stringify({ question }),
         });
         const data = await response.json();
+
+        // Afficher la réponse dans le chatbox
+        addMessage('bot', data.response);
+    } catch (error) {
+        addMessage('bot', "Erreur : Impossible de contacter le serveur.");
+    }
+});
+
+function addMessage(sender, text) {
+    const message = document.createElement('div');
+    message.classList.add('message', sender);
+    message.textContent = text;
+    chatbox.appendChild(message);
+    chatbox.scrollTop = chatbox.scrollHeight;
+}
