@@ -32,3 +32,18 @@ class DirectLineConfig:
             "expires_in": self.token_validity_hours * 3600
         }
     
+    def validate_token(self, token):
+        """
+        Valide un token et retourne True s'il est valide
+        """
+        if token not in self.tokens:
+            return False
+        
+        token_data = self.tokens[token]
+        if datetime.now() > token_data["expiration"]:
+            # Nettoyer les tokens expirés
+            del self.tokens[token]
+            return False
+        
+        return True
+    
