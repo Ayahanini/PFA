@@ -1,0 +1,156 @@
+/* Variables */
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2980b9;
+    --text-color: #333;
+    --light-gray: #f5f5f5;
+    --border-color: #ddd;
+}
+
+/* Styles généraux */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: #f9f9f9;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* En-tête */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+/* Section principale */
+main {
+    flex: 1;
+}
+
+.chat-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    height: 70vh;
+    position: relative;
+}
+
+#webchat {
+    height: 100%;
+}
+
+/* Interface de secours */
+#fallback-interface {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.fallback-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.fallback-message {
+    margin-bottom: 10px;
+    padding: 10px 15px;
+    border-radius: 18px;
+    max-width: 80%;
+    word-break: break-word;
+}
+
+.fallback-bot-message {
+    background-color: var(--light-gray);
+    align-self: flex-start;
+}
+
+.fallback-user-message {
+    background-color: var(--primary-color);
+    color: white;
+    margin-left: auto;
+}
+
+.fallback-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid var(--border-color);
+}
+
+#fallback-message-input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    margin-right: 10px;
+    font-size: 16px;
+}
+
+#fallback-send-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+#fallback-send-button:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Style du WebChat */
+.webchat__bubble--from-user {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.webchat__bubble--from-bot {
+    background-color: var(--light-gray);
+}
+
+/* Pied de page */
+footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 30px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .chat-container {
+        height: 80vh;
+    }
+}
