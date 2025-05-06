@@ -47,3 +47,11 @@ class DirectLineConfig:
         
         return True
     
+    def get_user_id(self, token):
+        """
+        Récupère l'ID utilisateur associé à un token valide
+        """
+        if self.validate_token(token):
+            return self.tokens[token]["user_id"]
+        return None
+    
