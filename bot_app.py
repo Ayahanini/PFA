@@ -22,7 +22,7 @@ from botbuilder.core import (
     TurnContext,
 )
 
-		from botbuilder.schema import Activity, ActivityTypes
+from botbuilder.schema import Activity, ActivityTypes
 
 # Import depuis votre application existante
 from chatbot import analyser_question
@@ -98,3 +98,68 @@ async def get_best_response(user_message):
     
     # Par défaut, retourner la réponse du chatbot simple
     return simple_response
+# Route principale pour les activités du bot
+async def messages(req: Request) -> Response:
+    if "application/json" in req.headers["Content-Type"]:
+        body = await req.json()
+    else:
+        return Response(status=415)
+
+    activity = Activity().deserialize(body)
+    auth_header = req.headers["Authorization"] if "Authorization" in req.headers else ""
+
+    try:
+        response = await ADAPTER.process_activity(activity, auth_header, bot_logic)
+        if response:
+            return web.json_response(response.body)
+        return Response(status=201)
+    except Exception as exception:
+        raise exception
+
+# Logique principale du bot
+async def bot_logic(turn_context: TurnContext):
+    if turn_context.activity.type == ActivityTypes.message:
+        user_message = turn_context.activity.text
+        
+        # Vérifier si c'est une demande de prédiction de risque
+        if "prédire" in user_message.lower() and "risque" in user_message.lower() and MODEL:
+            await turn_context.send_activity("Pour prédire votre risque cardiaque, j'ai besoin de plusieurs informations médicales. Utilisez le format suivant: ")
+            await turn_context.send_activity("PRÉDICTION: âge, sexe (1=homme, 0=femme), pression artérielle, cholestérol, glycémie, etc.")
+        
+        # Vérifier si c'est un message de prédiction formaté
+        elif user_message.upper().startswith("PRÉDICTION:") and MODEL:
+            try:
+                # Extraire les valeurs des caractéristiques
+                values_str = user_message.split(":", 1)[1].strip()
+                values = [float(x.strip()) for x in values_str.split(",")]
+                
+                # Faire la prédiction
+                result = predire_risque(MODEL, values)
+                
+                if result["prediction"] == 1:
+                    await turn_context.send_activity("⚠️ Selon les données fournies, vous présentez un risque élevé de maladie cardiaque. Il est recommandé de consulter un professionnel de santé.")
+                else:
+                    await turn_context.send_activity("✅ Selon les données fournies, votre risque de maladie cardiaque semble faible. Continuez à adopter un mode de vie sain.")
+            except Exception as e:
+                await turn_context.send_activity(f"Je n'ai pas pu analyser les données. Assurez-vous de les fournir au format correct. Erreur: {str(e)}")
+        
+        # Sinon, traiter comme une question normale
+        else:
+            response = await get_best_response(user_message)
+            await turn_context.send_activity(response)
+    elif turn_context.activity.type == ActivityTypes.conversation_update:
+        # Message de bienvenue lors d'une nouvelle conversation
+        for member in turn_context.activity.members_added:
+            if member.id != turn_context.activity.recipient.id:
+                welcome_message = "Bonjour! Je suis votre assistant médical spécialisé dans les maladies cardiaques. Je peux répondre à vos questions sur les symptômes, la prévention, et les facteurs de risque. Je peux également évaluer votre risque cardiaque. Comment puis-je vous aider aujourd'hui?"
+                await turn_context.send_activity(welcome_message)
+
+# Configuration de l'application aiohttp
+APP = web.Application()
+APP.router.add_post("/api/messages", messages)
+
+if __name__ == "__main__":
+    try:
+        web.run_app(APP, host="localhost", port=3978)
+    except Exception as error:
+        raise error
