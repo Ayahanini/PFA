@@ -17,3 +17,18 @@ class DirectLineConfig:
         self._secret = "LOCAL_DIRECT_LINE_SECRET"
         self.tokens = {}  # token -> expiration_time
     
+    def generate_token(self, user_id=None):
+        """
+        Génère un token temporaire pour Direct Line
+        """
+        token = secrets.token_urlsafe(16)
+        expiration = datetime.now() + timedelta(hours=self.token_validity_hours)
+        self.tokens[token] = {
+            "expiration": expiration,
+            "user_id": user_id
+        }
+        return {
+            "token": token,
+            "expires_in": self.token_validity_hours * 3600
+        }
+    
