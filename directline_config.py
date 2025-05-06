@@ -55,3 +55,20 @@ class DirectLineConfig:
             return self.tokens[token]["user_id"]
         return None
     
+    def clean_expired_tokens(self):
+        """
+        Nettoie les tokens expirés
+        """
+        now = datetime.now()
+        expired_tokens = [
+            token for token, data in self.tokens.items() 
+            if now > data["expiration"]
+        ]
+        
+        for token in expired_tokens:
+            del self.tokens[token]
+        
+        return len(expired_tokens)
+
+# Instance singleton
+directline_config = DirectLineConfig()
