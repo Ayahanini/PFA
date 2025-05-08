@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Cardiaque - Assistance Médicale</title>
+    <link rel="stylesheet" href="/PFA/static/css/styles-chat.css">
+    <script src="/PFA/static/js/chat.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- En-tête -->
+        <header class="chat-header">
+            <div class="bot-info">
+                <img src="/static/images/chatbot-icon.png" alt="Icone du chatbot" class="bot-avatar">
+                <div>
+                    <h1>Assistant Cardiaque</h1>
+                    <p>En ligne</p>
+                </div>
+            </div>
+            <button id="back-btn" class="back-btn">
+                <i class="icon-back">←</i> Retour
+            </button>
+        </header>
+
+        <!-- Zone de conversation -->
+        <div class="chat-messages" id="chat-messages">
+            <!-- Messages chargés dynamiquement -->
+            <div class="message bot-message">
+                <div class="message-content">
+                    <div class="message-text">Bonjour Jean ! Je suis votre assistant cardiaque. Comment puis-je vous aider aujourd'hui ?</div>
+                    <div class="message-time">10:00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zone de saisie -->
+        <div class="chat-input">
+            <div class="quick-actions">
+                <button class="quick-btn" data-query="Rappel médicament">💊 Rappel médicament</button>
+                <button class="quick-btn" data-query="Symptômes">🫀 Symptômes</button>
+                <button class="quick-btn" data-query="Rendez-vous">📅 Rendez-vous</button>
+            </div>
+            <form id="message-form">
+                <input type="text" id="user-input" placeholder="Tapez votre message..." autocomplete="off">
+                <button type="submit" class="send-btn">
+                    <i class="icon-send">↑</i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
