@@ -79,6 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Message de bienvenue initial
     setTimeout(() => {
-        addMessage(botResponses.default, 'bot')
+        addMessage(botResponses.default, 'bot');
     }, 500);
 });
