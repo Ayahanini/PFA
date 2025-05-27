@@ -1,0 +1,122 @@
+[
+  {
+    "question": "Quels sont les symptômes des maladies cardiaques ?",
+    "answer": "Les symptômes incluent douleurs thoraciques, essoufflement, fatigue, palpitations, vertiges et gonflement des jambes."
+  },
+  {
+    "question": "Quels sont les facteurs de risque des maladies cardiaques ?",
+    "answer": "Les facteurs de risque incluent l'hypertension, le tabagisme, le cholestérol élevé, le diabète, l'obésité, la sédentarité et les antécédents familiaux."
+  },
+  {
+    "question": "Comment prévenir les maladies cardiaques ?",
+    "answer": "On peut les prévenir en adoptant une alimentation saine, en pratiquant une activité physique régulière, en évitant le tabac et en contrôlant sa tension artérielle."
+  },
+  {
+    "question": "Quels types de maladies cardiaques existe-t-il ?",
+    "answer": "Les principales sont : les cardiopathies ischémiques, l'insuffisance cardiaque, les troubles du rythme cardiaque et les cardiopathies congénitales."
+  },
+  {
+    "question": "Qu'est-ce qu'une crise cardiaque ?",
+    "answer": "Une crise cardiaque ou infarctus du myocarde survient lorsque l'apport sanguin à une partie du cœur est bloqué."
+  },
+  {
+    "question": "Quels sont les signes d'un infarctus ?",
+    "answer": "Douleur thoracique, sueurs, nausées, essoufflement, douleur dans le bras ou la mâchoire."
+  },
+  {
+    "question": "Comment diagnostique-t-on une maladie cardiaque ?",
+    "answer": "Grâce à des examens comme l'ECG, l'échocardiographie, les tests d'effort, ou encore les analyses sanguines."
+  },
+  {
+    "question": "Quels sont les traitements des maladies cardiaques ?",
+    "answer": "Les traitements incluent les médicaments, l'angioplastie, le pontage coronarien, et les changements de mode de vie."
+  },
+  {
+    "question": "Le stress peut-il provoquer une maladie cardiaque ?",
+    "answer": "Oui, un stress chronique peut augmenter la pression artérielle et les risques de maladies cardiaques."
+  },
+  {
+    "question": "Quel est le rôle du cholestérol dans les maladies cardiaques ?",
+    "answer": "Un excès de cholestérol peut former des plaques dans les artères, réduisant la circulation sanguine vers le cœur."
+  },
+  {
+    "question": "Qu'est-ce qu'une arythmie cardiaque ?",
+    "answer": "C'est un trouble du rythme cardiaque, comme la tachycardie, la bradycardie ou la fibrillation auriculaire."
+  },
+  {
+    "question": "Comment traite-t-on la fibrillation auriculaire ?",
+    "answer": "Avec des médicaments anticoagulants, des bêtabloquants ou une cardioversion électrique."
+  },
+  {
+    "question": "Qu'est-ce que l'insuffisance cardiaque ?",
+    "answer": "C'est une incapacité du cœur à pomper suffisamment de sang pour répondre aux besoins du corps."
+  },
+  {
+    "question": "Quels sont les symptômes de l'insuffisance cardiaque ?",
+    "answer": "Essoufflement, fatigue, jambes gonflées, prise de poids rapide, toux nocturne."
+  },
+  {
+    "question": "Qu'est-ce qu'un pontage coronarien ?",
+    "answer": "C'est une opération qui permet de contourner une artère coronaire obstruée à l'aide d'un vaisseau sanguin prélevé ailleurs."
+  },
+  {
+    "question": "À quel âge commence-t-on à surveiller le cœur ?",
+    "answer": "Dès 40 ans en général, ou plus tôt en présence de facteurs de risque comme le tabagisme ou les antécédents familiaux."
+  },
+  {
+    "question": "Quelle est la tension artérielle normale ?",
+    "answer": "Une tension normale est autour de 120/80 mmHg."
+  },
+  {
+    "question": "Qu'est-ce qu'une angioplastie ?",
+    "answer": "C'est une intervention qui consiste à débloquer une artère bouchée à l'aide d'un ballonnet et parfois d'un stent."
+  },
+  {
+    "question": "Le diabète est-il un facteur de risque cardiaque ?",
+    "answer": "Oui, le diabète multiplie les risques de maladies cardiovasculaires, surtout s'il n'est pas contrôlé."
+  },
+  {
+    "question": "Quel est le lien entre l'obésité et les maladies cardiaques ?",
+    "answer": "L'obésité augmente la tension, le cholestérol, et le risque de diabète, ce qui favorise les maladies cardiaques."
+  },
+  {
+    "question": "Quel sport est bon pour le cœur ?",
+    "answer": "La marche rapide, la natation, le vélo, et toute activité cardio modérée sont bénéfiques."
+  },
+  {
+    "question": "Faut-il éviter le sel pour le cœur ?",
+    "answer": "Oui, une consommation excessive de sel peut provoquer de l'hypertension, un facteur de risque cardiovasculaire."
+  },
+  {
+    "question": "Quels médicaments sont prescrits pour les maladies cardiaques ?",
+    "answer": "Des bêtabloquants, des statines, des inhibiteurs de l'enzyme de conversion, des diurétiques, et des anticoagulants."
+  },
+  {
+    "question": "Quels examens détectent une artère bouchée ?",
+    "answer": "La coronarographie est l'examen de référence, parfois précédée d'un test d'effort ou d'un scanner coronarien."
+  },
+  {
+    "question": "Qu'est-ce qu'un souffle au cœur ?",
+    "answer": "C'est un bruit anormal entendu au stéthoscope, parfois bénin, parfois signe d'une anomalie valvulaire."
+  },
+  {
+    "question": "Peut-on vivre avec une maladie cardiaque ?",
+    "answer": "Oui, avec un suivi médical régulier, une hygiène de vie adaptée et parfois un traitement médicamenteux ou chirurgical."
+  },
+  {
+    "question": "L'alcool est-il mauvais pour le cœur ?",
+    "answer": "À fortes doses oui, mais une consommation modérée (par exemple vin rouge) est parfois considérée comme protectrice selon certains avis médicaux."
+  },
+  {
+    "question": "Qu'est-ce qu'une valvulopathie cardiaque ?",
+    "answer": "C'est une maladie des valves cardiaques, qui peuvent fuir (insuffisance) ou se rétrécir (sténose)."
+  },
+  {
+    "question": "Une maladie cardiaque peut-elle être héréditaire ?",
+    "answer": "Oui, certaines cardiopathies comme la cardiomyopathie hypertrophique sont d'origine génétique."
+  },
+  {
+    "question": "Le tabac endommage-t-il le cœur ?",
+    "answer": "Oui, il abîme les vaisseaux sanguins, augmente la pression artérielle et le risque de caillots."
+  }
+]
