@@ -318,6 +318,88 @@
     {
         "question": "Quel est le risque de maladie cardiaque pour une personne de 60.0 ans avec un cholestérol de 230.0 et une pression artérielle de 117.0 ?",
         "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
-}
+},
+  {
+    "question": "Quels sont les effets secondaires des bêtabloquants ?",
+    "answer": "Fatigue, ralentissement du rythme cardiaque, troubles du sommeil, mains froides."
+  },
+  {
+    "question": "Quand utilise-t-on un défibrillateur implantable ?",
+    "answer": "En cas de risque élevé d’arythmies graves ou de mort subite."
+  },
+  {
+    "question": "Qu’est-ce qu’un pacemaker ?",
+    "answer": "Un petit appareil implanté pour réguler le rythme cardiaque."
+  },
+  {
+    "question": "Combien de temps dure une opération de pontage ?",
+    "answer": "Environ 3 à 6 heures selon la complexité."
+  },
+  {
+    "question": "Le traitement de l’insuffisance cardiaque est-il à vie ?",
+    "answer": "Souvent oui, mais il permet de bien vivre avec la maladie."
+  },
+  {
+    "question": "Quels sont les effets d’un stent ?",
+    "answer": "Il maintient l’artère ouverte après une angioplastie."
+  },
+  {
+    "question": "Quelles sont les complications possibles après une angioplastie ?",
+    "answer": "Hématome, rétrécissement à nouveau de l’artère, saignements."
+  },
+  {
+    "question": "Quel est le rôle des statines ?",
+    "answer": "Elles réduisent le taux de cholestérol LDL dans le sang."
+  },
+  {
+    "question": "Peut-on guérir d'une maladie cardiaque ?",
+    "answer": "Certaines peuvent être contrôlées, mais rarement totalement guéries."
+  },
+  {
+    "question": "Quand faut-il une intervention chirurgicale sur les valves ?",
+    "answer": "Quand la fuite ou le rétrécissement valvulaire est sévère et symptomatique."
+  },
+  {
+    "question": "Peut-on faire du sport avec une maladie cardiaque ?",
+    "answer": "Oui, sous avis médical et avec une activité adaptée."
+  },
+  {
+    "question": "Peut-on voyager en avion avec une maladie cardiaque ?",
+    "answer": "Oui, sauf en cas de problème cardiaque aigu récent."
+  },
+  {
+    "question": "Un patient cardiaque peut-il avoir une vie sexuelle normale ?",
+    "answer": "Oui, sauf contre-indication médicale."
+  },
+  {
+    "question": "Quelle alimentation suivre après une crise cardiaque ?",
+    "answer": "Riche en fruits, légumes, fibres, pauvre en graisses saturées et sel."
+  },
+  {
+    "question": "Le cœur peut-il se régénérer ?",
+    "answer": "Partiellement, mais les cellules cardiaques se renouvellent lentement."
+  },
+  {
+    "question": "La rééducation cardiaque est-elle obligatoire ?",
+    "answer": "Recommandée après une crise ou une chirurgie pour améliorer la récupération."
+  },
+  {
+    "question": "Combien de fois consulter un cardiologue ?",
+    "answer": "Cela dépend de votre état, mais au moins une fois par an si suivi nécessaire."
+  },
+  {
+    "question": "Le froid est-il dangereux pour le cœur ?",
+    "answer": "Oui, il peut provoquer une vasoconstriction et augmenter la tension."
+  },
+  {
+    "question": "Comment gérer le stress après un infarctus ?",
+    "answer": "Par le soutien psychologique, la relaxation, l’activité physique douce."
+  },
+  {
+    "question": "Les médecines douces peuvent-elles aider ?",
+    "answer": "Elles peuvent compléter le traitement, mais jamais le remplacer."
+  }
+  
+
 
 ]
