@@ -1,31 +1,25 @@
 from flask import Flask, request, jsonify, render_template
-from bot import MedicalBot  # ton propre module
+from knowledge_base import KnowledgeBase
+from bot import MedicalBotFlask
 
 app = Flask(__name__)
 
-# Chargement du bot
-bot = MedicalBot("D:/CHATBOTMEDICAL2/botbuilder-tools/CardioBot/medical_knowledge.json")
+# Chargement de la KB vectorisée
+kb = KnowledgeBase("D:/CHATBOTMEDICAL2/PFA/medical_knowledge.json")
+
+# Instanciation du bot version Flask
+bot = MedicalBotFlask(kb)
 
 @app.route("/")
 def index():
-    return render_template("index.html")  # Ton fichier dans le dossier templates/
+    return render_template("index.html")
 
 @app.route("/api/ask", methods=["POST"])
 def ask():
-    try:
-        data = request.get_json()
-        user_message = data.get("message", "")
-        print(f"Question: {user_message}")
-        
-        # Appel direct à ta base de connaissance vectorielle
-        answer = bot.kb.answer_question(user_message)
-        print(f"Réponse: {answer}")
-
-        return jsonify({"response": answer})
-
-    except Exception as e:
-        print("Erreur :", e)
-        return jsonify({"response": "Désolé, une erreur est survenue."}), 500
+    data = request.get_json()
+    question = data.get("message", "")
+    response = bot.get_response(question)
+    return jsonify({"response": response})
 
 if __name__ == "__main__":
     app.run(debug=True)
