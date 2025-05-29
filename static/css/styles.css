@@ -1,0 +1,130 @@
+/* Reset de base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.login-wrapper {
+    width: 100%;
+    max-width: 450px;
+}
+
+.login-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    text-align: center;
+}
+
+.logo-img {
+    width: 150px;
+    margin-bottom: 15px;
+}
+
+h1 {
+    color: #2a5c82;
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.role-tabs {
+    display: flex;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f0f2f5;
+}
+
+.role-tab {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.role-tab.active {
+    background: #2a5c82;
+    color: white;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #444;
+    font-weight: 500;
+}
+
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border 0.3s;
+}
+
+input:focus {
+    outline: none;
+    border-color: #2a5c82;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.remember-me input {
+    margin-right: 10px;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 14px;
+    background: #2a5c82;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.login-btn:hover {
+    background: #1e4a6b;
+}
+
+.forgot-password {
+    display: inline-block;
+    margin-top: 15px;
+    color: #2a5c82;
+    text-decoration: none;
+    font-size: 14px;
+}
