@@ -1,40 +1,44 @@
 body {
-    font-family: Arial, sans-serif;
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 0 20px;
-}
-.status-container {
-    border: 1px solid #ccc;
-    padding: 15px;
-    margin: 20px 0;
-    border-radius: 5px;
-}
-.status-ok {
-    background-color: #d4edda;
-    border-color: #c3e6cb;
-    color: #155724;
-}
-.status-error {
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-    color: #721c24;
-}
-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-right: 10px;
-}
-button:hover {
-    background-color: #0069d9;
-}
-pre {
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 5px;
-    overflow-x: auto;
-}
+            font-family: Arial, sans-serif;
+            background-color: #eef;
+            padding: 30px;
+        }
+
+        #chat {
+            width: 100%;
+            max-width: 700px;
+            margin: auto;
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 10px #ccc;
+        }
+
+        .message {
+            margin: 10px 0;
+        }
+
+        .user {
+            text-align: right;
+            color: blue;
+        }
+
+        .bot {
+            text-align: left;
+            color: green;
+        }
+
+        #input-area {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+        }
+
+        button {
+            padding: 10px;
+        }
