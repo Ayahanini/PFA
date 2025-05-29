@@ -1,0 +1,84 @@
+Ma Démarche Complète de Création du Chatbot Médical avec Botpress (No-code)
+
+Dans le cadre de ce projet, j'ai conçu un chatbot médical intelligent sur la plateforme Botpress,
+en me concentrant sur une approche no-code. L’objectif principal était de créer une interface conversationnelle capable 
+de guider un utilisateur dans une auto-évaluation de symptômes cardiaques en utilisant une expérience fluide, intuitive et interactive.
+Tout cela a été réalisé sans écrire une seule ligne de code, mais en exploitant au maximum les fonctionnalités avancées de Botpress Studio.
+
+**Ma première étape a consisté à concevoir la structure logique de la conversation en utilisant l’éditeur visuel de Botpress Studio. J’ai organisé l’interaction utilisateur autour de plusieurs flows structurés, afin de garantir une navigation claire, médicale, et efficace.
+
+Flow d’accueil personnalisé :
+J’ai créé un flow d’introduction qui se déclenche automatiquement dès que l’utilisateur lance le chatbot. Ce flow contient un message de bienvenue clair et rassurant, qui explique brièvement l’objectif du chatbot : aider l’utilisateur à identifier des symptômes cardiaques de manière rapide et interactive. Cette introduction est essentielle pour instaurer une relation de confiance dès les premières secondes de la conversation.
+
+Questionnaire médical dynamique :
+J’ai construit un formulaire conversationnel composé de plusieurs cartes interactives (Cards). Celles-ci posent des questions médicales ciblées comme :
+
+"Ressentez-vous une douleur thoracique ?", "Avez-vous eu des palpitations récemment ?", "Depuis combien de jours avez-vous ces symptômes ?".
+Pour chaque question, j’ai utilisé différents types de réponses : choix multiples, réponses libres ou menus déroulants, selon le contexte. Cela permet de collecter précisément les symptômes rapportés par l’utilisateur, tout en gardant une expérience fluide et naturelle.
+
+Logique conditionnelle entre les réponses :
+J’ai configuré dans Botpress des règles conditionnelles qui orientent le chemin de la conversation selon les réponses données. Par exemple, si un utilisateur déclare une douleur aiguë persistante, le chatbot déclenche un sous-flow plus détaillé pour explorer les symptômes associés. Cette capacité à adapter dynamiquement le parcours utilisateur rend le chatbot intelligent, réactif, et pertinent médicalement.
+
+Connexion au backend via appel API (sans coder) :
+Une fois les informations collectées, j’ai configuré un appel HTTP POST directement dans l’interface Botpress (sans ligne de code), vers une API Flask hébergée localement. Ce backend utilise un modèle de machine learning pour analyser les symptômes et renvoyer un diagnostic médical préliminaire (par exemple : "Risque d’angine de poitrine modéré"). L’appel API est sécurisé et les données sont envoyées sous forme de JSON structuré.
+
+Affichage du résultat dans la conversation :
+Le bot reçoit la prédiction en réponse à l’appel API et la présente à l’utilisateur sous forme de message formaté. Le ton du message a été pensé pour être bienveillant, clair et compréhensible, en indiquant les prochaines étapes possibles (ex : "Nous vous conseillons de consulter un professionnel de santé dans les plus brefs délais"). J’ai aussi prévu une possibilité de relancer une nouvelle analyse ou terminer la session proprement.
+
+**Intégration d’une base de connaissances médicale (Knowledge Base)
+Dans une logique d’amélioration de l’intelligence et de la pertinence du chatbot, j’ai utilisé la fonctionnalité Knowledge Base (KB) proposée par Botpress pour doter le bot d’une capacité de réponse libre à des questions médicales générales. Cette fonctionnalité permet au chatbot d'accéder à une base d'informations structurée, à laquelle il peut faire appel lorsqu’un utilisateur pose une question ouverte en dehors du scénario principal.
+
+Concrètement, j’ai :
+
+Collecté des documents médicaux fiables : notamment des articles vulgarisés sur les maladies cardiovasculaires provenant de sources médicales reconnues (comme l’OMS, des articles universitaires, des portails santé certifiés, etc.).
+
+Synthétisé et formaté le contenu sous forme de paragraphes texte organisés par thème (symptômes, causes, prévention, traitements, examens médicaux).
+
+Importé ce contenu dans la section "Knowledge Base" de Botpress, en le liant à des catégories thématiques (ex. : "symptômes", "prévention", "urgences").
+
+Une fois la base configurée, le chatbot peut, via son moteur de recherche sémantique intégré, comprendre des questions formulées naturellement par l’utilisateur telles que :
+
+"Quels sont les signes d’une crise cardiaque ?"
+
+"Qu’est-ce que l’angine de poitrine ?"
+
+"Comment éviter les maladies cardiaques ?"
+
+"Quels sont les facteurs de risque ?"
+
+Il va alors chercher dans la base le contenu le plus pertinent, et répondre automatiquement avec des extraits adaptés. Cette capacité ne dépend pas d’un flow préprogrammé, mais d’un moteur de correspondance intelligente entre la question de l’utilisateur et les documents fournis, ce qui rend le bot beaucoup plus souple, intelligent et réactif.
+
+Cette intégration permet :
+
+D’élargir le rôle du chatbot à un outil d’information médicale pédagogique.
+
+De renforcer sa crédibilité en tant qu’assistant conversationnel sérieux.
+
+D’offrir une expérience utilisateur enrichie, où les utilisateurs peuvent poser librement leurs questions, même en dehors du questionnaire de symptômes.
+
+Enfin, cette démarche a été réalisée sans écrire de code, uniquement en exploitant les capacités natives de Botpress Studio. Elle illustre la puissance du no-code dans la construction de solutions conversationnelles accessibles et intelligentes.
+
+**Personnalisation de l’interface utilisateur (Webchat)
+Pour rendre l’expérience plus professionnelle et cohérente :
+
+J’ai modifié le thème du Webchat embarqué :
+
+Couleurs adaptées au domaine médical (bleu),
+
+Ajout d’un logo représentant le cœur/santé,
+
+Avatar personnalisé pour le bot.
+
+Le chatbot a été intégré dans une page HTML sur notre frontend, ce qui permet de le tester depuis notre application.
+
+L’utilisateur peut ainsi discuter avec le bot dans une interface propre, responsive et intuitive.
+
+Valeur ajoutée et apport pédagogique
+J’ai démontré qu’avec des outils no-code puissants, il est possible de construire une expérience conversationnelle médicale crédible.
+
+Le travail réalisé va au-delà de la simple création de formulaire : c’est un scénario intelligent, contextuel et évolutif.
+
+L’intégration des bases de connaissance et la logique conditionnelle renforcent la valeur ajoutée pédagogique du chatbot.
+
+Ce travail m’a permis d’acquérir une excellente maîtrise des outils visuels, de l’UX conversationnelle, de l’architecture logicielle et de l’intégration backend – même sans toucher au code.
+
