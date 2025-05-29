@@ -1,0 +1,405 @@
+[
+  {
+    "question": "Quels sont les symptômes des maladies cardiaques ?",
+    "answer": "Les symptômes incluent douleurs thoraciques, essoufflement, fatigue, palpitations, vertiges et gonflement des jambes."
+  },
+  {
+    "question": "Quels sont les facteurs de risque des maladies cardiaques ?",
+    "answer": "Les facteurs de risque incluent l'hypertension, le tabagisme, le cholestérol élevé, le diabète, l'obésité, la sédentarité et les antécédents familiaux."
+  },
+  {
+    "question": "Comment prévenir les maladies cardiaques ?",
+    "answer": "On peut les prévenir en adoptant une alimentation saine, en pratiquant une activité physique régulière, en évitant le tabac et en contrôlant sa tension artérielle."
+  },
+  {
+    "question": "Quels types de maladies cardiaques existe-t-il ?",
+    "answer": "Les principales sont : les cardiopathies ischémiques, l'insuffisance cardiaque, les troubles du rythme cardiaque et les cardiopathies congénitales."
+  },
+  {
+    "question": "Qu'est-ce qu'une crise cardiaque ?",
+    "answer": "Une crise cardiaque ou infarctus du myocarde survient lorsque l'apport sanguin à une partie du cœur est bloqué."
+  },
+  {
+    "question": "Quels sont les signes d'un infarctus ?",
+    "answer": "Douleur thoracique, sueurs, nausées, essoufflement, douleur dans le bras ou la mâchoire."
+  },
+  {
+    "question": "Comment diagnostique-t-on une maladie cardiaque ?",
+    "answer": "Grâce à des examens comme l'ECG, l'échocardiographie, les tests d'effort, ou encore les analyses sanguines."
+  },
+  {
+    "question": "Quels sont les traitements des maladies cardiaques ?",
+    "answer": "Les traitements incluent les médicaments, l'angioplastie, le pontage coronarien, et les changements de mode de vie."
+  },
+  {
+    "question": "Le stress peut-il provoquer une maladie cardiaque ?",
+    "answer": "Oui, un stress chronique peut augmenter la pression artérielle et les risques de maladies cardiaques."
+  },
+  {
+    "question": "Quel est le rôle du cholestérol dans les maladies cardiaques ?",
+    "answer": "Un excès de cholestérol peut former des plaques dans les artères, réduisant la circulation sanguine vers le cœur."
+  },
+  {
+    "question": "Qu'est-ce qu'une arythmie cardiaque ?",
+    "answer": "C'est un trouble du rythme cardiaque, comme la tachycardie, la bradycardie ou la fibrillation auriculaire."
+  },
+  {
+    "question": "Comment traite-t-on la fibrillation auriculaire ?",
+    "answer": "Avec des médicaments anticoagulants, des bêtabloquants ou une cardioversion électrique."
+  },
+  {
+    "question": "Qu'est-ce que l'insuffisance cardiaque ?",
+    "answer": "C'est une incapacité du cœur à pomper suffisamment de sang pour répondre aux besoins du corps."
+  },
+  {
+    "question": "Quels sont les symptômes de l'insuffisance cardiaque ?",
+    "answer": "Essoufflement, fatigue, jambes gonflées, prise de poids rapide, toux nocturne."
+  },
+  {
+    "question": "Qu'est-ce qu'un pontage coronarien ?",
+    "answer": "C'est une opération qui permet de contourner une artère coronaire obstruée à l'aide d'un vaisseau sanguin prélevé ailleurs."
+  },
+  {
+    "question": "À quel âge commence-t-on à surveiller le cœur ?",
+    "answer": "Dès 40 ans en général, ou plus tôt en présence de facteurs de risque comme le tabagisme ou les antécédents familiaux."
+  },
+  {
+    "question": "Quelle est la tension artérielle normale ?",
+    "answer": "Une tension normale est autour de 120/80 mmHg."
+  },
+  {
+    "question": "Qu'est-ce qu'une angioplastie ?",
+    "answer": "C'est une intervention qui consiste à débloquer une artère bouchée à l'aide d'un ballonnet et parfois d'un stent."
+  },
+  {
+    "question": "Le diabète est-il un facteur de risque cardiaque ?",
+    "answer": "Oui, le diabète multiplie les risques de maladies cardiovasculaires, surtout s'il n'est pas contrôlé."
+  },
+  {
+    "question": "Quel est le lien entre l'obésité et les maladies cardiaques ?",
+    "answer": "L'obésité augmente la tension, le cholestérol, et le risque de diabète, ce qui favorise les maladies cardiaques."
+  },
+  {
+    "question": "Quel sport est bon pour le cœur ?",
+    "answer": "La marche rapide, la natation, le vélo, et toute activité cardio modérée sont bénéfiques."
+  },
+  {
+    "question": "Faut-il éviter le sel pour le cœur ?",
+    "answer": "Oui, une consommation excessive de sel peut provoquer de l'hypertension, un facteur de risque cardiovasculaire."
+  },
+  {
+    "question": "Quels médicaments sont prescrits pour les maladies cardiaques ?",
+    "answer": "Des bêtabloquants, des statines, des inhibiteurs de l'enzyme de conversion, des diurétiques, et des anticoagulants."
+  },
+  {
+    "question": "Quels examens détectent une artère bouchée ?",
+    "answer": "La coronarographie est l'examen de référence, parfois précédée d'un test d'effort ou d'un scanner coronarien."
+  },
+  {
+    "question": "Qu'est-ce qu'un souffle au cœur ?",
+    "answer": "C'est un bruit anormal entendu au stéthoscope, parfois bénin, parfois signe d'une anomalie valvulaire."
+  },
+  {
+    "question": "Peut-on vivre avec une maladie cardiaque ?",
+    "answer": "Oui, avec un suivi médical régulier, une hygiène de vie adaptée et parfois un traitement médicamenteux ou chirurgical."
+  },
+  {
+    "question": "L'alcool est-il mauvais pour le cœur ?",
+    "answer": "À fortes doses oui, mais une consommation modérée (par exemple vin rouge) est parfois considérée comme protectrice selon certains avis médicaux."
+  },
+  {
+    "question": "Qu'est-ce qu'une valvulopathie cardiaque ?",
+    "answer": "C'est une maladie des valves cardiaques, qui peuvent fuir (insuffisance) ou se rétrécir (sténose)."
+  },
+  {
+    "question": "Une maladie cardiaque peut-elle être héréditaire ?",
+    "answer": "Oui, certaines cardiopathies comme la cardiomyopathie hypertrophique sont d'origine génétique."
+  },
+  {
+    "question": "Le tabac endommage-t-il le cœur ?",
+    "answer": "Oui, il abîme les vaisseaux sanguins, augmente la pression artérielle et le risque de caillots."
+  },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 52.0 ans avec un cholestérol de 212.0 et une pression artérielle de 125.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 53.0 ans avec un cholestérol de 203.0 et une pression artérielle de 140.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 70.0 ans avec un cholestérol de 174.0 et une pression artérielle de 145.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 61.0 ans avec un cholestérol de 203.0 et une pression artérielle de 148.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 62.0 ans avec un cholestérol de 294.0 et une pression artérielle de 138.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 58.0 ans avec un cholestérol de 248.0 et une pression artérielle de 100.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 58.0 ans avec un cholestérol de 318.0 et une pression artérielle de 114.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 55.0 ans avec un cholestérol de 289.0 et une pression artérielle de 160.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 46.0 ans avec un cholestérol de 249.0 et une pression artérielle de 120.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 54.0 ans avec un cholestérol de 286.0 et une pression artérielle de 122.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 71.0 ans avec un cholestérol de 149.0 et une pression artérielle de 112.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 43.0 ans avec un cholestérol de 341.0 et une pression artérielle de 132.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 34.0 ans avec un cholestérol de 210.0 et une pression artérielle de 118.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 51.0 ans avec un cholestérol de 298.0 et une pression artérielle de 140.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 52.0 ans avec un cholestérol de 204.0 et une pression artérielle de 128.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 34.0 ans avec un cholestérol de 210.0 et une pression artérielle de 118.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 51.0 ans avec un cholestérol de 308.0 et une pression artérielle de 140.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 54.0 ans avec un cholestérol de 266.0 et une pression artérielle de 124.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 50.0 ans avec un cholestérol de 244.0 et une pression artérielle de 120.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 58.0 ans avec un cholestérol de 211.0 et une pression artérielle de 140.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 60.0 ans avec un cholestérol de 185.0 et une pression artérielle de 140.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 67.0 ans avec un cholestérol de 223.0 et une pression artérielle de 106.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 45.0 ans avec un cholestérol de 208.0 et une pression artérielle de 104.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 63.0 ans avec un cholestérol de 252.0 et une pression artérielle de 135.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 42.0 ans avec un cholestérol de 209.0 et une pression artérielle de 120.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 61.0 ans avec un cholestérol de 307.0 et une pression artérielle de 145.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 44.0 ans avec un cholestérol de 233.0 et une pression artérielle de 130.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 58.0 ans avec un cholestérol de 319.0 et une pression artérielle de 136.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 56.0 ans avec un cholestérol de 256.0 et une pression artérielle de 130.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 55.0 ans avec un cholestérol de 327.0 et une pression artérielle de 180.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 44.0 ans avec un cholestérol de 169.0 et une pression artérielle de 120.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 50.0 ans avec un cholestérol de 244.0 et une pression artérielle de 120.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 57.0 ans avec un cholestérol de 131.0 et une pression artérielle de 130.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 70.0 ans avec un cholestérol de 269.0 et une pression artérielle de 160.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 50.0 ans avec un cholestérol de 196.0 et une pression artérielle de 129.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 46.0 ans avec un cholestérol de 231.0 et une pression artérielle de 150.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 51.0 ans avec un cholestérol de 213.0 et une pression artérielle de 125.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 59.0 ans avec un cholestérol de 271.0 et une pression artérielle de 138.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 64.0 ans avec un cholestérol de 263.0 et une pression artérielle de 128.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 57.0 ans avec un cholestérol de 229.0 et une pression artérielle de 128.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 65.0 ans avec un cholestérol de 360.0 et une pression artérielle de 160.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 54.0 ans avec un cholestérol de 258.0 et une pression artérielle de 120.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 61.0 ans avec un cholestérol de 330.0 et une pression artérielle de 130.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 46.0 ans avec un cholestérol de 249.0 et une pression artérielle de 120.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 55.0 ans avec un cholestérol de 342.0 et une pression artérielle de 132.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 42.0 ans avec un cholestérol de 226.0 et une pression artérielle de 140.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 41.0 ans avec un cholestérol de 203.0 et une pression artérielle de 135.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 66.0 ans avec un cholestérol de 228.0 et une pression artérielle de 178.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 66.0 ans avec un cholestérol de 278.0 et une pression artérielle de 146.0 ?",
+        "answer": "Cette personne présente un risque élevé de maladie cardiaque, en raison de facteurs comme un cholestérol élevé et une pression artérielle élevée."
+    },
+    {
+        "question": "Quel est le risque de maladie cardiaque pour une personne de 60.0 ans avec un cholestérol de 230.0 et une pression artérielle de 117.0 ?",
+        "answer": "Cette personne présente un risque faible de maladie cardiaque, les valeurs de cholestérol et de pression artérielle étant dans des limites normales."
+},
+  {
+    "question": "Quels sont les effets secondaires des bêtabloquants ?",
+    "answer": "Fatigue, ralentissement du rythme cardiaque, troubles du sommeil, mains froides."
+  },
+  {
+    "question": "Quand utilise-t-on un défibrillateur implantable ?",
+    "answer": "En cas de risque élevé d'arythmies graves ou de mort subite."
+  },
+  {
+    "question": "Qu'est-ce qu'un pacemaker ?",
+    "answer": "Un petit appareil implanté pour réguler le rythme cardiaque."
+  },
+  {
+    "question": "Combien de temps dure une opération de pontage ?",
+    "answer": "Environ 3 à 6 heures selon la complexité."
+  },
+  {
+    "question": "Le traitement de l'insuffisance cardiaque est-il à vie ?",
+    "answer": "Souvent oui, mais il permet de bien vivre avec la maladie."
+  },
+  {
+    "question": "Quels sont les effets d'un stent ?",
+    "answer": "Il maintient l'artère ouverte après une angioplastie."
+  },
+  {
+    "question": "Quelles sont les complications possibles après une angioplastie ?",
+    "answer": "Hématome, rétrécissement à nouveau de l'artère, saignements."
+  },
+  {
+    "question": "Quel est le rôle des statines ?",
+    "answer": "Elles réduisent le taux de cholestérol LDL dans le sang."
+  },
+  {
+    "question": "Peut-on guérir d'une maladie cardiaque ?",
+    "answer": "Certaines peuvent être contrôlées, mais rarement totalement guéries."
+  },
+  {
+    "question": "Quand faut-il une intervention chirurgicale sur les valves ?",
+    "answer": "Quand la fuite ou le rétrécissement valvulaire est sévère et symptomatique."
+  },
+  {
+    "question": "Peut-on faire du sport avec une maladie cardiaque ?",
+    "answer": "Oui, sous avis médical et avec une activité adaptée."
+  },
+  {
+    "question": "Peut-on voyager en avion avec une maladie cardiaque ?",
+    "answer": "Oui, sauf en cas de problème cardiaque aigu récent."
+  },
+  {
+    "question": "Un patient cardiaque peut-il avoir une vie sexuelle normale ?",
+    "answer": "Oui, sauf contre-indication médicale."
+  },
+  {
+    "question": "Quelle alimentation suivre après une crise cardiaque ?",
+    "answer": "Riche en fruits, légumes, fibres, pauvre en graisses saturées et sel."
+  },
+  {
+    "question": "Le cœur peut-il se régénérer ?",
+    "answer": "Partiellement, mais les cellules cardiaques se renouvellent lentement."
+  },
+  {
+    "question": "La rééducation cardiaque est-elle obligatoire ?",
+    "answer": "Recommandée après une crise ou une chirurgie pour améliorer la récupération."
+  },
+  {
+    "question": "Combien de fois consulter un cardiologue ?",
+    "answer": "Cela dépend de votre état, mais au moins une fois par an si suivi nécessaire."
+  },
+  {
+    "question": "Le froid est-il dangereux pour le cœur ?",
+    "answer": "Oui, il peut provoquer une vasoconstriction et augmenter la tension."
+  },
+  {
+    "question": "Comment gérer le stress après un infarctus ?",
+    "answer": "Par le soutien psychologique, la relaxation, l'activité physique douce."
+  },
+  {
+    "question": "Les médecines douces peuvent-elles aider ?",
+    "answer": "Elles peuvent compléter le traitement, mais jamais le remplacer."
+  }
+  
+
+
+]
