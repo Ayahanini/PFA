@@ -1,28 +1,51 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Chatbot - Maladies Cardiaques</title>
-  <link rel="stylesheet" href="/PFA/static/css/styles-dashbord.css">
-  <script src="/PFA/static/js/dashbord.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard | Chatbot Cardiaque</title>
+  <link rel="stylesheet" href="/PFA/static/css/styles-dashbord.css" />
 </head>
 <body>
+  <div class="dashboard-container">
+    <!-- Barre latérale -->
+    <aside class="sidebar">
+      <h2>CardioBot</h2>
+      <nav>
+        <ul>
+          <li><a href="#">🏠 Accueil</a></li>
+          <li><a href="#">🩺 Diagnostic</a></li>
+          <li><a href="#">📊 Statistiques</a></li>
+          <li><a href="#">⚙️ Paramètres</a></li>
+        </ul>
+      </nav>
+    </aside>
 
-  <header class="toolbar">
-    <h1>Chatbot Santé Cardiaque</h1>
-  </header>
+    <!-- Contenu principal -->
+    <div class="main-content">
+      <header class="toolbar">
+        <h1>Tableau de bord - Assistant Cardiaque</h1>
+      </header>
 
-  <main class="content">
-    <h2>Bienvenue sur le tableau de bord</h2>
-    <p>Utilisez notre assistant pour poser vos questions sur les maladies cardiaques.</p>
-    <button id="navigateBtn">Lancer le Chatbot</button>
-  </main>
+      <main class="dashboard">
+        <section class="welcome">
+          <h2>Bienvenue !</h2>
+          <p>Utilisez notre chatbot pour détecter des signes liés aux maladies cardiaques.</p>
+        </section>
 
-  <footer class="footer">
-    <p>&copy; 2025 CHU de Fès - Tous droits réservés</p>
-  </footer>
+        <section class="cards">
+          <div class="card">
+            <h3>Lancer un diagnostic</h3>
+            <p>Répondez à quelques questions et accédez au chatbot.</p>
+            <button onclick="window.location.href='chatbot.html'">Commencer</button>
+          </div>
+        </section>
+      </main>
 
-  
+      <footer class="footer">
+        <p>&copy; 2025 CHU de Fès — CardioBot. Tous droits réservés.</p>
+      </footer>
+    </div>
+  </div>
 </body>
 </html>
