@@ -1,81 +1,28 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeartBot - Suivi Cardiaque</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Font Awesome pour icônes -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="script.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Chatbot - Maladies Cardiaques</title>
+  <link rel="stylesheet" href="/PFA/static/css/styles-dashbord.css">
+  <script src="/PFA/static/js/dashbord.js"></script>
 </head>
 <body>
-    <!-- Toolbar -->
-    <header class="toolbar">
-        <h1><i class="fas fa-heartbeat"></i> HeartBot</h1>
-        <nav>
-            <button id="auth-btn"><i class="fas fa-user"></i> S'authentifier</button>
-            <button id="reminder-btn"><i class="fas fa-bell"></i> Rappels</button>
-            <button id="emergency-btn"><i class="fas fa-ambulance"></i> Urgence</button>
-        </nav>
-    </header>
 
-    <!-- Dashboard -->
-    <main class="dashboard">
-        <div class="health-summary">
-            <div class="health-card">
-                <h3><i class="fas fa-heart"></i> Rythme Cardiaque</h3>
-                <p>72 <span>bpm</span></p>
-            </div>
-            <div class="health-card">
-                <h3><i class="fas fa-tint"></i> Tension Artérielle</h3>
-                <p>120/80 <span>mmHg</span></p>
-            </div>
-        </div>
+  <header class="toolbar">
+    <h1>Chatbot Santé Cardiaque</h1>
+  </header>
 
-        <!-- Chatbot Trigger -->
-        <div class="chatbot-trigger">
-            <button id="chatbot-btn">
-                <i class="fas fa-comment-medical"></i> Chat avec HeartBot
-            </button>
-        </div>
+  <main class="content">
+    <h2>Bienvenue sur le tableau de bord</h2>
+    <p>Utilisez notre assistant pour poser vos questions sur les maladies cardiaques.</p>
+    <button id="navigateBtn">Lancer le Chatbot</button>
+  </main>
 
-        <!-- Formulaire (caché par défaut) -->
-        <div id="chatbot-form" class="hidden">
-            <h2><i class="fas fa-stethoscope"></i> Analyse Cardiaque</h2>
-            <form id="medical-form">
-                <label for="age">Âge :</label>
-                <input type="number" id="age" required>
+  <footer class="footer">
+    <p>&copy; 2025 CHU de Fès - Tous droits réservés</p>
+  </footer>
 
-                <label for="blood-pressure">Tension artérielle (mmHg) :</label>
-                <input type="text" id="blood-pressure" placeholder="Ex: 120/80" required>
-
-                <label for="symptoms">Symptômes :</label>
-                <select id="symptoms" multiple>
-                    <option value="douleur">Douleur thoracique</option>
-                    <option value="essoufflement">Essoufflement</option>
-                    <option value="fatigue">Fatigue intense</option>
-                </select>
-
-                <button type="submit" id="analyze-btn">
-                    <i class="fas fa-search"></i> Analyser
-                </button>
-            </form>
-        </div>
-
-        <!-- Résultats (caché par défaut) -->
-        <div id="results" class="hidden">
-            <h2><i class="fas fa-file-medical"></i> Votre Rapport</h2>
-            <div id="risk-level" class="risk-low">
-                <p>Risque: <span>Faible</span></p>
-            </div>
-            <button id="send-to-doctor">
-                <i class="fas fa-paper-plane"></i> Envoyer à mon médecin
-            </button>
-        </div>
-    </main>
-
-    
+  
 </body>
 </html>

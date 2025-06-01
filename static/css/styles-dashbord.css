@@ -1,0 +1,45 @@
+/* Style de base */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .toolbar {
+    background-color: #e91e63;
+    color: white;
+    padding: 15px 20px;
+    text-align: center;
+  }
+  
+  .content {
+    flex: 1;
+    padding: 40px;
+    text-align: center;
+    background-color: #f8f8f8;
+  }
+  
+  button {
+    background-color: #e91e63;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    margin-top: 20px;
+  }
+  
+  button:hover {
+    background-color: #d81b60;
+  }
+  
+  .footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+  }
+  
