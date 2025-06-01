@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CardioSanté - Plateforme de santé cardiovasculaire</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#3b82f6", secondary: "#64748b" },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <style>
+      :where([class^="ri-"])::before { content: "\f3c2"; }
+      body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #0f172a;
+      color: #e2e8f0;
+      }
+      .gradient-text {
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      }
+      .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.1);
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+      background: #1e293b;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #475569;
+      border-radius: 20px;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      background: #3b82f6;
+      border-radius: 50%;
+      cursor: pointer;
+      }
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen">
+    <header
+      class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-slate-800"
+    >
+      <div
+        class="container mx-auto px-4 py-3 flex items-center justify-between"
+      >
+        <div class="flex items-center gap-2">
+          <div
+            class="w-10 h-10 flex items-center justify-center bg-primary rounded-full"
+          >
+            <i class="ri-heart-pulse-line text-white ri-lg"></i>
+          </div>
+          <span class="text-2xl font-['Pacifico'] text-white">CardioSanté</span>
+        </div>
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="#" class="text-white hover:text-primary transition-colors"
+            >Accueil</a
+          >
+          <a
+            href="#"
+            class="text-slate-400 hover:text-primary transition-colors"
+            >Test de Risque</a
+          >
+          <a
+            href="#"
+            class="text-slate-400 hover:text-primary transition-colors"
+            >Conseils</a
+          >
+          <a
+            href="#"
+            class="text-slate-400 hover:text-primary transition-colors"
+            >Blog</a
+          >
+          <a
+            href="#"
+            class="text-slate-400 hover:text-primary transition-colors"
+            >Contact</a
+          >
+        </nav>
+        <div class="flex items-center gap-4">
+          <div class="hidden md:flex items-center gap-2">
+            <button
+              class="flex items-center gap-1 text-sm text-slate-400 hover:text-white transition-colors"
+            >
+              <span>FR</span>
+              <i class="ri-arrow-down-s-line ri-lg"></i>
+            </button>
+            <button
+              class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+            >
+              <i class="ri-moon-line ri-lg"></i>
+            </button>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              id="loginBtn"
+              class="hidden md:block px-4 py-2 text-sm text-primary border border-primary hover:bg-primary/10 transition-colors !rounded-button whitespace-nowrap"
+            >
+              Se connecter
+            </button>
+            <button
+              id="registerBtn"
+              class="px-4 py-2 text-sm text-white bg-primary hover:bg-primary/90 transition-colors !rounded-button whitespace-nowrap"
+            >
+              S'inscrire
+            </button>
+
+            <!-- Login Modal -->
+            <div
+              id="loginModal"
+              class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center"
+            >
+              <div class="bg-slate-900 p-6 rounded-lg w-full max-w-md">
+                <div class="flex justify-between items-center mb-6">
+                  <h3 class="text-xl font-semibold">Connexion</h3>
+                  <button class="close-modal text-slate-400 hover:text-white">
+                    <i class="ri-close-line ri-lg"></i>
+                  </button>
+                </div>
+                <form id="loginForm" class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium mb-2">Email</label>
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      class="w-full bg-slate-800 border border-slate-700 rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="votre@email.com"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium mb-2"
+                      >Mot de passe</label
+                    >
+                    <input
+                      type="password"
+                      name="password"
+                      required
+                      class="w-full bg-slate-800 border border-slate-700 rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="••••••••"
+                    />
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <label class="flex items-center">
+                      <input type="checkbox" class="sr-only" name="remember" />
+                      <div
+                        class="w-4 h-4 border border-slate-600 rounded mr-2"
+                      ></div>
+                      <span class="text-sm text-slate-400"
+                        >Se souvenir de moi</span
+                      >
+                    </label>
+                    <a href="#" class="text-sm text-primary hover:underline"
+                      >Mot de passe oublié ?</a
+                    >
+                  </div>
+                  <button
+                    type="submit"
+                    class="w-full px-4 py-2 bg-primary hover:bg-primary/90 text-white font-medium !rounded-button"
+                  >
+                    Se connecter
+                  </button>
+                </form>
+                <p class="mt-4 text-sm text-slate-400 text-center">
+                  Pas encore de compte ?
+                  <a
+                    href="#"
+                    class="text-primary hover:underline"
+                    id="switchToRegister"
+                    >S'inscrire</a
+                  >
+                </p>
+              </div>
+            </div>
+
+            <!-- Register Modal -->
+            <div
+              id="registerModal"
+              class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center"
+            >
+              <div class="bg-slate-900 p-6 rounded-lg w-full max-w-md">
+                <div class="flex justify-between items-center mb-6">
+                  <h3 class="text-xl font-semibold">Créer un compte</h3>
+                  <button class="close-modal text-slate-400 hover:text-white">
+                    <i class="ri-close-line ri-lg"></i>
+                  </button>
+                </div>
+                <form id="registerForm" class="space-y-4">
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium mb-2"
+                        >Prénom</label
+                      >
+                      <input
+                        type="text"
+                        name="firstName"
+                        required
+                        class="w-full bg-slate-800 border border-slate-700 rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="Prénom"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium mb-2">Nom</label>
+                      <input
+                        type="text"
+                        name="lastName"
+                        required
+                        class="w-full bg-slate-800 border border-slate-700 rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="Nom"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium mb-2">Email</label>
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      class="w-full bg-slate-800 border border-slate-700 rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="votre@email.com"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium mb-2"
+                      >Mot de passe</label
+                    >
+                    <input
+                      type="password"
+                      name="password"
+                      required
+                      class="w-full bg-slate-800 border border-slate-700 rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="••••••••"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium mb-2"
+                      >Confirmer le mot de passe</label
+                    >
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      required
+                      class="w-full bg-slate-800 border border-slate-700 rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="••••••••"
+                    />
+                  </div>
+                  <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                      <input
+                        type="checkbox"
+                        required
+                        class="sr-only"
+                        name="terms"
+                      />
+                      <div
+                        class="w-4 h-4 border border-slate-600 rounded mr-2"
+                      ></div>
+                    </div>
+                    <label class="text-sm text-slate-400">
+                      J'accepte les
+                      <a href="#" class="text-primary hover:underline"
+                        >conditions d'utilisation</a
+                      >
+                      et la
+                      <a href="#" class="text-primary hover:underline"
+                        >politique de confidentialité</a
+                      >
+                    </label>
+                  </div>
+                  <button
+                    type="submit"
+                    class="w-full px-4 py-2 bg-primary hover:bg-primary/90 text-white font-medium !rounded-button"
+                  >
+                    Créer un compte
+                  </button>
+                </form>
+                <p class="mt-4 text-sm text-slate-400 text-center">
+                  Déjà un compte ?
+                  <a
+                    href="#"
+                    class="text-primary hover:underline"
+                    id="switchToLogin"
+                    >Se connecter</a
+                  >
+                </p>
+              </div>
+            </div>
+          </div>
+          <button
+            class="md:hidden w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+          >
+            <i class="ri-menu-line ri-lg"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+    <main>
+      <!-- Hero Section -->
+      <section class="relative overflow-hidden">
+        <div
+          class="absolute inset-0 bg-gradient-to-r from-slate-900 to-transparent z-10"
+        ></div>
+        <div
+          class="absolute inset-0"
+          style="background-image: url('https://readdy.ai/api/search-image?query=A%20professional%20medical%20scene%20showing%20a%20cardiologist%20consulting%20with%20a%20patient%2C%20with%20modern%20medical%20equipment%20and%20heart%20monitoring%20displays%20in%20the%20background.%20The%20image%20should%20have%20a%20clean%2C%20blue-tinted%20medical%20aesthetic%20with%20soft%20lighting%20and%20a%20professional%20atmosphere.%20The%20left%20side%20of%20the%20image%20should%20have%20a%20dark%20gradient%20or%20empty%20space%20for%20text%20overlay&width=1920&height=1080&seq=hero1&orientation=landscape'); background-size: cover; background-position: center right;"
+        ></div>
+        <div class="container mx-auto px-4 py-20 md:py-32 relative z-20">
+          <div class="max-w-2xl">
+            <span
+              class="inline-block px-3 py-1 text-xs font-medium text-primary bg-primary/10 rounded-full mb-4"
+              >Plateforme de santé cardiovasculaire</span
+            >
+            <h1
+              class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white leading-tight"
+            >
+              Prenez soin de votre <span class="gradient-text">cœur</span>, nous
+              vous guidons
+            </h1>
+            <p class="text-lg text-slate-300 mb-8">
+              Découvrez notre plateforme intelligente qui vous aide à évaluer
+              vos risques cardiovasculaires, obtenir des conseils personnalisés
+              et communiquer avec des professionnels de santé.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4">
+              <button
+                class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium !rounded-button whitespace-nowrap"
+              >
+                Faire le test de risque
+              </button>
+              <button
+                class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-medium !rounded-button whitespace-nowrap"
+              >
+                Consulter un spécialiste
+              </button>
+            </div>
+            <div class="mt-12 flex items-center gap-6">
+              <div class="flex -space-x-4">
+                <div
+                  class="w-10 h-10 rounded-full border-2 border-slate-900 overflow-hidden"
+                  style="background-image: url('https://readdy.ai/api/search-image?query=Professional%20headshot%20of%20a%20middle-aged%20female%20doctor%20with%20a%20warm%20smile%2C%20wearing%20a%20white%20coat%20against%20a%20neutral%20background&width=100&height=100&seq=doc1&orientation=squarish'); background-size: cover;"
+                ></div>
+                <div
+                  class="w-10 h-10 rounded-full border-2 border-slate-900 overflow-hidden"
+                  style="background-image: url('https://readdy.ai/api/search-image?query=Professional%20headshot%20of%20a%20male%20doctor%20in%20his%2050s%20with%20glasses%20and%20a%20confident%20expression%2C%20wearing%20a%20white%20coat%20against%20a%20neutral%20background&width=100&height=100&seq=doc2&orientation=squarish'); background-size: cover;"
+                ></div>
+                <div
+                  class="w-10 h-10 rounded-full border-2 border-slate-900 overflow-hidden"
+                  style="background-image: url('https://readdy.ai/api/search-image?query=Professional%20headshot%20of%20a%20young%20female%20medical%20professional%20with%20a%20friendly%20expression%2C%20wearing%20scrubs%20against%20a%20neutral%20background&width=100&height=100&seq=doc3&orientation=squarish'); background-size: cover;"
+                ></div>
+              </div>
+              <div>
+                <div class="flex items-center gap-1 text-yellow-400 mb-1">
+                  <i class="ri-star-fill"></i>
+                  <i class="ri-star-fill"></i>
+                  <i class="ri-star-fill"></i>
+                  <i class="ri-star-fill"></i>
+                  <i class="ri-star-half-fill"></i>
+                  <span class="text-sm text-slate-300 ml-1">4.8/5</span>
+                </div>
+                <p class="text-sm text-slate-400">
+                  Plus de 2 500 patients satisfaits
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Features Section -->
+      <section class="py-20 bg-slate-800">
+        <div class="container mx-auto px-4">
+          <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">
+              Nos services principaux
+            </h2>
+            <p class="text-slate-400 max-w-2xl mx-auto">
+              Découvrez comment notre plateforme peut vous aider à prendre soin
+              de votre santé cardiovasculaire avec des outils innovants et
+              personnalisés.
+            </p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div
+              class="bg-slate-900 p-6 rounded-lg transition-all duration-300 card-hover"
+            >
+              <div
+                class="w-12 h-12 flex items-center justify-center bg-primary/10 text-primary rounded-lg mb-4"
+              >
+                <i class="ri-heart-pulse-line ri-lg"></i>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">Évaluation des risques</h3>
+              <p class="text-slate-400 mb-4">
+                Complétez notre test interactif pour évaluer vos risques
+                cardiovasculaires et recevoir un rapport détaillé.
+              </p>
+              <a
+                href="#"
+                class="inline-flex items-center text-primary hover:underline"
+              >
+                En savoir plus
+                <i class="ri-arrow-right-line ml-1"></i>
+              </a>
+            </div>
+            <!-- Feature 2 -->
+            <div
+              class="bg-slate-900 p-6 rounded-lg transition-all duration-300 card-hover"
+            >
+              <div
+                class="w-12 h-12 flex items-center justify-center bg-primary/10 text-primary rounded-lg mb-4"
+              >
+                <i class="ri-message-3-line ri-lg"></i>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">Assistant virtuel</h3>
+              <p class="text-slate-400 mb-4">
+                Posez vos questions à notre chatbot intelligent qui vous guidera
+                et répondra à vos préoccupations.
+              </p>
+              <a
+                href="#"
+                class="inline-flex items-center text-primary hover:underline"
+              >
+                Discuter maintenant
+                <i class="ri-arrow-right-line ml-1"></i>
+              </a>
+            </div>
+            <!-- Feature 3 -->
+            <div
+              class="bg-slate-900 p-6 rounded-lg transition-all duration-300 card-hover"
+            >
+              <div
+                class="w-12 h-12 flex items-center justify-center bg-primary/10 text-primary rounded-lg mb-4"
+              >
+                <i class="ri-calendar-check-line ri-lg"></i>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">Rendez-vous médicaux</h3>
+              <p class="text-slate-400 mb-4">
+                Prenez rendez-vous avec des cardiologues qualifiés et
+                synchronisez avec votre calendrier personnel.
+              </p>
+              <a
+                href="#"
+                class="inline-flex items-center text-primary hover:underline"
+              >
+                Prendre rendez-vous
+                <i class="ri-arrow-right-line ml-1"></i>
+              </a>
+            </div>
+            <!-- Feature 4 -->
+            <div
+              class="bg-slate-900 p-6 rounded-lg transition-all duration-300 card-hover"
+            >
+              <div
+                class="w-12 h-12 flex items-center justify-center bg-primary/10 text-primary rounded-lg mb-4"
+              >
+                <i class="ri-file-chart-line ri-lg"></i>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">Suivi personnalisé</h3>
+              <p class="text-slate-400 mb-4">
+                Accédez à votre tableau de bord pour suivre vos progrès et
+                visualiser l'évolution de vos indicateurs.
+              </p>
+              <a
+                href="#"
+                class="inline-flex items-center text-primary hover:underline"
+              >
+                Voir mon tableau de bord
+                <i class="ri-arrow-right-line ml-1"></i>
+              </a>
+            </div>
+            <!-- Feature 5 -->
+            <div
+              class="bg-slate-900 p-6 rounded-lg transition-all duration-300 card-hover"
+            >
+              <div
+                class="w-12 h-12 flex items-center justify-center bg-primary/10 text-primary rounded-lg mb-4"
+              >
+                <i class="ri-article-line ri-lg"></i>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">Ressources éducatives</h3>
+              <p class="text-slate-400 mb-4">
+                Consultez notre blog avec des articles, vidéos et infographies
+                sur la santé cardiovasculaire.
+              </p>
+              <a
+                href="#"
+                class="inline-flex items-center text-primary hover:underline"
+              >
+                Explorer le blog
+                <i class="ri-arrow-right-line ml-1"></i>
+              </a>
+            </div>
+            <!-- Feature 6 -->
+            <div
+              class="bg-slate-900 p-6 rounded-lg transition-all duration-300 card-hover"
+            >
+              <div
+                class="w-12 h-12 flex items-center justify-center bg-primary/10 text-primary rounded-lg mb-4"
+              >
+                <i class="ri-map-pin-line ri-lg"></i>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">Centres médicaux</h3>
+              <p class="text-slate-400 mb-4">
+                Localisez les hôpitaux et cardiologues proches de chez vous
+                grâce à notre carte interactive.
+              </p>
+              <a
+                href="#"
+                class="inline-flex items-center text-primary hover:underline"
+              >
+                Trouver un spécialiste
+                <i class="ri-arrow-right-line ml-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Risk Assessment Test Section -->
+      <section class="py-20 bg-slate-900">
+        <div class="container mx-auto px-4">
+          <div class="flex flex-col lg:flex-row gap-12 items-center">
+            <div class="w-full lg:w-1/2">
+              <span
+                class="inline-block px-3 py-1 text-xs font-medium text-primary bg-primary/10 rounded-full mb-4"
+                >Évaluation interactive</span
+              >
+              <h2 class="text-3xl md:text-4xl font-bold mb-6">
+                Évaluez votre risque cardiovasculaire en quelques minutes
+              </h2>
+              <p class="text-slate-400 mb-8">
+                Notre test de risque cardiaque utilise des algorithmes avancés
+                basés sur les dernières recherches médicales pour vous fournir
+                une évaluation personnalisée de votre santé cardiovasculaire.
+              </p>
+              <div class="space-y-6 mb-8">
+                <div class="flex items-start gap-4">
+                  <div
+                    class="w-10 h-10 flex items-center justify-center bg-primary/10 text-primary rounded-full mt-1 flex-shrink-0"
+                  >
+                    <i class="ri-checkbox-circle-line ri-lg"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-lg font-medium mb-1">
+                      Questionnaire complet
+                    </h4>
+                    <p class="text-slate-400">
+                      Questions sur vos antécédents médicaux, mode de vie et
+                      facteurs de risque.
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-4">
+                  <div
+                    class="w-10 h-10 flex items-center justify-center bg-primary/10 text-primary rounded-full mt-1 flex-shrink-0"
+                  >
+                    <i class="ri-bar-chart-line ri-lg"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-lg font-medium mb-1">Résultats visuels</h4>
+                    <p class="text-slate-400">
+                      Visualisez vos résultats sous forme de graphiques
+                      interactifs faciles à comprendre.
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-4">
+                  <div
+                    class="w-10 h-10 flex items-center justify-center bg-primary/10 text-primary rounded-full mt-1 flex-shrink-0"
+                  >
+                    <i class="ri-file-list-3-line ri-lg"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-lg font-medium mb-1">
+                      Recommandations personnalisées
+                    </h4>
+                    <p class="text-slate-400">
+                      Recevez des conseils adaptés à votre profil pour améliorer
+                      votre santé cardiaque.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <button
+                class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium !rounded-button whitespace-nowrap"
+              >
+                Commencer le test
+              </button>
+            </div>
+            <div class="w-full lg:w-1/2 bg-slate-800 rounded-lg p-6">
+              <div class="bg-slate-900 rounded-lg p-6 mb-6">
+                <h3 class="text-xl font-semibold mb-4">
+                  Test de risque cardiovasculaire
+                </h3>
+                <p class="text-slate-400 mb-6">
+                  Répondez aux questions ci-dessous pour obtenir une évaluation
+                  de votre risque cardiaque.
+                </p>
+                <form class="space-y-6">
+                  <div>
+                    <label class="block text-sm font-medium mb-2">Âge</label>
+                    <input
+                      type="number"
+                      class="w-full bg-slate-800 border border-slate-700 rounded text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="Entrez votre âge"
+                      min="18"
+                      max="120"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium mb-2">Sexe</label>
+                    <div class="flex gap-4">
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <div class="relative">
+                          <input
+                            type="radio"
+                            name="gender"
+                            class="sr-only"
+                            checked
+                          />
+                          <div
+                            class="w-5 h-5 border border-slate-600 rounded-full"
+                          ></div>
+                          <div
+                            class="absolute inset-0 flex items-center justify-center"
+                          >
+                            <div class="w-3 h-3 bg-primary rounded-full"></div>
+                          </div>
+                        </div>
+                        <span>Homme</span>
+                      </label>
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <div class="relative">
+                          <input type="radio" name="gender" class="sr-only" />
+                          <div
+                            class="w-5 h-5 border border-slate-600 rounded-full"
+                          ></div>
+                          <div
+                            class="absolute inset-0 flex items-center justify-center opacity-0"
+                          >
+                            <div class="w-3 h-3 bg-primary rounded-full"></div>
+                          </div>
+                        </div>
+                        <span>Femme</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium mb-2"
+                      >Pression artérielle systolique (mmHg)</label
+                    >
+                    <input
+                      type="number"
+                      class="w-full bg-slate-800 border border-slate-700 rounded text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="Ex: 120"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium mb-2">Fumeur</label>
+                    <div class="relative inline-block w-full">
+                      <div
+                        class="flex items-center justify-between bg-slate-800 border border-slate-700 rounded px-4 py-2 cursor-pointer"
+                      >
+                        <span>Non</span>
+                        <i class="ri-arrow-down-s-line"></i>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      class="flex items-center justify-between text-sm font-medium mb-2"
+                    >
+                      <span>Niveau de stress (1-10)</span>
+                      <span class="text-primary">5</span>
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="10"
+                      value="5"
+                      class="w-full h-2 bg-slate-700 rounded-full appearance-none"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    class="w-full px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium !rounded-button whitespace-nowrap"
+                  >
+                    Analyser mes résultats
+                  </button>
+                </form>
+              </div>
+              <div class="text-center text-sm text-slate-500">
+                <p>
+                  Ce test ne remplace pas un avis médical professionnel.
+                  Consultez toujours un médecin pour un diagnostic complet.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Dashboard Preview Section -->
+      <section class="py-20 bg-slate-800">
+        <div class="container mx-auto px-4">
+          <div class="text-center mb-16">
+            <span
+              class="inline-block px-3 py-1 text-xs font-medium text-primary bg-primary/10 rounded-full mb-4"
+              >Tableau de bord patient</span
+            >
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">
+              Suivez votre santé cardiaque en temps réel
+            </h2>
+            <p class="text-slate-400 max-w-2xl mx-auto">
+              Notre tableau de bord interactif vous permet de visualiser vos
+              données, suivre vos progrès et recevoir des recommandations
+              personnalisées.
+            </p>
+          </div>
+          <div class="bg-slate-900 rounded-lg p-6 shadow-xl">
+            <div class="flex flex-col lg:flex-row gap-6">
+              <!-- Sidebar -->
+              <div
+                class="w-full lg:w-64 flex-shrink-0 bg-slate-800 rounded-lg p-4"
+              >
+                <div
+                  class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-700"
+                >
+                  <div
+                    class="w-10 h-10 rounded-full overflow-hidden"
+                    style="background-image: url('https://readdy.ai/api/search-image?query=Professional%20headshot%20of%20a%20middle-aged%20man%20with%20a%20friendly%20smile%20against%20a%20neutral%20background&width=100&height=100&seq=user1&orientation=squarish'); background-size: cover;"
+                  ></div>
+                  <div>
+                    <p class="font-medium">Martin Dubois</p>
+                    <p class="text-sm text-slate-400">Patient depuis 2023</p>
+                  </div>
+                </div>
+                <nav class="space-y-1">
+                  <a
+                    href="#"
+                    class="flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary rounded"
+                  >
+                    <i class="ri-dashboard-line"></i>
+                    <span>Tableau de bord</span>
+                  </a>
+                  <a
+                    href="#"
+                    class="flex items-center gap-3 px-3 py-2 text-slate-400 hover:bg-slate-700 rounded transition-colors"
+                  >
+                    <i class="ri-heart-pulse-line"></i>
+                    <span>Mes résultats</span>
+                  </a>
+                  <a
+                    href="#"
+                    class="flex items-center gap-3 px-3 py-2 text-slate-400 hover:bg-slate-700 rounded transition-colors"
+                  >
+                    <i class="ri-calendar-line"></i>
+                    <span>Rendez-vous</span>
+                  </a>
+                  <a
+                    href="#"
+                    class="flex items-center gap-3 px-3 py-2 text-slate-400 hover:bg-slate-700 rounded transition-colors"
+                  >
+                    <i class="ri-message-3-line"></i>
+                    <span>Messages</span>
+                  </a>
+                  <a
+                    href="#"
+                    class="flex items-center gap-3 px-3 py-2 text-slate-400 hover:bg-slate-700 rounded transition-colors"
+                  >
+                    <i class="ri-settings-line"></i>
+                    <span>Paramètres</span>
+                  </a>
+                </nav>
+              </div>
+              <!-- Main Content -->
+              <div class="flex-grow">
+                <div class="flex items-center justify-between mb-6">
+                  <h3 class="text-xl font-semibold">Aperçu de votre santé</h3>
+                  <div class="flex items-center gap-2">
+                    <button
+                      class="px-3 py-1 text-sm bg-slate-800 hover:bg-slate-700 rounded"
+                    >
+                      Jour
+                    </button>
+                    <button
+                      class="px-3 py-1 text-sm bg-primary text-white rounded"
+                    >
+                      Semaine
+                    </button>
+                    <button
+                      class="px-3 py-1 text-sm bg-slate-800 hover:bg-slate-700 rounded"
+                    >
+                      Mois
+                    </button>
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div class="bg-slate-800 p-4 rounded-lg">
+                    <div class="flex items-center justify-between mb-2">
+                      <p class="text-sm text-slate-400">
+                        Risque cardiovasculaire
+                      </p>
+                      <div
+                        class="w-8 h-8 flex items-center justify-center text-yellow-400"
+                      >
+                        <i class="ri-alert-line"></i>
+                      </div>
+                    </div>
+                    <div class="flex items-end gap-2">
+                      <span class="text-2xl font-semibold">Modéré</span>
+                      <span class="text-yellow-400 text-sm">12%</span>
+                    </div>
+                  </div>
+                  <div class="bg-slate-800 p-4 rounded-lg">
+                    <div class="flex items-center justify-between mb-2">
+                      <p class="text-sm text-slate-400">Pression artérielle</p>
+                      <div
+                        class="w-8 h-8 flex items-center justify-center text-green-400"
+                      >
+                        <i class="ri-heart-pulse-line"></i>
+                      </div>
+                    </div>
+                    <div class="flex items-end gap-2">
+                      <span class="text-2xl font-semibold">125/82</span>
+                      <span class="text-green-400 text-sm">Normal</span>
+                    </div>
+                  </div>
+                  <div class="bg-slate-800 p-4 rounded-lg">
+                    <div class="flex items-center justify-between mb-2">
+                      <p class="text-sm text-slate-400">Prochain rendez-vous</p>
+                      <div
+                        class="w-8 h-8 flex items-center justify-center text-primary"
+                      >
+                        <i class="ri-calendar-check-line"></i>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-lg font-semibold block"
+                        >Dr. Sophie Laurent</span
+                      >
+                      <span class="text-sm text-slate-400"
+                        >15 juin 2025, 14:30</span
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div class="bg-slate-800 p-4 rounded-lg mb-6">
+                  <h4 class="font-medium mb-4">
+                    Évolution de votre tension artérielle
+                  </h4>
+                  <div id="bloodPressureChart" class="w-full h-64"></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="bg-slate-800 p-4 rounded-lg">
+                    <h4 class="font-medium mb-4">
+                      Répartition des facteurs de risque
+                    </h4>
+                    <div id="riskFactorsChart" class="w-full h-64"></div>
+                  </div>
+                  <div class="bg-slate-800 p-4 rounded-lg">
+                    <h4 class="font-medium mb-4">
+                      Recommandations personnalisées
+                    </h4>
+                    <div class="space-y-4">
+                      <div class="flex items-start gap-3">
+                        <div
+                          class="w-8 h-8 flex items-center justify-center bg-primary/10 text-primary rounded-full flex-shrink-0"
+                        >
+                          <i class="ri-walk-line"></i>
+                        </div>
+                        <div>
+                          <p class="font-medium">
+                            Augmentez votre activité physique
+                          </p>
+                          <p class="text-sm text-slate-400">
+                            Visez 30 minutes de marche rapide par jour
+                          </p>
+                        </div>
+                      </div>
+                      <div class="flex items-start gap-3">
+                        <div
+                          class="w-8 h-8 flex items-center justify-center bg-primary/10 text-primary rounded-full flex-shrink-0"
+                        >
+                          <i class="ri-restaurant-line"></i>
+                        </div>
+                        <div>
+                          <p class="font-medium">
+                            Réduisez votre consommation de sel
+                          </p>
+                          <p class="text-sm text-slate-400">
+                            Limitez à moins de 5g par jour
+                          </p>
+                        </div>
+                      </div>
+                      <div class="flex items-start gap-3">
+                        <div
+                          class="w-8 h-8 flex items-center justify-center bg-primary/10 text-primary rounded-full flex-shrink-0"
+                        >
+                          <i class="ri-mental-health-line"></i>
+                        </div>
+                        <div>
+                          <p class="font-medium">
+                            Pratiquez des exercices de relaxation
+                          </p>
+                          <p class="text-sm text-slate-400">
+                            10 minutes de méditation quotidienne
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Chatbot Section -->
+      <section class="py-20 bg-slate-900">
+        <div class="container mx-auto px-4">
+          <div class="flex flex-col lg:flex-row items-center gap-12">
+            <div class="w-full lg:w-1/2">
+              <span
+                class="inline-block px-3 py-1 text-xs font-medium text-primary bg-primary/10 rounded-full mb-4"
+                >Assistant virtuel</span
+              >
+              <h2 class="text-3xl md:text-4xl font-bold mb-6">
+                Posez vos questions à notre assistant intelligent
+              </h2>
+              <p class="text-slate-400 mb-8">
+                Notre chatbot spécialisé en cardiologie est disponible 24/7 pour
+                répondre à vos questions, vous guider dans l'utilisation de la
+                plateforme et vous fournir des informations fiables sur la santé
+                cardiovasculaire.
+              </p>
+              <div class="space-y-6 mb-8">
+                <div class="flex items-start gap-4">
+                  <div
+                    class="w-10 h-10 flex items-center justify-center bg-primary/10 text-primary rounded-full mt-1 flex-shrink-0"
+                  >
+                    <i class="ri-question-answer-line ri-lg"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-lg font-medium mb-1">
+                      Réponses instantanées
+                    </h4>
+                    <p class="text-slate-400">
+                      Obtenez des réponses immédiates à vos questions sur les
+                      symptômes, les médicaments ou les facteurs de risque.
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-4">
+                  <div
+                    class="w-10 h-10 flex items-center justify-center bg-primary/10 text-primary rounded-full mt-1 flex-shrink-0"
+                  >
+                    <i class="ri-shield-check-line ri-lg"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-lg font-medium mb-1">
+                      Informations fiables
+                    </h4>
+                    <p class="text-slate-400">
+                      Toutes les informations sont basées sur des sources
+                      médicales reconnues et validées par des cardiologues.
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-4">
+                  <div
+                    class="w-10 h-10 flex items-center justify-center bg-primary/10 text-primary rounded-full mt-1 flex-shrink-0"
+                  >
+                    <i class="ri-user-heart-line ri-lg"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-lg font-medium mb-1">
+                      Orientation médicale
+                    </h4>
+                    <p class="text-slate-400">
+                      Le chatbot peut vous orienter vers un professionnel de
+                      santé si nécessaire et vous aider à prendre rendez-vous.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <button
+                class="px-6 py-3 bg-primary hover:bg-primary/90 text-white font-medium !rounded-button whitespace-nowrap"
+              >
+                Discuter maintenant
+              </button>
+            </div>
+            <div class="w-full lg:w-1/2">
+              <div class="bg-slate-800 rounded-lg overflow-hidden">
+                <div class="bg-slate-900 p-4 flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-10 h-10 flex items-center justify-center bg-primary rounded-full"
+                    >
+                      <i class="ri-robot-line text-white"></i>
+                    </div>
+                    <div>
+                      <p class="font-medium">CardioBot</p>
+                      <p class="text-xs text-slate-400">Assistant virtuel</p>
+                    </div>
+                  </div>
+                  <div>
+                    <button
+                      class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white"
+                    >
+                      <i class="ri-more-2-fill"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="h-96 p-4 overflow-y-auto custom-scrollbar">
+                  <div class="flex flex-col gap-4">
+                    <!-- Bot message -->
+                    <div class="flex items-start gap-3 max-w-[80%]">
+                      <div
+                        class="w-8 h-8 flex items-center justify-center bg-primary rounded-full flex-shrink-0"
+                      >
+                        <i class="ri-robot-line text-white text-sm"></i>
+                      </div>
+                      <div class="bg-slate-700 p-3 rounded-lg rounded-tl-none">
+                        <p>
+                          Bonjour ! Je suis CardioBot, votre assistant virtuel
+                          spécialisé en santé cardiovasculaire. Comment puis-je
+                          vous aider aujourd'hui ?
+                        </p>
+                      </div>
+                    </div>
+                    <!-- User message -->
+                    <div class="flex items-start gap-3 max-w-[80%] self-end">
+                      <div class="bg-primary p-3 rounded-lg rounded-tr-none">
+                        <p>
+                          Bonjour, j'ai des douleurs à la poitrine
+                          occasionnelles. Est-ce grave ?
+                        </p>
+                      </div>
+                      <div
+                        class="w-8 h-8 flex items-center justify-center bg-slate-700 rounded-full flex-shrink-0"
+                      >
+                        <i class="ri-user-line text-sm"></i>
+                      </div>
+                    </div>
+                    <!-- Bot message -->
+                    <div class="flex items-start gap-3 max-w-[80%]">
+                      <div
+                        class="w-8 h-8 flex items-center justify-center bg-primary rounded-full flex-shrink-0"
+                      >
+                        <i class="ri-robot-line text-white text-sm"></i>
+                      </div>
+                      <div class="bg-slate-700 p-3 rounded-lg rounded-tl-none">
+                        <p>
+                          Les douleurs à la poitrine peuvent avoir diverses
+                          causes, certaines bénignes et d'autres plus sérieuses.
+                          Pourriez-vous me décrire plus précisément ces douleurs
+                          ? (localisation, durée, ce qui les déclenche ou les
+                          soulage)
+                        </p>
+                      </div>
+                    </div>
+                    <!-- User message -->
+                    <div class="flex items-start gap-3 max-w-[80%] self-end">
+                      <div class="bg-primary p-3 rounded-lg rounded-tr-none">
+                        <p>
+                          C'est plutôt au centre de la poitrine, ça dure
+                          quelques minutes et ça arrive quand je monte les
+                          escaliers rapidement.
+                        </p>
+                      </div>
+                      <div
+                        class="w-8 h-8 flex items-center justify-center bg-slate-700 rounded-full flex-shrink-0"
+                      >
+                        <i class="ri-user-line text-sm"></i>
+                      </div>
+                    </div>
+                    <!-- Bot message -->
+                    <div class="flex items-start gap-3 max-w-[80%]">
+                      <div
+                        class="w-8 h-8 flex items-center justify-center bg-primary rounded-full flex-shrink-0"
+                      >
+                        <i class="ri-robot-line text-white text-sm"></i>
+                      </div>
+                      <div class="bg-slate-700 p-3 rounded-lg rounded-tl-none">
+                        <p>
+                          Merci pour ces précisions. Des douleurs thoraciques
+                          qui surviennent à l'effort et disparaissent au repos
+                          peuvent être liées à un problème cardiaque comme
+                          l'angine de poitrine. Je vous recommande vivement de
+                          consulter un médecin dès que possible pour une
+                          évaluation approfondie.
+                        </p>
+                        <p class="mt-2">
+                          Souhaitez-vous que je vous aide à prendre rendez-vous
+                          avec un cardiologue ?
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="p-4 border-t border-slate-700">
+                  <div class="flex gap-2">
+                    <input
+                      type="text"
+                      class="flex-grow bg-slate-700 border-none rounded px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="Tapez votre message..."
+                    />
+                    <button
+                      class="w-10 h-10 flex items-center justify-center bg-primary rounded-full"
+                    >
+                      <i class="ri-send-plane-fill text-white"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Medical Centers Map Section -->
+      <section class="py-20 bg-slate-800">
+        <div class="container mx-auto px-4">
+          <div class="text-center mb-16">
+            <span
+              class="inline-block px-3 py-1 text-xs font-medium text-primary bg-primary/10 rounded-full mb-4"
+              >Centres médicaux</span
+            >
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">
+              Trouvez des spécialistes près de chez vous
+            </h2>
+            <p class="text-slate-400 max-w-2xl mx-auto">
+              Notre carte interactive vous permet de localiser les hôpitaux,
+              cliniques et cardiologues à proximité de votre emplacement.
+            </p>
+          </div>
+          <div class="bg-slate-900 rounded-lg overflow-hidden">
+            <div class="relative h-[500px] overflow-hidden">
+              <div
+                class="absolute inset-0"
+                style="background-image: url('https://public.readdy.ai/gen_page/map_placeholder_1280x720.png'); background-size: cover; background-position: center;"
+              ></div>
+              <!-- Map Markers -->
+              <div
+                class="absolute top-1/4 left-1/3 transform -translate-x-1/2 -translate-y-1/2"
+              >
+                <div class="relative group">
+                  <div
+                    class="w-8 h-8 flex items-center justify-center bg-primary rounded-full cursor-pointer animate-pulse"
+                  >
+                    <i class="ri-hospital-line text-white"></i>
+                  </div>
+                  <div
+                    class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 bg-slate-800 p-2 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                  >
+                    <p class="font-medium text-sm">Hôpital Cardiologique</p>
+                    <p class="text-xs text-slate-400">
+                      15 rue de la Santé, Paris
+                    </p>
+                    <div
+                      class="flex items-center gap-1 text-yellow-400 text-xs mt-1"
+                    >
+                      <i class="ri-star-fill"></i>
+                      <i class="ri-star-fill"></i>
+                      <i class="ri-star-fill"></i>
+                      <i class="ri-star-fill"></i>
+                      <i class="ri-star-half-fill"></i>
+                      <span class="text-slate-400 ml-1">4.7</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="absolute top-1/2 left-2/3 transform -translate-x-1/2 -translate-y-1/2"
+              >
+                <div class="relative group">
+                  <div
+                    class="w-8 h-8 flex items-center justify-center bg-primary rounded-full cursor-pointer"
+                  >
+                    <i class="ri-user-heart-line text-white"></i>
+                  </div>
+                  <div
+                    class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 bg-slate-800 p-2 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                  >
+                    <p class="font-medium text-sm">Dr. Philippe Martin</p>
+                    <p class="text-xs text-slate-400">
+                      Cardiologue, 8 avenue Montaigne
+                    </p>
+                    <div
+                      class="flex items-center gap-1 text-yellow-400 text-xs mt-1"
+                    >
+                      <i class="ri-star-fill"></i>
+                      <i class="ri-star-fill"></i>
+                      <i class="ri-star-fill"></i>
+                      <i class="ri-star-fill"></i>
+                      <i class="ri-star-line"></i>
+                      <span class="text-slate-400 ml-1">4.2</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="absolute top-3/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2"
+              >
+                <div class="relative group">
+                  <div
+                    class="w-8 h-8 flex items-center justify-center bg-secondary rounded-full cursor-pointer"
+                  >
+                    <i class="ri-building-4-line text-white"></i>
+                  </div>
+                  <div
+                    class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 bg-slate-800 p-2 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                  >
+                    <p class="font-medium text-sm">Clinique du Cœur</p>
+                    <p class="text-xs text-slate-400">
+                      23 boulevard Saint-Michel
+                    </p>
+                    <div
+                      class="flex items-center gap-1 text-yellow-400 text-xs mt-1"
+                    >
+                      <i class="ri-star-fill"></i>
+                      <i class="ri-star-fill"></i>
+                      <i class="ri-star-fill"></i>
+                      <i class="ri-star-fill"></i>
+                      <i class="ri-star-fill"></i>
+                      <span class="text-slate-400 ml-1">4.9</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Map Controls -->
+              <div
+                class="absolute top-4 left-4 bg-slate-800 rounded-lg shadow-lg p-2"
+              >
+                <div class="flex flex-col gap-2">
+                  <button
+                    class="w-8 h-8 flex items-center justify-center bg-slate-700 hover:bg-slate-600 rounded"
+                  >
+                    <i class="ri-add-line"></i>
+                  </button>
+                  <button
+                    class="w-8 h-8 flex items-center justify-center bg-slate-700 hover:bg-slate-600 rounded"
+                  >
+                    <i class="ri-subtract-line"></i>
+                  </button>
+                  <div class="border-t border-slate-700 my-1"></div>
+                  <button
+                    class="w-8 h-8 flex items-center justify-center bg-slate-700 hover:bg-slate-600 rounded"
+                  >
+                    <i class="ri-map-pin-user-line"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- Map Filters -->
+              <div
+                class="absolute top-4 right-4 bg-slate-800 rounded-lg shadow-lg p-2"
+              >
+                <div class="flex gap-2">
+                  <button
+                    class="px-3 py-1 text-xs bg-primary text-white rounded-full"
+                  >
+                    Tous
+                  </button>
+                  <button
+                    class="px-3 py-1 text-xs bg-slate-700 hover:bg-slate-600 rounded-full"
+                  >
+                    Hôpitaux
+                  </button>
+                  <button
+                    class="px-3 py-1 text-xs bg-slate-700 hover:bg-slate-600 rounded-full"
+                  >
+                    Cardiologues
+                  </button>
+                  <button
+                    class="px-3 py-1 text-xs bg-slate-700 hover:bg-slate-600 rounded-full"
+                  >
+                    Cliniques
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="p-4 border-t border-slate-700">
+              <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-grow">
+                  <div class="relative">
+                    <input
+                      type="text"
+                      class="w-full bg-slate-800 border border-slate-700 rounded pl-10 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="Rechercher par ville, code postal ou spécialité..."
+                    />
+                    <div
+                      class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                    >
+                      <i class="ri-search-line text-slate-400"></i>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  class="px-6 py-2 bg-primary hover:bg-primary/90 text-white font-medium !rounded-button whitespace-nowrap"
+                >
+                  Rechercher
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="mt-8 text-center">
+            <p class="text-slate-400">
+              Vous ne trouvez pas de spécialiste près de chez vous ?
+            </p>
+            <a
+              href="#"
+              class="inline-flex items-center text-primary hover:underline mt-2"
+            >
+              Consultez notre annuaire complet
+              <i class="ri-arrow-right-line ml-1"></i>
+            </a>
+          </div>
+        </div>
+      </section>
+      <!-- Testimonials Section -->
+      <section class="py-20 bg-slate-900">
+        <div class="container mx-auto px-4">
+          <div class="text-center mb-16">
+            <span
+              class="inline-block px-3 py-1 text-xs font-medium text-primary bg-primary/10 rounded-full mb-4"
+              >Témoignages</span
+            >
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">
+              Ce que nos utilisateurs disent
+            </h2>
+            <p class="text-slate-400 max-w-2xl mx-auto">
+              Découvrez comment notre plateforme a aidé des personnes à prendre
+              soin de leur santé cardiovasculaire.
+            </p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Testimonial 1 -->
+            <div class="bg-slate-800 p-6 rounded-lg">
+              <div class="flex items-center gap-1 text-yellow-400 mb-4">
+                <i class="ri-star-fill"></i>
+                <i class="ri-star-fill"></i>
+                <i class="ri-star-fill"></i>
+                <i class="ri-star-fill"></i>
+                <i class="ri-star-fill"></i>
+              </div>
+              <p class="text-slate-300 mb-6">
+                "Grâce au test de risque cardiovasculaire, j'ai découvert que
+                j'avais plusieurs facteurs de risque. J'ai suivi les
+                recommandations personnalisées et après 6 mois, mes indicateurs
+                se sont nettement améliorés."
+              </p>
+              <div class="flex items-center gap-4">
+                <div
+                  class="w-12 h-12 rounded-full overflow-hidden"
+                  style="background-image: url('https://readdy.ai/api/search-image?query=Professional%20headshot%20of%20a%20middle-aged%20woman%20with%20short%20blonde%20hair%20and%20a%20warm%20smile%20against%20a%20neutral%20background&width=100&height=100&seq=test1&orientation=squarish'); background-size: cover;"
+                ></div>
+                <div>
+                  <p class="font-medium">Isabelle Moreau</p>
+                  <p class="text-sm text-slate-400">52 ans, Paris</p>
+                </div>
+              </div>
+            </div>
+            <!-- Testimonial 2 -->
+            <div class="bg-slate-800 p-6 rounded-lg">
+              <div class="flex items-center gap-1 text-yellow-400 mb-4">
+                <i class="ri-star-fill"></i>
+                <i class="ri-star-fill"></i>
+                <i class="ri-star-fill"></i>
+                <i class="ri-star-fill"></i>
+                <i class="ri-star-half-fill"></i>
+              </div>
+              <p class="text-slate-300 mb-6">
+                "Le chatbot m'a aidé à comprendre mes symptômes et m'a encouragé
+                à consulter rapidement. Le cardiologue a confirmé que j'avais
+                une arythmie qui nécessitait un traitement. Cette plateforme m'a
+                peut-être sauvé la vie."
+              </p>
+              <div class="flex items-center gap-4">
+                <div
+                  class="w-12 h-12 rounded-full o
