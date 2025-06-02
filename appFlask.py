@@ -38,7 +38,8 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 HEART_MODEL_PATH = os.path.join(BASE_DIR, 'modele_heart.pkl')
 heart_model_data = None
-@app.route('/cardiac-predict', methods=['POST'])
+@main_bp.route('/cardiac-predict', methods=['POST'])
+@login_required
 def cardiac_predict():
     try:
         # Récupérer les données JSON
