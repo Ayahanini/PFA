@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cardiaque Simplifié</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f8ff;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #e74c3c;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .description {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #555;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .risk-low {
+            background-color: #d4efdf;
+            border-left: 5px solid #27ae60;
+        }
+        
+        .risk-high {
+            background-color: #fadbd8;
+            border-left: 5px solid #e74c3c;
+        }
+        
+        .result h2 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .result p {
+            margin-bottom: 10px;
+        }
+        
+        .recommendations {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #ccc;
+        }
+        
+        .recommendations h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .recommendations ul {
+            padding-left: 20px;
+        }
+        
+        .recommendations li {
+            margin-bottom: 8px;
+        }
+        
+        .progress-container {
+            height: 30px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Évaluation du Risque Cardiaque</h1>
+        
+        <p class="description">
+            Cette évaluation est basée sur le dataset médical Heart Disease. Remplissez les informations ci-dessous pour obtenir une estimation de votre risque cardiaque.
+        </p>
+        
+        <form id="cardiacForm">
+            <div class="form-group">
+                <label for="age">Âge (ans)</label>
+                <input type="number" id="age" min="0" max="120" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="sex">Sexe</label>
+                <select id="sex" required>
+                    <option value="">Sélectionnez</option>
+                    <option value="0">Femme</option>
+                    <option value="1">Homme</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="cp">Type de douleur thoracique</label>
+                <select id="cp" required>
+                    <option value="">Sélectionnez</option>
+                    <option value="0">Typical angina</option>
+                    <option value="1">Atypical angina</option>
+                    <option value="2">Non-anginal pain</option>
+                    <option value="3">Asymptomatic</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="trestbps">Pression artérielle au repos (mm Hg)</label>
+                <input type="number" id="trestbps" min="0" max="250" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="chol">Cholestérol (mg/dl)</label>
+                <input type="number" id="chol" min="0" max="600" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="fbs">Glycémie à jeun > 120 mg/dl</label>
+                <select id="fbs" required>
+                    <option value="">Sélectionnez</option>
+                    <option value="0">Non</option>
+                    <option value="1">Oui</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="restecg">Résultat électrocardiographique au repos</label>
+                <select id="restecg" required>
+                    <option value="">Sélectionnez</option>
+                    <option value="0">Normal</option>
+                    <option value="1">Anomalie onde ST-T</option>
+                    <option value="2">Hypertrophie ventriculaire gauche probable</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="thalach">Fréquence cardiaque maximale atteinte</label>
+                <input type="number" id="thalach" min="0" max="250" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="exang">Angine provoquée par l'exercice</label>
+                <select id="exang" required>
+                    <option value="">Sélectionnez</option>
+                    <option value="0">Non</option>
+                    <option value="1">Oui</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="oldpeak">Dépression ST induite par l'exercice</label>
+                <input type="number" id="oldpeak" step="0.1" min="0" max="10" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="slope">Pente du segment ST de pointe à l'effort</label>
+                <select id="slope" required>
+                    <option value="">Sélectionnez</option>
+                    <option value="0">Pente ascendante</option>
+                    <option value="1">Plate</option>
+                    <option value="2">Pente descendante</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="ca">Nombre de vaisseaux principaux colorés</label>
+                <select id="ca" required>
+                    <option value="">Sélectionnez</option>
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="thal">Résultat du test au thallium</label>
+                <select id="thal" required>
+                    <option value="">Sélectionnez</option>
+                    <option value="1">Normal</option>
+                    <option value="2">Défaut fixe</option>
+                    <option value="3">Défaut réversible</option>
+                </select>
+            </div>
+            
+            <button type="submit">Évaluer le risque cardiaque</button>
+        </form>
+        
+        <div class="loading" id="loading">
+            Analyse en cours...
+        </div>
+        
+        <div class="result" id="result">
+            <h2>Résultat de l'analyse</h2>
+            <p id="resultMessage"></p>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="riskBar"></div>
+            </div>
+            
+            <p id="probabilityText"></p>
+            
+            <div class="recommendations">
+                <h3>Recommandations</h3>
+                <ul id="recommendationsList"></ul>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Ce test est basé sur un modèle prédictif et ne remplace pas une consultation médicale professionnelle.</p>
+            <p>© 2023 - Évaluation Cardiaque</p>
+        </div>
+    </div>
+    
+    <script>
+       document.getElementById('cardiacForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Afficher le loader
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('result').style.display = 'none';
+    
+    try {
+        // Collecter les données du formulaire
+        const formData = {
+            age: parseFloat(document.getElementById('age').value),
+            sex: parseFloat(document.getElementById('sex').value),
+            cp: parseFloat(document.getElementById('cp').value),
+            trestbps: parseFloat(document.getElementById('trestbps').value),
+            chol: parseFloat(document.getElementById('chol').value),
+            fbs: parseFloat(document.getElementById('fbs').value),
+            restecg: parseFloat(document.getElementById('restecg').value),
+            thalach: parseFloat(document.getElementById('thalach').value),
+            exang: parseFloat(document.getElementById('exang').value),
+            oldpeak: parseFloat(document.getElementById('oldpeak').value),
+            slope: parseFloat(document.getElementById('slope').value),
+            ca: parseFloat(document.getElementById('ca').value),
+            thal: parseFloat(document.getElementById('thal').value)
+        };
+        
+        // Envoyer les données à l'API
+        const response = await fetch('https://votre-api.com/cardiac-predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        // Vérifier si la réponse est OK
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Erreur API: ${response.status} - ${errorData.error || 'Pas de détails'}`);
+        }
+        
+        const result = await response.json();
+        
+        // Masquer le loader
+        document.getElementById('loading').style.display = 'none';
+        
+        // Afficher les résultats
+        displayResults(result);
+        
+    } catch (error) {
+        document.getElementById('loading').style.display = 'none';
+        
+        // Afficher le détail de l'erreur
+        const errorContainer = document.getElementById('errorDetails');
+        if (!errorContainer) {
+            // Créer un conteneur d'erreur s'il n'existe pas
+            const container = document.createElement('div');
+            container.id = 'errorDetails';
+            container.style.background = '#f8d7da';
+            container.style.padding = '15px';
+            container.style.borderRadius = '5px';
+            container.style.marginTop = '20px';
+            container.style.color = '#721c24';
+            container.innerHTML = `
+                <h3>Erreur détaillée</h3>
+                <p>${error.message}</p>
+                <button onclick="this.parentElement.remove()" 
+                        style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
+                    Fermer
+                </button>
+            `;
+            document.querySelector('.container').appendChild(container);
+        } else {
+            // Mettre à jour le conteneur existant
+            errorContainer.querySelector('p').textContent = error.message;
+        }
+        
+        console.error('Détails de l\'erreur:', error);
+    }
+});
+
+        
+        function displayResults(data) {
+            const resultContainer = document.getElementById('result');
+            const resultMessage = document.getElementById('resultMessage');
+            const riskBar = document.getElementById('riskBar');
+            const probabilityText = document.getElementById('probabilityText');
+            const recommendationsList = document.getElementById('recommendationsList');
+            
+            // Calculer le pourcentage de risque
+            const riskPercent = Math.round(data.probability * 100);
+            
+            // Définir le message et la classe CSS en fonction du risque
+            if (data.prediction === 1) {
+                resultContainer.className = 'result risk-high';
+                resultMessage.textContent = 'Risque cardiaque élevé détecté';
+                resultMessage.style.color = '#e74c3c';
+                riskBar.style.backgroundColor = '#e74c3c';
+                
+                recommendationsList.innerHTML = `
+                    <li>Consultez un cardiologue dans les plus brefs délais</li>
+                    <li>Évitez les activités physiques intenses</li>
+                    <li>Surveillez régulièrement votre tension artérielle</li>
+                    <li>Évitez le tabac et limitez votre consommation d'alcool</li>
+                    <li>Adoptez une alimentation pauvre en sel et en graisses saturées</li>
+                `;
+            } else {
+                resultContainer.className = 'result risk-low';
+                resultMessage.textContent = 'Risque cardiaque faible';
+                resultMessage.style.color = '#27ae60';
+                riskBar.style.backgroundColor = '#27ae60';
+                
+                recommendationsList.innerHTML = `
+                    <li>Continuez vos bilans de santé réguliers</li>
+                    <li>Maintenez une alimentation équilibrée riche en fruits et légumes</li>
+                    <li>Pratiquez une activité physique régulière (30 min/jour)</li>
+                    <li>Évitez le stress excessif et dormez suffisamment</li>
+                    <li>Limitez votre consommation d'alcool et évitez le tabac</li>
+                `;
+            }
+            
+            // Mettre à jour la barre de progression
+            riskBar.style.width = `${riskPercent}%`;
+            riskBar.textContent = `${riskPercent}%`;
+            
+            // Mettre à jour le texte de probabilité
+            probabilityText.textContent = `Probabilité estimée : ${riskPercent}%`;
+            
+            // Afficher les résultats
+            resultContainer.style.display = 'block';
+            
+            // Faire défiler jusqu'aux résultats
+            resultContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Valeurs par défaut pour le test
+        document.getElementById('age').value = 52;
+        document.getElementById('sex').value = 1;
+        document.getElementById('cp').value = 0;
+        document.getElementById('trestbps').value = 125;
+        document.getElementById('chol').value = 212;
+        document.getElementById('fbs').value = 0;
+        document.getElementById('restecg').value = 1;
+        document.getElementById('thalach').value = 168;
+        document.getElementById('exang').value = 0;
+        document.getElementById('oldpeak').value = 1.0;
+        document.getElementById('slope').value = 2;
+        document.getElementById('ca').value = 2;
+        document.getElementById('thal').value = 3;
+    </script>
+</body>
+</html>

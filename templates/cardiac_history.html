@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Historique des Tests Cardiaques</h2>
+        <a href="{{ url_for('main.cardiac_test') }}" class="btn btn-primary">
+            Nouveau Test
+        </a>
+    </div>
+    
+    {% if not tests %}
+    <div class="alert alert-info">
+        Vous n'avez effectué aucun test cardiaque pour le moment.
+    </div>
+    {% else %}
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date du Test</th>
+                            <th>Risque</th>
+                            <th>Probabilité</th>
+                            <th>Détails</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for test in tests %}
+                        <tr>
+                            <td>{{ test.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'danger' if test.result.prediction == 1 else 'success' }}">
+                                    {{ 'Élevé' if test.result.prediction == 1 else 'Faible' }}
+                                </span>
+                            </td>
+                            <td>{{ (test.result.probability * 100) | round(1) }}%</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info" 
+                                        type="button" 
+                                        data-bs-toggle="collapse" 
+                                        data-bs-target="#details-{{ test.id }}">
+                                    Voir détails
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="collapse" id="details-{{ test.id }}">
+                            <td colspan="4">
+                                <div class="p-3 bg-light rounded">
+                                    <h5>Données du test:</h5>
+                                    <ul>
+                                        {% for key, value in test.test_data.input.items() %}
+                                        <li><strong>{{ key }}:</strong> {{ value }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
