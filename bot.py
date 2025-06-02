@@ -1,29 +1,67 @@
+from botbuilder.core import TurnContext, ActivityHandler, MessageFactory
+from botbuilder.schema import Activity
+from knowledge_base import KnowledgeBase
+from typing import Dict
+import json
+
 class UserProfile:
     def __init__(self):
         self.history = []
 
-class MedicalBotFlask:
-    def __init__(self, kb):
-        self.kb = kb
-        self.user_profile = UserProfile()
+class MedicalBotFlask(ActivityHandler):
+    def __init__(self, kb_path: str = "medical_knowledge.json"):
+        super().__init__()
+        self.kb = KnowledgeBase(kb_path)
+        self.user_profiles: Dict[str, UserProfile] = {}
 
-    def get_response(self, user_question: str) -> str:
-        user_question = user_question.strip()
+    def _get_user_profile(self, user_id: str) -> UserProfile:
+        """Obtient ou crée un profil utilisateur"""
+        if user_id not in self.user_profiles:
+            self.user_profiles[user_id] = UserProfile()
+        return self.user_profiles[user_id]
 
-        if not user_question:
+    async def on_message_activity(self, turn_context: TurnContext):
+        user_input = turn_context.activity.text.strip()
+        user_id = turn_context.activity.from_property.id
+        
+        # Gestion spéciale de la commande historique
+        if user_input.lower() == "voir l'historique":
+            response = self._handle_history_command(user_id)
+        else:
+            response = self._generate_response(user_input, user_id)
+        
+        await turn_context.send_activity(MessageFactory.text(response))
+
+    def _handle_history_command(self, user_id: str) -> str:
+        """Gère la commande spéciale pour afficher l'historique"""
+        profile = self._get_user_profile(user_id)
+        if not profile.history:
+            return "ℹ️ Aucun historique trouvé."
+        
+        history_text = "\n".join([f"❓ {q}\n💬 {a}" for q, a in profile.history])
+        return f"🧾 Historique:\n{history_text}"
+
+    def _generate_response(self, user_input: str, user_id: str) -> str:
+        """Génère une réponse normale et met à jour l'historique"""
+        if not user_input:
             return "❓ Pouvez-vous reformuler votre question ?"
-
-        if user_question.lower() == "voir l'historique":
-            if not self.user_profile.history:
-                return "ℹ️ Aucun historique trouvé."
-            else:
-                history_text = "\n\n".join([f"❓ {q}\n💬 {a}" for q, a in self.user_profile.history])
-                return f"🧾 Voici l'historique de vos échanges :\n\n{history_text}"
-
-        # Simule un "typing" côté frontend (optionnel à gérer dans JS)
-        # time.sleep(5) —> À gérer côté frontend (afficher un loader 5 sec)
-
-        response = self.kb.answer_question(user_question)
-        self.user_profile.history.append((user_question, response))
+        
+        profile = self._get_user_profile(user_id)
+        response = self.kb.answer_question(user_input)
+        
+        # Mise à jour de l'historique
+        profile.history.append((user_input, response))
+        if len(profile.history) > 50:
+            profile.history = profile.history[-50:]
+        
         return response
 
+    # Fonction pour l'intégration Flask
+    def get_bot_response(self, user_message: str, user_id: str = "default_user") -> dict:
+        """Wrapper pour l'intégration avec Flask"""
+        response = self._generate_response(user_message, user_id)
+        return {
+            "type": "message",
+            "text": response,
+            "user_id": user_id
+        }
