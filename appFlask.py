@@ -12,6 +12,8 @@ from flask_wtf.csrf import CSRFProtect, generate_csrf
 from flask_cors import CORS
 from wtforms import ValidationError
 from bot import MedicalBotFlask  # Importer votre bot personnalisé
+# Blueprint principal
+main_bp = Blueprint('main', __name__)
 # Initialisation de l'application Flask
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'votre-cle-secrete-tres-longue-et-complexe'
@@ -25,7 +27,244 @@ csrf = CSRFProtect(app)
 
 
 bot = MedicalBotFlask("D:/CHATBOTMEDICAL2/PFA/medical_knowledge.json")
+# Ajouter ces imports en haut du fichier
+import joblib
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import StandardScaler
 
+# Charger le modèle cardiaque (ajouter après les autres initialisations)
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+HEART_MODEL_PATH = os.path.join(BASE_DIR, 'modele_heart.pkl')
+heart_model_data = None
+@app.route('/cardiac-predict', methods=['POST'])
+def cardiac_predict():
+    try:
+        # Récupérer les données JSON
+        data = request.get_json()
+        app.logger.info(f"Données reçues: {data}")
+        
+        # Vérifier que toutes les clés sont présentes
+        required_keys = ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 
+                         'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal']
+        
+        for key in required_keys:
+            if key not in data:
+                app.logger.error(f"Clé manquante: {key}")
+                return jsonify({"error": f"Donnée manquante: {key}"}), 400
+        
+        # Convertir les données en DataFrame
+        df = pd.DataFrame([data])
+        
+        # Charger le modèle
+        model_data = load_heart_model()
+        if not model_data:
+            app.logger.error("Modèle non disponible")
+            return jsonify({"error": "Modèle non disponible"}), 500
+        
+        # Vérifier que les colonnes correspondent
+        model_features = model_data['features']
+        if set(df.columns) != set(model_features):
+            app.logger.error(f"Colonnes incompatibles. Reçues: {df.columns}, Attendues: {model_features}")
+            return jsonify({
+                "error": "Colonnes incompatibles",
+                "received": list(df.columns),
+                "expected": model_features
+            }), 400
+        
+        # Réorganiser les colonnes selon l'ordre attendu par le modèle
+        df = df[model_features]
+        
+        # Faire la prédiction
+        pipeline = model_data['model']
+        try:
+            proba = pipeline.predict_proba(df)[0][1]
+        except Exception as e:
+            app.logger.error(f"Erreur lors de la prédiction: {str(e)}")
+            return jsonify({"error": "Erreur de prédiction", "details": str(e)}), 500
+        
+        prediction = 1 if proba >= 0.5 else 0
+        
+        # Journaliser le résultat
+        app.logger.info(f"Prédiction réussie: prediction={prediction}, probabilité={proba}")
+        
+        return jsonify({
+            "prediction": prediction,
+            "probability": float(proba),
+            "message": "Risque cardiaque élevé" if prediction == 1 else "Risque cardiaque faible"
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Erreur non gérée: {str(e)}")
+        return jsonify({"error": "Erreur interne du serveur"}), 500
+@main_bp.route('/cardiac-test')
+@login_required
+def cardiac_test():
+    """Affiche le formulaire de test cardiaque"""
+    app.logger.info("Tentative de chargement du modèle cardiaque")
+    model_data = load_heart_model()
+    
+    if not model_data:
+        app.logger.error("Échec du chargement du modèle cardiaque")
+        flash("Erreur technique : le modèle médical est indisponible. Contactez l'administrateur.", "danger")
+        return redirect(url_for('main.index'))
+    
+    app.logger.info(f"Modèle chargé avec {len(model_data['features'])} features")
+    features = model_data['features']
+    exemple = model_data.get('exemple', {})
+    
+    return render_template('cardiac_test.html', 
+                          features=features, 
+                          exemple=exemple,
+                          user=current_user)
+def load_heart_model():
+    """Charge le modèle cardiaque avec gestion robuste des erreurs"""
+    global heart_model_data
+    
+    if heart_model_data is not None:
+        return heart_model_data
+    
+    # Vérifier si le fichier existe
+    if not os.path.exists(HEART_MODEL_PATH):
+        app.logger.error(f"Fichier modèle introuvable: {HEART_MODEL_PATH}")
+        return None
+    
+    try:
+        # Charger le fichier
+        loaded_data = joblib.load(HEART_MODEL_PATH)
+        app.logger.info("Fichier modèle chargé avec succès")
+        
+        # Vérifier la structure
+        if not isinstance(loaded_data, dict):
+            app.logger.error("Le fichier modèle n'est pas un dictionnaire")
+            return None
+            
+        if 'model' not in loaded_data:
+            app.logger.error("Clé 'model' manquante dans le fichier modèle")
+            return None
+            
+        # Vérifier les features
+        if 'features' not in loaded_data:
+            app.logger.warning("Clé 'features' manquante - tentative de récupération")
+            
+            # Essayer de récupérer les noms de colonnes à partir du modèle
+            try:
+                pipeline = loaded_data['model']
+                
+                # Méthode 1: pour les versions récentes de scikit-learn
+                if hasattr(pipeline, 'feature_names_in_'):
+                    features = pipeline.feature_names_in_.tolist()
+                    app.logger.info(f"Features récupérées via feature_names_in_: {features}")
+                
+                # Méthode 2: pour les pipelines StandardScaler
+                elif (hasattr(pipeline, 'named_steps') and 
+                      'scaler' in pipeline.named_steps and 
+                      hasattr(pipeline.named_steps['scaler'], 'feature_names_in_')):
+                    scaler = pipeline.named_steps['scaler']
+                    features = scaler.feature_names_in_.tolist()
+                    app.logger.info(f"Features récupérées via le scaler: {features}")
+                
+                # Méthode 3: liste par défaut (à adapter à votre dataset)
+                else:
+                    features = [
+                        'age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 
+                        'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal'
+                    ]
+                    app.logger.warning(f"Utilisation des features par défaut: {features}")
+                
+                loaded_data['features'] = features
+                
+            except Exception as e:
+                app.logger.error(f"Erreur récupération features: {str(e)}")
+                return None
+        
+        # Vérifier l'exemple
+        if 'exemple' not in loaded_data:
+            app.logger.warning("Clé 'exemple' manquante - création d'un exemple par défaut")
+            loaded_data['exemple'] = {feature: 0.0 for feature in loaded_data['features']}
+        
+        heart_model_data = loaded_data
+        return heart_model_data
+        
+    except Exception as e:
+        app.logger.error(f"Erreur chargement modèle cardiaque: {str(e)}")
+        return None
+@app.route('/check-model')
+def check_model():
+    """Vérifie l'état du modèle médical"""
+    model_data = load_heart_model()
+    
+    if not model_data:
+        return jsonify({
+            "status": "error",
+            "message": "Modèle non disponible",
+            "path": HEART_MODEL_PATH,
+            "exists": os.path.exists(HEART_MODEL_PATH)
+        }), 500
+    
+    return jsonify({
+        "status": "success",
+        "features": model_data.get('features', []),
+        "exemple": model_data.get('exemple', {}),
+        "model_type": str(type(model_data['model']))
+    })
+def save_cardiac_result(user_id, input_data, result):
+    """Enregistre le résultat du test dans la base de données"""
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    try:
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS cardiac_tests (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER REFERENCES users(id),
+                test_data JSONB NOT NULL,
+                result JSONB NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        
+        cur.execute("""
+            INSERT INTO cardiac_tests (user_id, test_data, result)
+            VALUES (%s, %s, %s)
+        """, (user_id, 
+              {'input': input_data}, 
+              {'prediction': result['prediction'], 
+               'probability': result['probability']}))
+        
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        app.logger.error(f"Erreur sauvegarde résultat: {str(e)}")
+    finally:
+        cur.close()
+        conn.close()
+
+# Ajouter cette route pour l'historique des tests
+@main_bp.route('/cardiac-history')
+@login_required
+def cardiac_history():
+    """Affiche l'historique des tests cardiaques de l'utilisateur"""
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=extras.DictCursor)
+    
+    try:
+        cur.execute("""
+            SELECT * FROM cardiac_tests 
+            WHERE user_id = %s 
+            ORDER BY created_at DESC
+        """, (current_user.id,))
+        
+        tests = cur.fetchall()
+        return render_template('cardiac_history.html', tests=tests, user=current_user)
+    except Exception as e:
+        app.logger.error(f"Erreur historique cardiaque: {str(e)}")
+        flash("Erreur lors du chargement de l'historique", "danger")
+        return redirect(url_for('main.profile'))
+    finally:
+        cur.close()
+        conn.close()
 @app.route('/api/messages', methods=['POST'])
 @login_required
 def handle_message():
@@ -263,8 +502,7 @@ def logout():
     flash('Vous avez été déconnecté avec succès.', 'info')
     return redirect(url_for('auth.login'))
 
-# Blueprint principal
-main_bp = Blueprint('main', __name__)
+
 
 @main_bp.route('/')
 def index():
@@ -279,7 +517,30 @@ def chatbot():
 @main_bp.route('/profile')
 @login_required
 def profile():
-    return render_template('profile.html', user=current_user)
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=extras.DictCursor)
+    
+    try:
+        # Récupérer les tests cardiaques de l'utilisateur
+        cur.execute("""
+            SELECT * FROM cardiac_tests 
+            WHERE user_id = %s 
+            ORDER BY created_at DESC
+            LIMIT 10
+        """, (current_user.id,))
+        
+        cardiac_tests = cur.fetchall()
+        
+        return render_template('profile.html', 
+                              user=current_user,
+                              cardiac_tests=cardiac_tests)
+    except Exception as e:
+        app.logger.error(f"Erreur chargement profil: {str(e)}")
+        flash("Erreur lors du chargement du profil", "danger")
+        return redirect(url_for('main.index'))
+    finally:
+        cur.close()
+        conn.close()
 
 @main_bp.route('/ask', methods=['POST'])
 @login_required
