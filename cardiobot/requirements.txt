@@ -1,9 +1,0 @@
-aiohttp
-botbuilder-core
-botbuilder-schema
-botbuilder-integration-aiohttp
-faiss-cpu
-numpy
-sentence-transformers
-sumy
-nltk
