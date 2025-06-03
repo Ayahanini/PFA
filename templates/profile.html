@@ -72,56 +72,63 @@
                         </thead>
                         <tbody>
                             {% for test in cardiac_tests %}
-                            <tr>
-                                <td>{{ test.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
-                                <td>
-                                    <span class="badge bg-{{ 'danger' if test.result.prediction == 1 else 'success' }}">
-                                        {{ 'Élevé' if test.result.prediction == 1 else 'Faible' }}
-                                    </span>
-                                </td>
-                                <td>{{ (test.result.probability * 100) | round(1) }}%</td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-info" 
-                                            type="button" 
-                                            data-bs-toggle="collapse" 
-                                            data-bs-target="#details-{{ test.id }}">
-                                        <i class="bi bi-eye"></i> Détails
-                                    </button>
-                                    <a href="#" class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr class="collapse" id="details-{{ test.id }}">
-                                <td colspan="4">
-                                    <div class="p-3 bg-light rounded">
-                                        <h6>Données du test:</h6>
-                                        <div class="row">
-                                            {% for key, value in test.test_data.input.items() %}
-                                            <div class="col-md-4 mb-2">
-                                                <strong>{{ key | replace('_', ' ') | title }}:</strong> 
-                                                <span>{{ value }}</span>
-                                            </div>
-                                            {% endfor %}
-                                        </div>
-                                        <div class="mt-3">
-                                            <h6>Recommandations:</h6>
-                                            <ul>
-                                                {% if test.result.prediction == 1 %}
-                                                <li>Consultez un cardiologue rapidement</li>
-                                                <li>Évitez les activités physiques intenses</li>
-                                                <li>Surveillez votre tension artérielle</li>
-                                                {% else %}
-                                                <li>Continuez vos bilans de santé réguliers</li>
-                                                <li>Maintenez une alimentation équilibrée</li>
-                                                <li>Pratiquez une activité physique régulière</li>
-                                                {% endif %}
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
+<tr>
+    <td>{{ test.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+    <td>
+        <span class="badge bg-{{ 'danger' if test.prediction == 1 else 'success' }}">
+            {{ 'Élevé' if test.prediction == 1 else 'Faible' }}
+        </span>
+    </td>
+    <td>{{ (test.probability * 100) | round(1) }}%</td>
+    <td>
+        <button class="btn btn-sm btn-outline-info" 
+                type="button" 
+                data-bs-toggle="collapse" 
+                data-bs-target="#details-{{ test.id }}">
+            <i class="bi bi-eye"></i> Détails
+        </button>
+        <a href="#" class="btn btn-sm btn-outline-danger">
+            <i class="bi bi-trash"></i>
+        </a>
+    </td>
+</tr>
+<tr class="collapse" id="details-{{ test.id }}">
+    <td colspan="4">
+        <div class="p-3 bg-light rounded">
+            <h6>Données du test:</h6>
+            <div class="row">
+                <div class="col-md-4 mb-2">
+                    <strong>Age:</strong> <span>{{ test.age }}</span>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <strong>Sexe:</strong> <span>{{ 'Homme' if test.sex == 1 else 'Femme' }}</span>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <strong>Pression artérielle:</strong> <span>{{ test.trestbps }} mmHg</span>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <strong>Cholestérol:</strong> <span>{{ test.chol }} mg/dl</span>
+                </div>
+                <!-- Add other fields as needed -->
+            </div>
+            <div class="mt-3">
+                <h6>Recommandations:</h6>
+                <ul>
+                    {% if test.prediction == 1 %}
+                    <li>Consultez un cardiologue rapidement</li>
+                    <li>Évitez les activités physiques intenses</li>
+                    <li>Surveillez votre tension artérielle</li>
+                    {% else %}
+                    <li>Continuez vos bilans de santé réguliers</li>
+                    <li>Maintenez une alimentation équilibrée</li>
+                    <li>Pratiquez une activité physique régulière</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </td>
+</tr>
+{% endfor %}
                         </tbody>
                     </table>
                 </div>

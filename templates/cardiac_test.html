@@ -52,7 +52,7 @@
             color: #2c3e50;
         }
         
-        input {
+        input, select {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
@@ -61,7 +61,7 @@
             transition: border-color 0.3s;
         }
         
-        input:focus {
+        input:focus, select:focus {
             border-color: #3498db;
             outline: none;
         }
@@ -158,6 +158,14 @@
             text-align: center;
             margin: 20px 0;
         }
+
+        .error-details {
+            background: #f8d7da;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            color: #721c24;
+        }
     </style>
 </head>
 <body>
@@ -169,6 +177,9 @@
         </p>
         
         <form id="cardiacForm">
+            <!-- Champ CSRF caché -->
+            <input type="hidden" name="csrf_token" id="csrf_token">
+            
             <div class="form-group">
                 <label for="age">Âge (ans)</label>
                 <input type="number" id="age" min="0" max="120" required>
@@ -303,98 +314,142 @@
     </div>
     
     <script>
-      document.getElementById('cardiacForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    // Afficher le loader
-    document.getElementById('loading').style.display = 'block';
-    document.getElementById('result').style.display = 'none';
-    
-    // Supprimer les erreurs précédentes
-    const errorContainer = document.getElementById('errorDetails');
-    if (errorContainer) errorContainer.remove();
-    
-    try {
-        // Collecter les données du formulaire
-        const formData = {
-            age: parseFloat(document.getElementById('age').value),
-            sex: parseFloat(document.getElementById('sex').value),
-            cp: parseFloat(document.getElementById('cp').value),
-            trestbps: parseFloat(document.getElementById('trestbps').value),
-            chol: parseFloat(document.getElementById('chol').value),
-            fbs: parseFloat(document.getElementById('fbs').value),
-            restecg: parseFloat(document.getElementById('restecg').value),
-            thalach: parseFloat(document.getElementById('thalach').value),
-            exang: parseFloat(document.getElementById('exang').value),
-            oldpeak: parseFloat(document.getElementById('oldpeak').value),
-            slope: parseFloat(document.getElementById('slope').value),
-            ca: parseFloat(document.getElementById('ca').value),
-            thal: parseFloat(document.getElementById('thal').value)
-        };
-        
-        // Envoyer les données à l'API
-        const response = await fetch('/cardiac-predict', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'  // Important pour identifier les requêtes AJAX
-            },
-            body: JSON.stringify(formData),
-            credentials: 'include'  // Pour inclure les cookies de session
+        // Au chargement de la page, récupérer le token CSRF
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const csrfToken = await getCSRFToken();
+                if (csrfToken) {
+                    document.getElementById('csrf_token').value = csrfToken;
+                } else {
+                    console.warn('Token CSRF non trouvé au chargement');
+                }
+            } catch (error) {
+                console.error('Erreur initialisation CSRF:', error);
+            }
         });
-        
-        // Vérifier le type de contenu avant de parser
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            // Si ce n'est pas du JSON, lire le texte pour diagnostiquer
-            const textResponse = await response.text();
-            throw new Error(`Réponse inattendue: ${textResponse.substring(0, 100)}...`);
+
+        // Fonction améliorée pour récupérer le token CSRF
+        async function getCSRFToken() {
+            // Essayer d'abord depuis l'endpoint API
+            try {
+                const response = await fetch('/csrf-token', {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.csrf_token;
+                }
+            } catch (apiError) {
+                console.warn('Échec récupération CSRF via API:', apiError);
+            }
+            
+            // Fallback: depuis les cookies
+            try {
+                const cookieValue = document.cookie
+                    .split('; ')
+                    .find(row => row.startsWith('csrf_token='))
+                    ?.split('=')[1];
+                return cookieValue ? decodeURIComponent(cookieValue) : '';
+            } catch (cookieError) {
+                console.warn('Échec récupération CSRF via cookies:', cookieError);
+                return '';
+            }
         }
-        
-        // Parser la réponse JSON
-        const result = await response.json();
-        
-        // Vérifier si la réponse contient une erreur
-        if (result.error) {
-            throw new Error(result.error);
+
+        // Fonction pour afficher les erreurs
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            
+            const errorContainer = document.createElement('div');
+            errorContainer.className = 'error-details';
+            errorContainer.innerHTML = `
+                <h3>Erreur de sécurité</h3>
+                <p><strong>${message}</strong></p>
+                <p>Veuillez rafraîchir la page et réessayer.</p>
+                <button onclick="location.reload()" 
+                        style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-top: 10px;">
+                    Rafraîchir la page
+                </button>
+            `;
+            
+            const container = document.querySelector('.container');
+            const existingError = document.getElementById('errorDetails');
+            if (existingError) {
+                container.replaceChild(errorContainer, existingError);
+            } else {
+                container.appendChild(errorContainer);
+            }
         }
-        
-        // Masquer le loader
-        document.getElementById('loading').style.display = 'none';
-        
-        // Afficher les résultats
-        displayResults(result);
-        
-    } catch (error) {
-        document.getElementById('loading').style.display = 'none';
-        
-        // Afficher le détail de l'erreur
-        const errorContainer = document.createElement('div');
-        errorContainer.id = 'errorDetails';
-        errorContainer.style.background = '#f8d7da';
-        errorContainer.style.padding = '15px';
-        errorContainer.style.borderRadius = '5px';
-        errorContainer.style.marginTop = '20px';
-        errorContainer.style.color = '#721c24';
-        errorContainer.innerHTML = `
-            <h3>Erreur détaillée</h3>
-            <p><strong>${error.message}</strong></p>
-            <p>Cette erreur indique que le serveur a retourné une réponse inattendue.</p>
-            <button onclick="this.parentElement.remove()" 
-                    style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-top: 10px;">
-                Fermer
-            </button>
-        `;
-        document.querySelector('.container').appendChild(errorContainer);
-        
-        console.error('Détails de l\'erreur:', error);
-    }
-});
-    async function fetchCSRFToken() {
-        const response = await fetch('/csrf-token');
-        const data = await response.json();
-        return data.csrf_token;
-    }
+
+        // Gestionnaire de soumission du formulaire
+        document.getElementById('cardiacForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Afficher le loader
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+            
+            // Supprimer les erreurs précédentes
+            const previousError = document.getElementById('errorDetails');
+            if (previousError) previousError.remove();
+            
+            try {
+                // Vérifier que le token CSRF est présent
+                const csrfToken = document.getElementById('csrf_token').value;
+                if (!csrfToken) {
+                    throw new Error("Problème de sécurité: token CSRF manquant");
+                }
+                
+                // Collecter les données du formulaire
+                const formData = {
+                    age: parseFloat(document.getElementById('age').value),
+                    sex: parseFloat(document.getElementById('sex').value),
+                    cp: parseFloat(document.getElementById('cp').value),
+                    trestbps: parseFloat(document.getElementById('trestbps').value),
+                    chol: parseFloat(document.getElementById('chol').value),
+                    fbs: parseFloat(document.getElementById('fbs').value),
+                    restecg: parseFloat(document.getElementById('restecg').value),
+                    thalach: parseFloat(document.getElementById('thalach').value),
+                    exang: parseFloat(document.getElementById('exang').value),
+                    oldpeak: parseFloat(document.getElementById('oldpeak').value),
+                    slope: parseFloat(document.getElementById('slope').value),
+                    ca: parseFloat(document.getElementById('ca').value),
+                    thal: parseFloat(document.getElementById('thal').value),
+                    csrf_token: csrfToken
+                };
+                
+                // Envoyer les données à l'API
+                const response = await fetch('/cardiac-predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify(formData),
+                    credentials: 'include'
+                });
+                
+                // Vérifier si la réponse est OK
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => null);
+                    throw new Error(errorData?.error || `Erreur HTTP: ${response.status}`);
+                }
+                
+                // Parser la réponse JSON
+                const result = await response.json();
+                
+                // Masquer le loader
+                document.getElementById('loading').style.display = 'none';
+                
+                // Afficher les résultats
+                displayResults(result);
+                
+            } catch (error) {
+                showError(error.message);
+                console.error('Détails de l\'erreur:', error);
+            }
+        });
         
         function displayResults(data) {
             const resultContainer = document.getElementById('result');
