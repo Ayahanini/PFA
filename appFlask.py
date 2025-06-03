@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for, flash
+from flask import Flask, request, jsonify, render_template, redirect, url_for, flash , send_from_directory, current_app, abort
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -12,7 +12,7 @@ from flask_wtf.csrf import CSRFProtect, generate_csrf
 from flask_cors import CORS
 from wtforms import ValidationError
 from bot import MedicalBotFlask  # Importer votre bot personnalisé
-# Blueprint principal
+from fpdf import FPDF # Blueprint principal
 main_bp = Blueprint('main', __name__)
 # Initialisation de l'application Flask
 app = Flask(__name__)
@@ -48,7 +48,7 @@ def cardiac_test():
 @main_bp.route('/cardiac-predict', methods=['POST'])
 @login_required
 def cardiac_predict():
-    """Endpoint pour les prédictions cardiaques"""
+    """Endpoint pour les prédictions cardiaques avec génération de PDF"""
     conn = None
     cur = None
     
@@ -86,6 +86,7 @@ def cardiac_predict():
                 "error": "Champs manquants",
                 "missing": missing_fields
             }), 400
+
 
         # 3. Conversion des données en DataFrame
         input_data = {k: [v] for k, v in data.items() if k in required_fields}
@@ -132,7 +133,7 @@ def cardiac_predict():
             (user_id, age, sex, cp, trestbps, chol, fbs, restecg, 
              thalach, exang, oldpeak, slope, ca, thal, prediction, probability)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            RETURNING id
+            RETURNING id, created_at
         """, (
             current_user.id,
             data['age'],
@@ -151,18 +152,31 @@ def cardiac_predict():
             prediction,
             float(proba)
         ))
-
-        test_id = cur.fetchone()[0]
+        test_id, created_at = cur.fetchone()
         conn.commit()
 
-        # 8. Réponse JSON
+        try:
+            pdf_path = generate_cardiac_report(
+                user=current_user,
+                test_id=test_id,
+                created_at=created_at,
+                prediction=prediction,
+                probability=proba,
+                input_data=data
+            )
+            pdf_url = url_for('static', filename=pdf_path, _external=True) if pdf_path else None
+        except Exception as e:
+            app.logger.error(f"Erreur génération PDF: {str(e)}")
+            pdf_url = None
+        
         return jsonify({
             "prediction": prediction,
             "probability": float(proba),
             "test_id": test_id,
+            "pdf_url": pdf_url,
             "message": "Risque cardiaque élevé" if prediction == 1 else "Risque cardiaque faible",
             "interpretation": get_interpretation(prediction, proba, data)
-        })
+        }), 200
 
     except Exception as e:
         app.logger.exception(f"Erreur dans cardiac_predict: {str(e)}")
@@ -178,6 +192,229 @@ def cardiac_predict():
         if conn:
             conn.close()
 
+
+def generate_cardiac_report(user, test_id, created_at, prediction, probability, input_data):
+    """Génère un PDF avec les résultats de la prédiction cardiaque"""
+    try:
+        # Vérification des répertoires
+        reports_dir = os.path.join(current_app.root_path, 'static/reports')
+        os.makedirs(reports_dir, exist_ok=True)
+        
+        pdf = FPDF()
+        pdf.add_page()
+        
+        # En-tête
+        pdf.set_font("Arial", 'B', 16)
+        pdf.cell(0, 10, "Rapport d'Analyse Cardiaque", 0, 1, 'C')
+        pdf.ln(10)
+        
+        # Informations patient
+        pdf.set_font("Arial", 'B', 12)
+        user_name = f"{user.first_name} {user.last_name}" if hasattr(user, 'first_name') and hasattr(user, 'last_name') else user.email
+        pdf.cell(0, 10, f"Patient: {user_name}", 0, 1)
+        pdf.cell(0, 10, f"Date du test: {created_at.strftime('%d/%m/%Y %H:%M')}", 0, 1)
+        pdf.ln(15)
+        
+        # Résultats
+        pdf.set_fill_color(200, 220, 255)
+        pdf.cell(0, 10, "RÉSULTATS DE L'ANALYSE", 0, 1, 'C', True)
+        pdf.ln(10)
+        
+        risk_level = "ÉLEVÉ" if prediction == 1 else "FAIBLE"
+        color = (255, 0, 0) if prediction == 1 else (0, 128, 0)
+        pdf.set_text_color(*color)
+        pdf.set_font("Arial", 'B', 14)
+        pdf.cell(0, 10, f"Niveau de risque: {risk_level}", 0, 1, 'C')
+        pdf.set_text_color(0, 0, 0)
+        pdf.set_font("Arial", '', 12)
+        pdf.cell(0, 10, f"Probabilité: {probability*100:.2f}%", 0, 1, 'C')
+        pdf.ln(15)
+        
+        # Détails des paramètres
+        pdf.set_font("Arial", 'B', 12)
+        pdf.cell(0, 10, "Paramètres d'entrée:", 0, 1)
+        
+        # Tableau des paramètres
+        col_widths = [70, 50]
+        pdf.set_font("Arial", 'B', 10)
+        pdf.cell(col_widths[0], 10, "Paramètre", border=1)
+        pdf.cell(col_widths[1], 10, "Valeur", border=1, ln=1)
+        
+        pdf.set_font("Arial", '', 10)
+        for param, value in input_data.items():
+            pdf.cell(col_widths[0], 8, param.replace('_', ' ').title(), border=1)
+            pdf.cell(col_widths[1], 8, str(value), border=1, ln=1)
+        
+        # Interprétation
+        pdf.ln(15)
+        pdf.set_font("Arial", 'I', 10)
+        interpretation = get_interpretation(prediction, probability, input_data)
+        pdf.multi_cell(0, 8, interpretation)
+        
+        # Pied de page
+        pdf.ln(20)
+        pdf.set_font("Arial", 'I', 8)
+        pdf.cell(0, 10, "Ce rapport est généré automatiquement et ne remplace pas une consultation médicale.", 0, 1, 'C')
+        
+        # Sauvegarde
+        filename = f"cardiac_report_{test_id}.pdf"
+        filepath = os.path.join(reports_dir, filename)
+        pdf.output(filepath)
+        
+        return f"reports/{filename}"
+    except Exception as e:
+        app.logger.error(f"Erreur lors de la génération du PDF: {str(e)}")
+        raise RuntimeError(f"Erreur lors de la génération du rapport: {str(e)}")
+
+@main_bp.route('/view-report/<int:report_id>')
+@login_required
+def view_report(report_id):
+    """Affiche le rapport dans le navigateur avec option de téléchargement"""
+    conn = None
+    cur = None
+    
+    try:
+        # 1. Vérifier que le rapport appartient à l'utilisateur courant
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        cur.execute("""
+            SELECT id, user_id, report_path 
+            FROM cardiac_tests 
+            WHERE id = %s
+        """, (report_id,))
+        
+        report = cur.fetchone()
+        
+        if not report:
+            abort(404, description="Rapport non trouvé")
+            
+        if report[1] != current_user.id:
+            abort(403, description="Vous n'avez pas accès à ce rapport")
+            
+        # 2. Vérifier que le fichier PDF existe
+        pdf_filename = f"cardiac_report_{report_id}.pdf"
+        pdf_path = os.path.join(current_app.root_path, 'static/reports', pdf_filename)
+        
+        if not os.path.exists(pdf_path):
+            app.logger.error(f"Fichier PDF manquant pour le rapport {report_id}")
+            abort(404, description="Le rapport n'est pas disponible")
+            
+        # 3. Préparer les données pour le template
+        pdf_url = url_for('static', filename=f'reports/{pdf_filename}')
+        download_url = url_for('main.download_report', report_id=report_id)
+        
+        # 4. Récupérer des métadonnées supplémentaires si nécessaire
+        cur.execute("""
+            SELECT created_at, prediction, probability
+            FROM cardiac_tests
+            WHERE id = %s
+        """, (report_id,))
+        
+        created_at, prediction, probability = cur.fetchone()
+        
+        return render_template(
+            'view_report.html',
+            pdf_url=pdf_url,
+            download_url=download_url,
+            report_id=report_id,
+            created_at=created_at.strftime('%d/%m/%Y à %H:%M'),
+            risk_level="élevé" if prediction == 1 else "faible",
+            probability=f"{probability*100:.1f}%"
+        )
+        
+    except Exception as e:
+        app.logger.error(f"Erreur dans view_report: {str(e)}")
+        abort(500, description="Une erreur est survenue lors de l'accès au rapport")
+        
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
+@main_bp.route('/download-report/<int:report_id>')
+@login_required
+def download_report(report_id):
+    """Endpoint pour télécharger le rapport PDF"""
+    try:
+        # Mêmes vérifications d'accès que pour view_report
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        cur.execute("""
+            SELECT user_id FROM cardiac_tests WHERE id = %s
+        """, (report_id,))
+        
+        report = cur.fetchone()
+        
+        if not report or report[0] != current_user.id:
+            abort(403)
+            
+        pdf_filename = f"cardiac_report_{report_id}.pdf"
+        pdf_path = os.path.join(current_app.root_path, 'static/reports', pdf_filename)
+        
+        if not os.path.exists(pdf_path):
+            abort(404)
+            
+        return send_from_directory(
+            directory=os.path.join(current_app.root_path, 'static/reports'),
+            path=pdf_filename,
+            as_attachment=True,
+            download_name=f"rapport_cardio_{report_id}.pdf"
+        )
+        
+    except Exception as e:
+        app.logger.error(f"Erreur dans download_report: {str(e)}")
+        abort(500)
+        
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()      
+@main_bp.route('/get_last_cardiac_report')
+@login_required
+def get_last_cardiac_report():
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=extras.DictCursor)
+    
+    try:
+        cur.execute("""
+            SELECT * FROM cardiac_tests 
+            WHERE user_id = %s 
+            ORDER BY created_at DESC 
+            LIMIT 1
+        """, (current_user.id,))
+        
+        last_test = cur.fetchone()
+        
+        if not last_test:
+            return jsonify({'error': 'Aucun test cardiaque trouvé'}), 404
+        
+        return jsonify({
+            'date': last_test['created_at'].strftime('%d/%m/%Y %H:%M'),
+            'prediction': last_test['prediction'],
+            'probability': last_test['probability'],
+            'message': 'Risque cardiaque élevé' if last_test['prediction'] == 1 else 'Risque cardiaque faible',
+            'risk_percentage': round(last_test['probability'] * 100),
+            'recommendations': [
+                'Consultez un cardiologue rapidement',
+                'Évitez les activités physiques intenses',
+                'Surveillez votre tension artérielle'
+            ] if last_test['prediction'] == 1 else [
+                'Continuez vos bilans de santé réguliers',
+                'Maintenez une alimentation équilibrée',
+                'Pratiquez une activité physique régulière'
+            ]
+        })
+    except Exception as e:
+        app.logger.error(f"Erreur dans get_last_cardiac_report: {str(e)}")
+        return jsonify({'error': 'Erreur serveur'}), 500
+    finally:
+        cur.close()
+        conn.close()
 def get_interpretation(prediction, probability, data):
     """Fournit une interprétation des résultats"""
     age = data['age']
@@ -250,7 +487,6 @@ def cardiac_history():
         cur.close()
         conn.close()
 @app.route('/api/messages', methods=['POST'])
-@login_required
 def handle_message():
     try:
         data = request.get_json()
@@ -519,7 +755,6 @@ def index():
     return render_template('index.html')
 
 @main_bp.route('/chatbot')
-@login_required
 def chatbot():
     """Route pour afficher l'interface du chatbot"""
     return render_template('chatbot.html', user=current_user)
@@ -556,7 +791,6 @@ def profile():
         conn.close()
 
 @main_bp.route('/ask', methods=['POST'])
-@login_required
 def ask():
     """Route pour traiter les questions du chatbot (API)"""
     user_message = request.json.get('message', '')
