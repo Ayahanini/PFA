@@ -20,11 +20,14 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'votre-cle-secrete-tr
 app.config['WTF_CSRF_TIME_LIMIT'] = 3600  # Durée de validité du token CSRF
 
 # Initialisation des extensions
-CORS(app, supports_credentials=True)  # Active CORS pour les requêtes cross-origin
+CORS(app, supports_credentials=True, expose_headers=['X-CSRFToken']) # Active CORS pour les requêtes cross-origin
 login_manager = LoginManager(app)
 login_manager.login_view = 'auth.login'
 csrf = CSRFProtect(app)
-
+@main_bp.before_request
+def check_csrf():
+    if request.path.startswith('/api/'):
+        csrf.protect()
 
 bot = MedicalBotFlask("D:/CHATBOTMEDICAL2/PFA/medical_knowledge.json")
 # Ajouter ces imports en haut du fichier
@@ -32,107 +35,105 @@ import joblib
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-
 # Charger le modèle cardiaque (ajouter après les autres initialisations)
 import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-HEART_MODEL_PATH = os.path.join(BASE_DIR, 'modele_heart.pkl')
+HEART_MODEL_PATH = os.path.join(BASE_DIR, 'D:/CHATBOTMEDICAL2/PFA/modele_heart.pkl')
 heart_model_data = None
 @main_bp.route('/cardiac-test', methods=['GET'])
 @login_required
 def cardiac_test():
     """Affiche le formulaire de test cardiaque"""
     return render_template('cardiac_test.html')
-def load_heart_model():
-    """Charge le modèle cardiaque et ses métadonnées"""
-    global heart_model_data
-    
-    if heart_model_data is None:
-        try:
-            # Charger le modèle depuis le fichier
-            model_data = joblib.load(HEART_MODEL_PATH)
-            
-            # Stocker en mémoire pour les requêtes futures
-            heart_model_data = {
-                'model': model_data['pipeline'],
-                'features': model_data['features'],
-                'version': model_data.get('version', '1.0'),
-                'created_at': model_data.get('created_at', 'unknown')
-            }
-            
-            app.logger.info(f"Modèle cardiaque chargé (version {heart_model_data['version']})")
-        except Exception as e:
-            app.logger.error(f"Erreur chargement modèle cardiaque: {str(e)}")
-            return None
-    
-    return heart_model_data
 @main_bp.route('/cardiac-predict', methods=['POST'])
 @login_required
 def cardiac_predict():
+    """Endpoint pour les prédictions cardiaques"""
     conn = None
     cur = None
+    
     try:
-        # Vérifier le type de contenu
+        # 1. Vérification des données reçues
         if not request.is_json:
-            app.logger.warning("Requête sans en-tête JSON reçue")
             return jsonify({
-                "error": "Format de requête invalide",
+                "error": "Format invalide",
                 "message": "Le contenu doit être au format JSON"
             }), 400
-        
-        # Récupérer les données JSON
+
         data = request.get_json()
-        app.logger.info(f"Données reçues: {data}")
-        
-        # Vérifier que toutes les clés sont présentes
-        required_keys = ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 
-                       'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal']
-        
-        missing_keys = [key for key in required_keys if key not in data]
-        if missing_keys:
-            app.logger.error(f"Clés manquantes: {', '.join(missing_keys)}")
+        app.logger.info(f"Données reçues pour prédiction: {data}")
+
+        # 2. Validation des champs obligatoires
+        required_fields = {
+            'age': int,
+            'sex': int,
+            'cp': int,
+            'trestbps': int,
+            'chol': int,
+            'fbs': int,
+            'restecg': int,
+            'thalach': int,
+            'exang': int,
+            'oldpeak': float,
+            'slope': int,
+            'ca': int,
+            'thal': int
+        }
+
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
             return jsonify({
-                "error": "Données incomplètes",
-                "missing": missing_keys
+                "error": "Champs manquants",
+                "missing": missing_fields
             }), 400
-        
-        # Convertir les données en DataFrame
-        df = pd.DataFrame([data])
-        
-        # Charger le modèle
+
+        # 3. Conversion des données en DataFrame
+        input_data = {k: [v] for k, v in data.items() if k in required_fields}
+        df = pd.DataFrame(input_data)
+
+        # 4. Chargement du modèle
         model_data = load_heart_model()
         if not model_data:
-            app.logger.error("Modèle non disponible")
-            return jsonify({"error": "Modèle médical indisponible"}), 503
-        
-        # Vérifier que les colonnes correspondent
+            return jsonify({
+                "error": "Modèle indisponible",
+                "message": "Le modèle de prédiction n'est pas chargé"
+            }), 503
+
+        # 5. Vérification des features
         model_features = model_data['features']
         if set(df.columns) != set(model_features):
-            app.logger.error(f"Colonnes incompatibles. Reçues: {df.columns}, Attendues: {model_features}")
             return jsonify({
-                "error": "Colonnes incompatibles",
+                "error": "Incompatibilité des caractéristiques",
                 "received": list(df.columns),
                 "expected": model_features
             }), 400
-        
-        # Réorganiser les colonnes selon l'ordre attendu par le modèle
+
+        # Réorganisation des colonnes
         df = df[model_features]
-        
-        # Faire la prédiction
+
+        # 6. Prédiction
         pipeline = model_data['model']
-        proba = pipeline.predict_proba(df)[0][1]
-        prediction = 1 if proba >= 0.5 else 0
-        
-        # Enregistrer le résultat dans la base de données
+        try:
+            proba = pipeline.predict_proba(df)[0][1]  # Probabilité de classe positive
+            prediction = int(proba >= 0.5)  # Seuil à 50%
+        except Exception as e:
+            app.logger.error(f"Erreur lors de la prédiction: {str(e)}")
+            return jsonify({
+                "error": "Erreur de prédiction",
+                "message": str(e)
+            }), 500
+
+        # 7. Enregistrement en base de données
         conn = get_db_connection()
         cur = conn.cursor()
-        
+
         cur.execute("""
             INSERT INTO cardiac_tests 
-            (user_id, age, sex, cp, trestbps, chol, fbs, restecg, thalach, 
-             exang, oldpeak, slope, ca, thal, prediction, probability)
+            (user_id, age, sex, cp, trestbps, chol, fbs, restecg, 
+             thalach, exang, oldpeak, slope, ca, thal, prediction, probability)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-         """, (
+            RETURNING id
+        """, (
             current_user.id,
             data['age'],
             data['sex'],
@@ -149,29 +150,80 @@ def cardiac_predict():
             data['thal'],
             prediction,
             float(proba)
-        ) )
-        
+        ))
+
+        test_id = cur.fetchone()[0]
         conn.commit()
-        
+
+        # 8. Réponse JSON
         return jsonify({
             "prediction": prediction,
             "probability": float(proba),
-            "message": "Risque cardiaque élevé" if prediction == 1 else "Risque cardiaque faible"
+            "test_id": test_id,
+            "message": "Risque cardiaque élevé" if prediction == 1 else "Risque cardiaque faible",
+            "interpretation": get_interpretation(prediction, proba, data)
         })
-        
+
     except Exception as e:
+        app.logger.exception(f"Erreur dans cardiac_predict: {str(e)}")
         if conn:
             conn.rollback()
-        app.logger.exception(f"Erreur dans cardiac_predict: {str(e)}")
         return jsonify({
-            "error": "Erreur interne du serveur",
-            "details": str(e)
+            "error": "Erreur interne",
+            "message": str(e)
         }), 500
     finally:
         if cur:
             cur.close()
         if conn:
             conn.close()
+
+def get_interpretation(prediction, probability, data):
+    """Fournit une interprétation des résultats"""
+    age = data['age']
+    sex = "homme" if data['sex'] == 1 else "femme"
+    
+    base_msg = (
+        f"Pour un {sex} de {age} ans, le modèle prédit un "
+        f"{'risque élevé' if prediction == 1 else 'risque faible'} "
+        f"(probabilité: {probability:.1%})."
+    )
+    
+    advice = ""
+    if prediction == 1:
+        advice = (
+            "Consultez un cardiologue. Facteurs de risque détectés: "
+            f"pression artérielle: {data['trestbps']} mmHg, "
+            f"cholestérol: {data['chol']} mg/dl."
+        )
+    else:
+        advice = (
+            "Résultat normal mais maintenez de bonnes habitudes: "
+            "alimentation équilibrée et activité physique régulière."
+        )
+    
+    return f"{base_msg} {advice}"
+def load_heart_model():
+    global heart_model_data
+    
+    if heart_model_data is None:
+        try:
+            model_data = joblib.load(HEART_MODEL_PATH)
+            
+            # Modification ici - utiliser 'model' au lieu de 'pipeline'
+            heart_model_data = {
+                'model': model_data['model'],  # Changé de 'pipeline' à 'model'
+                'features': model_data['features'],
+                'version': model_data.get('version', '1.0'),
+                'created_at': model_data.get('created_at', 'unknown')
+            }
+            
+            app.logger.info(f"Modèle cardiaque chargé (version {heart_model_data['version']})")
+        except Exception as e:
+            app.logger.error(f"Erreur chargement modèle cardiaque: {str(e)}")
+            return None
+    
+    return heart_model_data
 
 # Ajouter cette route pour l'historique des tests
 @main_bp.route('/cardiac-history')
@@ -489,9 +541,12 @@ def profile():
         
         cardiac_tests = cur.fetchall()
         
+        # Convert DictRow objects to regular dictionaries if needed
+        cardiac_tests = [dict(test) for test in cardiac_tests]
+        
         return render_template('profile.html', 
-                              user=current_user,
-                              cardiac_tests=cardiac_tests)
+                            user=current_user,
+                            cardiac_tests=cardiac_tests)
     except Exception as e:
         app.logger.error(f"Erreur chargement profil: {str(e)}")
         flash("Erreur lors du chargement du profil", "danger")
