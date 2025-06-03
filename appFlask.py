@@ -38,22 +38,63 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 HEART_MODEL_PATH = os.path.join(BASE_DIR, 'modele_heart.pkl')
 heart_model_data = None
+@main_bp.route('/cardiac-test', methods=['GET'])
+@login_required
+def cardiac_test():
+    """Affiche le formulaire de test cardiaque"""
+    return render_template('cardiac_test.html')
+def load_heart_model():
+    """Charge le modèle cardiaque et ses métadonnées"""
+    global heart_model_data
+    
+    if heart_model_data is None:
+        try:
+            # Charger le modèle depuis le fichier
+            model_data = joblib.load(HEART_MODEL_PATH)
+            
+            # Stocker en mémoire pour les requêtes futures
+            heart_model_data = {
+                'model': model_data['pipeline'],
+                'features': model_data['features'],
+                'version': model_data.get('version', '1.0'),
+                'created_at': model_data.get('created_at', 'unknown')
+            }
+            
+            app.logger.info(f"Modèle cardiaque chargé (version {heart_model_data['version']})")
+        except Exception as e:
+            app.logger.error(f"Erreur chargement modèle cardiaque: {str(e)}")
+            return None
+    
+    return heart_model_data
 @main_bp.route('/cardiac-predict', methods=['POST'])
 @login_required
 def cardiac_predict():
+    conn = None
+    cur = None
     try:
+        # Vérifier le type de contenu
+        if not request.is_json:
+            app.logger.warning("Requête sans en-tête JSON reçue")
+            return jsonify({
+                "error": "Format de requête invalide",
+                "message": "Le contenu doit être au format JSON"
+            }), 400
+        
         # Récupérer les données JSON
         data = request.get_json()
         app.logger.info(f"Données reçues: {data}")
         
         # Vérifier que toutes les clés sont présentes
         required_keys = ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 
-                         'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal']
+                       'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal']
         
-        for key in required_keys:
-            if key not in data:
-                app.logger.error(f"Clé manquante: {key}")
-                return jsonify({"error": f"Donnée manquante: {key}"}), 400
+        missing_keys = [key for key in required_keys if key not in data]
+        if missing_keys:
+            app.logger.error(f"Clés manquantes: {', '.join(missing_keys)}")
+            return jsonify({
+                "error": "Données incomplètes",
+                "missing": missing_keys
+            }), 400
         
         # Convertir les données en DataFrame
         df = pd.DataFrame([data])
@@ -62,7 +103,7 @@ def cardiac_predict():
         model_data = load_heart_model()
         if not model_data:
             app.logger.error("Modèle non disponible")
-            return jsonify({"error": "Modèle non disponible"}), 500
+            return jsonify({"error": "Modèle médical indisponible"}), 503
         
         # Vérifier que les colonnes correspondent
         model_features = model_data['features']
@@ -79,16 +120,38 @@ def cardiac_predict():
         
         # Faire la prédiction
         pipeline = model_data['model']
-        try:
-            proba = pipeline.predict_proba(df)[0][1]
-        except Exception as e:
-            app.logger.error(f"Erreur lors de la prédiction: {str(e)}")
-            return jsonify({"error": "Erreur de prédiction", "details": str(e)}), 500
-        
+        proba = pipeline.predict_proba(df)[0][1]
         prediction = 1 if proba >= 0.5 else 0
         
-        # Journaliser le résultat
-        app.logger.info(f"Prédiction réussie: prediction={prediction}, probabilité={proba}")
+        # Enregistrer le résultat dans la base de données
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        cur.execute("""
+            INSERT INTO cardiac_tests 
+            (user_id, age, sex, cp, trestbps, chol, fbs, restecg, thalach, 
+             exang, oldpeak, slope, ca, thal, prediction, probability)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+         """, (
+            current_user.id,
+            data['age'],
+            data['sex'],
+            data['cp'],
+            data['trestbps'],
+            data['chol'],
+            data['fbs'],
+            data['restecg'],
+            data['thalach'],
+            data['exang'],
+            data['oldpeak'],
+            data['slope'],
+            data['ca'],
+            data['thal'],
+            prediction,
+            float(proba)
+        ) )
+        
+        conn.commit()
         
         return jsonify({
             "prediction": prediction,
@@ -97,150 +160,18 @@ def cardiac_predict():
         })
         
     except Exception as e:
-        app.logger.error(f"Erreur non gérée: {str(e)}")
-        return jsonify({"error": "Erreur interne du serveur"}), 500
-@main_bp.route('/cardiac-test')
-@login_required
-def cardiac_test():
-    """Affiche le formulaire de test cardiaque"""
-    app.logger.info("Tentative de chargement du modèle cardiaque")
-    model_data = load_heart_model()
-    
-    if not model_data:
-        app.logger.error("Échec du chargement du modèle cardiaque")
-        flash("Erreur technique : le modèle médical est indisponible. Contactez l'administrateur.", "danger")
-        return redirect(url_for('main.index'))
-    
-    app.logger.info(f"Modèle chargé avec {len(model_data['features'])} features")
-    features = model_data['features']
-    exemple = model_data.get('exemple', {})
-    
-    return render_template('cardiac_test.html', 
-                          features=features, 
-                          exemple=exemple,
-                          user=current_user)
-def load_heart_model():
-    """Charge le modèle cardiaque avec gestion robuste des erreurs"""
-    global heart_model_data
-    
-    if heart_model_data is not None:
-        return heart_model_data
-    
-    # Vérifier si le fichier existe
-    if not os.path.exists(HEART_MODEL_PATH):
-        app.logger.error(f"Fichier modèle introuvable: {HEART_MODEL_PATH}")
-        return None
-    
-    try:
-        # Charger le fichier
-        loaded_data = joblib.load(HEART_MODEL_PATH)
-        app.logger.info("Fichier modèle chargé avec succès")
-        
-        # Vérifier la structure
-        if not isinstance(loaded_data, dict):
-            app.logger.error("Le fichier modèle n'est pas un dictionnaire")
-            return None
-            
-        if 'model' not in loaded_data:
-            app.logger.error("Clé 'model' manquante dans le fichier modèle")
-            return None
-            
-        # Vérifier les features
-        if 'features' not in loaded_data:
-            app.logger.warning("Clé 'features' manquante - tentative de récupération")
-            
-            # Essayer de récupérer les noms de colonnes à partir du modèle
-            try:
-                pipeline = loaded_data['model']
-                
-                # Méthode 1: pour les versions récentes de scikit-learn
-                if hasattr(pipeline, 'feature_names_in_'):
-                    features = pipeline.feature_names_in_.tolist()
-                    app.logger.info(f"Features récupérées via feature_names_in_: {features}")
-                
-                # Méthode 2: pour les pipelines StandardScaler
-                elif (hasattr(pipeline, 'named_steps') and 
-                      'scaler' in pipeline.named_steps and 
-                      hasattr(pipeline.named_steps['scaler'], 'feature_names_in_')):
-                    scaler = pipeline.named_steps['scaler']
-                    features = scaler.feature_names_in_.tolist()
-                    app.logger.info(f"Features récupérées via le scaler: {features}")
-                
-                # Méthode 3: liste par défaut (à adapter à votre dataset)
-                else:
-                    features = [
-                        'age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 
-                        'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal'
-                    ]
-                    app.logger.warning(f"Utilisation des features par défaut: {features}")
-                
-                loaded_data['features'] = features
-                
-            except Exception as e:
-                app.logger.error(f"Erreur récupération features: {str(e)}")
-                return None
-        
-        # Vérifier l'exemple
-        if 'exemple' not in loaded_data:
-            app.logger.warning("Clé 'exemple' manquante - création d'un exemple par défaut")
-            loaded_data['exemple'] = {feature: 0.0 for feature in loaded_data['features']}
-        
-        heart_model_data = loaded_data
-        return heart_model_data
-        
-    except Exception as e:
-        app.logger.error(f"Erreur chargement modèle cardiaque: {str(e)}")
-        return None
-@app.route('/check-model')
-def check_model():
-    """Vérifie l'état du modèle médical"""
-    model_data = load_heart_model()
-    
-    if not model_data:
+        if conn:
+            conn.rollback()
+        app.logger.exception(f"Erreur dans cardiac_predict: {str(e)}")
         return jsonify({
-            "status": "error",
-            "message": "Modèle non disponible",
-            "path": HEART_MODEL_PATH,
-            "exists": os.path.exists(HEART_MODEL_PATH)
+            "error": "Erreur interne du serveur",
+            "details": str(e)
         }), 500
-    
-    return jsonify({
-        "status": "success",
-        "features": model_data.get('features', []),
-        "exemple": model_data.get('exemple', {}),
-        "model_type": str(type(model_data['model']))
-    })
-def save_cardiac_result(user_id, input_data, result):
-    """Enregistre le résultat du test dans la base de données"""
-    conn = get_db_connection()
-    cur = conn.cursor()
-    
-    try:
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS cardiac_tests (
-                id SERIAL PRIMARY KEY,
-                user_id INTEGER REFERENCES users(id),
-                test_data JSONB NOT NULL,
-                result JSONB NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
-        
-        cur.execute("""
-            INSERT INTO cardiac_tests (user_id, test_data, result)
-            VALUES (%s, %s, %s)
-        """, (user_id, 
-              {'input': input_data}, 
-              {'prediction': result['prediction'], 
-               'probability': result['probability']}))
-        
-        conn.commit()
-    except Exception as e:
-        conn.rollback()
-        app.logger.error(f"Erreur sauvegarde résultat: {str(e)}")
     finally:
-        cur.close()
-        conn.close()
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
 
 # Ajouter cette route pour l'historique des tests
 @main_bp.route('/cardiac-history')
@@ -358,6 +289,7 @@ def init_db():
     cur = conn.cursor()
     
     try:
+        # Table users
         cur.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id SERIAL PRIMARY KEY,
@@ -370,6 +302,31 @@ def init_db():
             is_active BOOLEAN DEFAULT TRUE
         )
         """)
+        
+        # Add cardiac_tests table
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS cardiac_tests (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id),
+            age INTEGER NOT NULL,
+            sex INTEGER NOT NULL,
+            cp INTEGER NOT NULL,
+            trestbps INTEGER NOT NULL,
+            chol INTEGER NOT NULL,
+            fbs INTEGER NOT NULL,
+            restecg INTEGER NOT NULL,
+            thalach INTEGER NOT NULL,
+            exang INTEGER NOT NULL,
+            oldpeak FLOAT NOT NULL,
+            slope INTEGER NOT NULL,
+            ca INTEGER NOT NULL,
+            thal INTEGER NOT NULL,
+            prediction INTEGER NOT NULL,
+            probability FLOAT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
+        
         conn.commit()
     except Exception as e:
         conn.rollback()
