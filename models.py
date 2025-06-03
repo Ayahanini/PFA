@@ -47,7 +47,9 @@ def train_and_save_model(input_file='heart.csv', output_file='modele_heart.pkl')
             'model': pipeline,
             'features': list(X.columns),
             'exemple': X.iloc[0].to_dict(),
-            'accuracy': accuracy
+            'accuracy': accuracy,
+            'version': '1.0',  # Ajouté
+            'created_at': pd.Timestamp.now().isoformat()  # Ajouté
         }
         
         print(f"Sauvegarde du modèle dans: {output_file}")
