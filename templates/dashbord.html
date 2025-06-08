@@ -1,51 +1,265 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard | Chatbot Cardiaque</title>
-  <link rel="stylesheet" href="/PFA/static/css/styles-dashbord.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CardiaCare</title>
+    <link rel="stylesheet" href="/PFA/static/css/style.css">
+    <link rel="stylesheet" href="/PFA/static/css/dashbord.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="/PFA/static/js/dashbord.js"></script>
 </head>
 <body>
-  <div class="dashboard-container">
-    <!-- Barre latérale -->
-    <aside class="sidebar">
-      <h2>CardioBot</h2>
-      <nav>
-        <ul>
-          <li><a href="#">🏠 Accueil</a></li>
-          <li><a href="#">🩺 Diagnostic</a></li>
-          <li><a href="#">📊 Statistiques</a></li>
-          <li><a href="#">⚙️ Paramètres</a></li>
-        </ul>
-      </nav>
-    </aside>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>CardiaCare</span>
+            </div>
+            <div class="nav-actions">
+                <a href="chat.html" class="nav-btn">
+                    <i class="fas fa-comments"></i>
+                    Chat
+                </a>
+                <a href="index.html" class="nav-btn">
+                    <i class="fas fa-home"></i>
+                    Accueil
+                </a>
+            </div>
+        </div>
+    </nav>
 
-    <!-- Contenu principal -->
-    <div class="main-content">
-      <header class="toolbar">
-        <h1>Tableau de bord - Assistant Cardiaque</h1>
-      </header>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="dashboard-title">
+                <div>
+                    <h1><i class="fas fa-chart-line"></i> Tableau de Bord Médical</h1>
+                    <p>Suivi de votre santé cardiaque en temps réel</p>
+                </div>
+                <button class="card-action" onclick="window.location.href='chat.html'">
+                    <i class="fas fa-plus"></i> Nouvelle Consultation
+                </button>
+            </div>
+        </div>
 
-      <main class="dashboard">
-        <section class="welcome">
-          <h2>Bienvenue !</h2>
-          <p>Utilisez notre chatbot pour détecter des signes liés aux maladies cardiaques.</p>
-        </section>
+        <div class="container">
+            <!-- Stats Row -->
+            <div class="dashboard-stats">
+                <div class="stat-widget">
+                    <i class="fas fa-heart stat-icon"></i>
+                    <h3 id="riskScore">23%</h3>
+                    <p>Risque Cardiaque Actuel</p>
+                </div>
+                <div class="stat-widget">
+                    <i class="fas fa-comments stat-icon"></i>
+                    <h3 id="consultationsCount">47</h3>
+                    <p>Consultations IA</p>
+                </div>
+                <div class="stat-widget">
+                    <i class="fas fa-pills stat-icon"></i>
+                    <h3 id="medicationsCount">12</h3>
+                    <p>Rappels Médicaments</p>
+                </div>
+                <div class="stat-widget">
+                    <i class="fas fa-calendar-check stat-icon"></i>
+                    <h3 id="appointmentsCount">3</h3>
+                    <p>RDV à venir</p>
+                </div>
+            </div>
 
-        <section class="cards">
-          <div class="card">
-            <h3>Lancer un diagnostic</h3>
-            <p>Répondez à quelques questions et accédez au chatbot.</p>
-            <button onclick="window.location.href='chatbot.html'">Commencer</button>
-          </div>
-        </section>
-      </main>
+            <!-- Main Grid -->
+            <div class="dashboard-grid">
+                <!-- Chart Area -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-chart-area"></i> Évolution du Risque Cardiaque
+                        </h2>
+                        <button class="card-action" onclick="showChartDetails()">Voir Détails</button>
+                    </div>
+                    <div class="chart-container" id="riskChart">
+                        <div class="chart-placeholder">
+                            <i class="fas fa-chart-line" style="font-size: 3rem; color: var(--gray-400);"></i>
+                            <p>Graphique d'évolution du risque cardiaque<br>
+                            <small>Données des 30 derniers jours</small></p>
+                        </div>
+                    </div>
+                    <div class="health-metrics">
+                        <div class="metric-card">
+                            <div class="metric-value" id="bloodPressure">120/80</div>
+                            <div class="metric-label">Tension</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="heartRate">72</div>
+                            <div class="metric-label">BPM</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="cholesterol">195</div>
+                            <div class="metric-label">Cholestérol</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="glucose">5.8</div>
+                            <div class="metric-label">Glycémie</div>
+                        </div>
+                    </div>
+                </div>
 
-      <footer class="footer">
-        <p>&copy; 2025 CHU de Fès — CardioBot. Tous droits réservés.</p>
-      </footer>
+                <!-- Activity Sidebar -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-clock"></i> Activité Récente
+                        </h2>
+                        <button class="card-action" onclick="refreshActivity()">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                    </div>
+                    <ul class="activity-list" id="activityList">
+                        <li class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p class="activity-title">Consultation IA terminée</p>
+                                <p class="activity-time">Il y a 2 heures</p>
+                            </div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-pills"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p class="activity-title">Médicament pris</p>
+                                <p class="activity-time">Il y a 3 heures</p>
+                            </div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p class="activity-title">Données vitales mises à jour</p>
+                                <p class="activity-time">Hier</p>
+                            </div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p class="activity-title">RDV cardiologie confirmé</p>
+                                <p class="activity-time">Il y a 2 jours</p>
+                            </div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p class="activity-title">Rapport médical généré</p>
+                                <p class="activity-time">Il y a 3 jours</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Medication Schedule -->
+            <div class="dashboard-card medication-schedule">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-pills"></i> Prochains Médicaments
+                    </h2>
+                    <button class="card-action" onclick="manageMedications()">Gérer</button>
+                </div>
+                <div class="medication-grid">
+                    <div class="medication-item">
+                        <div class="med-icon">
+                            <i class="fas fa-pills"></i>
+                        </div>
+                        <div class="med-info">
+                            <h4>Aspirine 100mg</h4>
+                            <p>Prochaine prise dans 30 min</p>
+                        </div>
+                        <div class="med-status pending">En attente</div>
+                    </div>
+                    <div class="medication-item">
+                        <div class="med-icon">
+                            <i class="fas fa-capsules"></i>
+                        </div>
+                        <div class="med-info">
+                            <h4>Lisinopril 10mg</h4>
+                            <p>Prochaine prise dans 2h</p>
+                        </div>
+                        <div class="med-status upcoming">À venir</div>
+                    </div>
+                    <div class="medication-item">
+                        <div class="med-icon">
+                            <i class="fas fa-tablets"></i>
+                        </div>
+                        <div class="med-info">
+                            <h4>Atorvastatine 20mg</h4>
+                            <p>Prochaine prise ce soir</p>
+                        </div>
+                        <div class="med-status upcoming">À venir</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <a href="chat.html" class="action-card">
+                    <i class="fas fa-comments"></i>
+                    <h3>Chat Médical</h3>
+                    <p>Posez vos questions à l'IA</p>
+                </a>
+                <a href="#" class="action-card" onclick="startAssessment()">
+                    <i class="fas fa-heart"></i>
+                    <h3>Évaluation Risque</h3>
+                    <p>Analyse IA de votre état</p>
+                </a>
+                <a href="#" class="action-card" onclick="manageMedications()">
+                    <i class="fas fa-pills"></i>
+                    <h3>Mes Médicaments</h3>
+                    <p>Gérer vos traitements</p>
+                </a>
+                <a href="#" class="action-card" onclick="exportReport()">
+                    <i class="fas fa-download"></i>
+                    <h3>Rapport Médical</h3>
+                    <p>Exporter vos données</p>
+                </a>
+            </div>
+
+            <!-- Alerts Section -->
+            <div class="alerts-section" id="alertsSection" style="display: none;">
+                <div class="dashboard-card alert-card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-exclamation-triangle"></i> Alertes Médicales
+                        </h2>
+                        <button class="card-action" onclick="dismissAllAlerts()">Tout effacer</button>
+                    </div>
+                    <div id="alertsList">
+                        <!-- Alertes dynamiques -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <!-- Modal pour les détails -->
+    <div class="modal" id="detailsModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Détails</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Contenu dynamique -->
+            </div>
+        </div>
+    </div>
 </body>
 </html>
