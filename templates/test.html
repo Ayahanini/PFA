@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cardiaque IA - CardiaCare</title>
+    <link rel="stylesheet" href="/PFA/static/css/style.css">
+    <link rel="stylesheet" href="/PFA/static/css/test.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="/PFA/static/js/test.js"></script>
+    <script src="/PFA/static/js/ml-integration.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>CardiaCare</span>
+            </div>
+            <div class="nav-actions">
+                <a href="chat.html" class="nav-btn">
+                    <i class="fas fa-comments"></i>
+                    Chat
+                </a>
+                <a href="dashboard.html" class="nav-btn">
+                    <i class="fas fa-chart-line"></i>
+                    Dashboard
+                </a>
+                <a href="index.html" class="nav-btn">
+                    <i class="fas fa-home"></i>
+                    Accueil
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <!-- Header -->
+        <div class="test-header">
+            <div class="header-content">
+                <div class="header-icon">
+                    <i class="fas fa-heart-pulse"></i>
+                </div>
+                <div class="header-text">
+                    <h1>Évaluation Cardiaque IA</h1>
+                    <p>Évaluez votre risque cardiaque en quelques minutes grâce à notre intelligence artificielle médicale</p>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text">
+                <span id="progressText">Étape 1 sur 4</span>
+            </div>
+        </div>
+
+        <div class="test-content">
+            <!-- Étape 1: Informations personnelles -->
+            <div class="test-step active" id="step1">
+                <div class="step-card">
+                    <div class="step-header">
+                        <h2>
+                            <i class="fas fa-user"></i>
+                            Informations Personnelles
+                        </h2>
+                        <p>Commençons par quelques informations de base</p>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="age">Âge</label>
+                            <input type="number" id="age" min="18" max="120" placeholder="Votre âge">
+                            <div class="field-help">Votre âge en années</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="gender">Sexe</label>
+                            <div class="gender-options">
+                                <input type="radio" id="male" name="gender" value="M">
+                                <label for="male" class="gender-card">
+                                    <i class="fas fa-mars"></i>
+                                    <span>Homme</span>
+                                </label>
+                                
+                                <input type="radio" id="female" name="gender" value="F">
+                                <label for="female" class="gender-card">
+                                    <i class="fas fa-venus"></i>
+                                    <span>Femme</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-actions">
+                        <button class="btn-next" onclick="nextStep()">
+                            Continuer <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Étape 2: Données vitales -->
+            <div class="test-step" id="step2">
+                <div class="step-card">
+                    <div class="step-header">
+                        <h2>
+                            <i class="fas fa-heartbeat"></i>
+                            Données Vitales
+                        </h2>
+                        <p>Informations sur vos constantes médicales (optionnel mais recommandé)</p>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="bloodPressure">Tension Artérielle (systolique)</label>
+                            <input type="number" id="bloodPressure" min="80" max="250" placeholder="Ex: 120">
+                            <div class="field-help">En mmHg - laissez vide si vous ne savez pas</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cholesterol">Cholestérol Total</label>
+                            <input type="number" id="cholesterol" min="100" max="500" placeholder="Ex: 200">
+                            <div class="field-help">En mg/dL - d'après vos dernières analyses</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="heartRate">Fréquence Cardiaque au repos</label>
+                            <input type="number" id="heartRate" min="40" max="200" placeholder="Ex: 70">
+                            <div class="field-help">Battements par minute au repos</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-actions">
+                        <button class="btn-back" onclick="previousStep()">
+                            <i class="fas fa-arrow-left"></i> Retour
+                        </button>
+                        <button class="btn-next" onclick="nextStep()">
+                            Continuer <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Étape 3: Facteurs de risque -->
+            <div class="test-step" id="step3">
+                <div class="step-card">
+                    <div class="step-header">
+                        <h2>
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Facteurs de Risque
+                        </h2>
+                        <p>Ces facteurs influencent significativement votre risque cardiaque</p>
+                    </div>
+                    
+                    <div class="risk-factors">
+                        <div class="risk-factor-card">
+                            <div class="risk-icon">
+                                <i class="fas fa-smoking"></i>
+                            </div>
+                            <div class="risk-content">
+                                <h3>Tabagisme</h3>
+                                <p>Fumez-vous ou avez-vous fumé récemment ?</p>
+                                <div class="radio-group">
+                                    <input type="radio" id="smoking-yes" name="smoking" value="true">
+                                    <label for="smoking-yes">Oui</label>
+                                    <input type="radio" id="smoking-no" name="smoking" value="false">
+                                    <label for="smoking-no">Non</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="risk-factor-card">
+                            <div class="risk-icon">
+                                <i class="fas fa-cube"></i>
+                            </div>
+                            <div class="risk-content">
+                                <h3>Diabète</h3>
+                                <p>Avez-vous du diabète de type 1 ou 2 ?</p>
+                                <div class="radio-group">
+                                    <input type="radio" id="diabetes-yes" name="diabetes" value="true">
+                                    <label for="diabetes-yes">Oui</label>
+                                    <input type="radio" id="diabetes-no" name="diabetes" value="false">
+                                    <label for="diabetes-no">Non</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="risk-factor-card">
+                            <div class="risk-icon">
+                                <i class="fas fa-dna"></i>
+                            </div>
+                            <div class="risk-content">
+                                <h3>Antécédents Familiaux</h3>
+                                <p>Des maladies cardiaques dans votre famille ?</p>
+                                <div class="radio-group">
+                                    <input type="radio" id="family-yes" name="familyHistory" value="true">
+                                    <label for="family-yes">Oui</label>
+                                    <input type="radio" id="family-no" name="familyHistory" value="false">
+                                    <label for="family-no">Non</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-actions">
+                        <button class="btn-back" onclick="previousStep()">
+                            <i class="fas fa-arrow-left"></i> Retour
+                        </button>
+                        <button class="btn-next" onclick="nextStep()">
+                            Continuer <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Étape 4: Symptômes et mode de vie -->
+            <div class="test-step" id="step4">
+                <div class="step-card">
+                    <div class="step-header">
+                        <h2>
+                            <i class="fas fa-notes-medical"></i>
+                            Symptômes et Mode de Vie
+                        </h2>
+                        <p>Dernières questions pour affiner l'évaluation</p>
+                    </div>
+                    
+                    <div class="symptoms-section">
+                        <h3>Ressentez-vous actuellement :</h3>
+                        <div class="symptoms-grid">
+                            <label class="symptom-checkbox">
+                                <input type="checkbox" name="symptoms" value="chest_pain">
+                                <span class="checkmark"></span>
+                                <div class="symptom-content">
+                                    <i class="fas fa-hand-fist"></i>
+                                    <span>Douleurs thoraciques</span>
+                                </div>
+                            </label>
+                            
+                            <label class="symptom-checkbox">
+                                <input type="checkbox" name="symptoms" value="shortness_breath">
+                                <span class="checkmark"></span>
+                                <div class="symptom-content">
+                                    <i class="fas fa-lungs"></i>
+                                    <span>Essoufflement</span>
+                                </div>
+                            </label>
+                            
+                            <label class="symptom-checkbox">
+                                <input type="checkbox" name="symptoms" value="fatigue">
+                                <span class="checkmark"></span>
+                                <div class="symptom-content">
+                                    <i class="fas fa-battery-quarter"></i>
+                                    <span>Fatigue inhabituelle</span>
+                                </div>
+                            </label>
+                            
+                            <label class="symptom-checkbox">
+                                <input type="checkbox" name="symptoms" value="palpitations">
+                                <span class="checkmark"></span>
+                                <div class="symptom-content">
+                                    <i class="fas fa-heartbeat"></i>
+                                    <span>Palpitations</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="lifestyle-section">
+                        <h3>Activité physique :</h3>
+                        <div class="activity-options">
+                            <input type="radio" id="activity-low" name="activity" value="low">
+                            <label for="activity-low" class="activity-card">
+                                <i class="fas fa-couch"></i>
+                                <span>Sédentaire</span>
+                                <small>Peu ou pas d'exercice</small>
+                            </label>
+                            
+                            <input type="radio" id="activity-moderate" name="activity" value="moderate">
+                            <label for="activity-moderate" class="activity-card">
+                                <i class="fas fa-walking"></i>
+                                <span>Modérée</span>
+                                <small>1-3 fois par semaine</small>
+                            </label>
+                            
+                            <input type="radio" id="activity-high" name="activity" value="high">
+                            <label for="activity-high" class="activity-card">
+                                <i class="fas fa-running"></i>
+                                <span>Active</span>
+                                <small>3+ fois par semaine</small>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="step-actions">
+                        <button class="btn-back" onclick="previousStep()">
+                            <i class="fas fa-arrow-left"></i> Retour
+                        </button>
+                        <button class="btn-analyze" onclick="analyzeRisk()">
+                            <i class="fas fa-brain"></i> Analyser avec l'IA
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Étape 5: Résultats -->
+            <div class="test-step" id="step5">
+                <div class="results-card">
+                    <div class="results-header">
+                        <div class="results-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h2>Résultats de votre Évaluation</h2>
+                        <p>Analyse basée sur l'intelligence artificielle médicale</p>
+                    </div>
+                    
+                    <div class="risk-result" id="riskResult">
+                        <!-- Résultat généré dynamiquement -->
+                    </div>
+                    
+                    <div class="recommendations" id="recommendations">
+                        <!-- Recommandations générées dynamiquement -->
+                    </div>
+                    
+                    <div class="results-actions">
+                        <button class="btn-restart" onclick="restartTest()">
+                            <i class="fas fa-redo"></i> Refaire le Test
+                        </button>
+                        <button class="btn-save" onclick="saveResults()">
+                            <i class="fas fa-save"></i> Sauvegarder
+                        </button>
+                        <button class="btn-chat" onclick="goToChat()">
+                            <i class="fas fa-comments"></i> Discuter avec l'IA
+                        </button>
+                    </div>
+                    
+                    <div class="disclaimer">
+                        <div class="disclaimer-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="disclaimer-text">
+                            <strong>Important :</strong> Cette évaluation est indicative et ne remplace pas un diagnostic médical professionnel. 
+                            Consultez votre médecin pour un avis médical personnalisé.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div class="loading-modal" id="loadingModal">
+        <div class="loading-content">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+            <h3>Analyse en cours...</h3>
+            <p>Notre IA traite vos données pour évaluer votre risque cardiaque</p>
+            <div class="loading-steps">
+                <div class="loading-step active">
+                    <i class="fas fa-check"></i>
+                    <span>Validation des données</span>
+                </div>
+                <div class="loading-step" id="loadingStep2">
+                    <i class="fas fa-brain"></i>
+                    <span>Analyse par l'IA</span>
+                </div>
+                <div class="loading-step" id="loadingStep3">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Génération du rapport</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
