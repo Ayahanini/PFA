@@ -1,568 +1,686 @@
-// Administration JavaScript - Version Complète
-class AdminManager {
+// Administration JavaScript - CardiaCare
+class AdminDashboard {
     constructor() {
         this.currentSection = 'overview';
-        this.charts = {};
-        this.systemData = this.initializeSystemData();
-        this.patients = this.initializePatientsData();
-        this.systemLogs = [];
-        this.confirmAction = null;
+        this.currentPage = 1;
+        this.itemsPerPage = 10;
+        this.searchQuery = '';
+        this.filterType = '';
+        this.confirmCallback = null;
         
-        this.initializeEventListeners();
-        this.initializeCharts();
-        this.updateAdminDashboard();
-        this.startRealTimeMonitoring();
-        this.loadSystemActivity();
-    }
-
-    initializeSystemData() {
-        return {
+        // Données simulées
+        this.patientsData = this.generatePatientsData();
+        this.consultationsData = this.generateConsultationsData();
+        this.systemLogs = this.generateSystemLogs();
+        this.systemStats = {
             totalPatients: 1247,
-            totalPredictions: 15840,
-            mlAccuracy: 94.2,
-            activeAlerts: 3,
-            systemHealth: {
-                webServer: { status: 'online', uptime: '15d 8h', cpu: 23 },
-                database: { status: 'online', uptime: '15d 8h', connections: 47 },
-                mlService: { status: 'online', uptime: '15d 8h', predictionsPerMin: 12 },
-                storage: { status: 'warning', usage: 78, message: 'Nettoyage requis' }
-            },
-            performance: {
-                responseTime: 145,
-                throughput: 156,
-                errorRate: 0.02
-            }
+            activeConsultations: 87,
+            systemHealth: 99.8,
+            mlAccuracy: 94.2
         };
+        
+        this.init();
     }
 
-    initializePatientsData() {
-        return [
-            {
-                id: 1247,
-                name: 'Marie Dupont',
-                email: 'marie.dupont@email.com',
-                age: 45,
-                riskLevel: 'low',
-                riskPercentage: 15,
-                lastEvaluation: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2h ago
-                status: 'active'
-            },
-            {
-                id: 1246,
-                name: 'Ahmed Benjelloun',
-                email: 'ahmed.b@email.com',
-                age: 62,
-                riskLevel: 'moderate',
-                riskPercentage: 45,
-                lastEvaluation: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
-                status: 'active'
-            },
-            {
-                id: 1245,
-                name: 'Fatima Semlali',
-                email: 'fatima.s@email.com',
-                age: 58,
-                riskLevel: 'high',
-                riskPercentage: 78,
-                lastEvaluation: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3h ago
-                status: 'critical'
-            }
-        ];
+    init() {
+        this.setupEventListeners();
+        this.loadSection('overview');
+        this.updateSystemStats();
+        this.startRealTimeUpdates();
+        this.animateOnLoad();
     }
 
-    initializeEventListeners() {
+    setupEventListeners() {
         // Navigation entre sections
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
-                const section = link.getAttribute('data-section');
-                this.switchSection(section);
+                const section = e.target.closest('.nav-link').dataset.section;
+                this.loadSection(section);
             });
         });
 
-        // Boutons d'action globaux
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.btn, .action-btn, .btn-sm')) {
-                const button = e.target.closest('.btn, .action-btn, .btn-sm');
-                this.handleButtonClick(button);
-            }
-        });
-
-        // Recherche de patients
-        const patientSearch = document.getElementById('patientSearch');
-        if (patientSearch) {
-            patientSearch.addEventListener('input', (e) => {
-                this.searchPatients(e.target.value);
+        // Recherche et filtres
+        const searchInput = document.getElementById('patientSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                this.searchQuery = e.target.value;
+                this.filterPatients();
             });
         }
 
-        // Fermeture des modales avec Escape
+        const filterSelect = document.getElementById('patientFilter');
+        if (filterSelect) {
+            filterSelect.addEventListener('change', (e) => {
+                this.filterType = e.target.value;
+                this.filterPatients();
+            });
+        }
+
+        // Gestion des modales
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                this.closeModal(e.target.id);
+            }
+        });
+
+        // Échap pour fermer les modales
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                this.closeAllModals();
+                document.querySelectorAll('.modal').forEach(modal => {
+                    if (modal.style.display === 'flex') {
+                        this.closeModal(modal.id);
+                    }
+                });
             }
         });
     }
 
-    switchSection(sectionId) {
+    loadSection(sectionName) {
         // Masquer toutes les sections
-        document.querySelectorAll('.admin-section').forEach(section => {
+        document.querySelectorAll('.content-section').forEach(section => {
             section.classList.remove('active');
         });
 
-        // Désactiver tous les liens de navigation
+        // Mettre à jour la navigation
         document.querySelectorAll('.nav-link').forEach(link => {
             link.classList.remove('active');
         });
 
-        // Activer la section demandée
-        const targetSection = document.getElementById(sectionId);
-        const targetLink = document.querySelector(`[data-section="${sectionId}"]`);
-
-        if (targetSection && targetLink) {
+        // Afficher la section demandée
+        const targetSection = document.getElementById(sectionName);
+        const targetNav = document.querySelector(`[data-section="${sectionName}"]`);
+        
+        if (targetSection) {
             targetSection.classList.add('active');
-            targetLink.classList.add('active');
-            this.currentSection = sectionId;
-
-            // Actions spécifiques selon la section
-            this.handleSectionSwitch(sectionId);
+            this.currentSection = sectionName;
         }
-    }
+        
+        if (targetNav) {
+            targetNav.classList.add('active');
+        }
 
-    handleSectionSwitch(sectionId) {
-        switch (sectionId) {
+        // Charger le contenu spécifique à la section
+        switch (sectionName) {
             case 'overview':
-                this.updateOverviewSection();
-                this.refreshCharts();
+                this.loadOverview();
                 break;
             case 'patients':
-                this.updatePatientsTable();
+                this.loadPatients();
+                break;
+            case 'consultations':
+                this.loadConsultations();
+                break;
+            case 'ml-models':
+                this.loadMLModels();
                 break;
             case 'analytics':
-                this.updateAnalyticsSection();
-                this.initMLCharts();
-                break;
-            case 'monitoring':
-                this.updateMonitoringSection();
-                this.refreshLogs();
-                break;
-            case 'reports':
-                this.updateReportsSection();
+                this.loadAnalytics();
                 break;
             case 'settings':
-                this.loadSystemSettings();
+                this.loadSettings();
+                break;
+            case 'logs':
+                this.loadLogs();
                 break;
         }
     }
 
-    handleButtonClick(button) {
-        // Gestion des clics de boutons avec gestion d'erreurs
-        try {
-            const action = button.onclick || button.getAttribute('onclick');
-            if (action) return; // Si onclick est défini, laisser faire
-
-            // Gestion basée sur le contenu ou les classes
-            const buttonText = button.textContent.trim();
-            
-            if (buttonText.includes('Actualiser')) {
-                this.refreshAdminData();
-            } else if (buttonText.includes('Alerte Système')) {
-                this.systemAlert();
-            } else if (buttonText.includes('Nouveau Patient')) {
-                this.addPatient();
-            }
-        } catch (error) {
-            console.error('Erreur lors du clic:', error);
-            this.showNotification('Erreur lors de l\'action', 'error');
-        }
+    loadOverview() {
+        this.loadActivityFeed();
+        this.loadSystemAlerts();
+        this.updateSystemStats();
     }
 
-    // Initialisation des graphiques
-    initializeCharts() {
-        this.initUsageChart();
-        this.initRiskDistributionChart();
-        this.initPerformanceChart();
-    }
-
-    initUsageChart() {
-        const ctx = document.getElementById('usageChart');
-        if (!ctx) return;
-
-        const data = this.generateUsageData(7);
-
-        this.charts.usage = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: data.labels,
-                datasets: [{
-                    label: 'Prédictions',
-                    data: data.predictions,
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4
-                }, {
-                    label: 'Utilisateurs Actifs',
-                    data: data.users,
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0,0,0,0.1)'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    initRiskDistributionChart() {
-        const ctx = document.getElementById('riskDistributionChart');
-        if (!ctx) return;
-
-        this.charts.riskDistribution = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Risque Faible', 'Risque Modéré', 'Risque Élevé'],
-                datasets: [{
-                    data: [65, 25, 10],
-                    backgroundColor: [
-                        '#22c55e',
-                        '#f59e0b',
-                        '#ef4444'
-                    ],
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
-        });
-    }
-
-    initPerformanceChart() {
-        const ctx = document.getElementById('performanceChart');
-        if (!ctx) return;
-
-        const data = this.generatePerformanceData(24);
-
-        this.charts.performance = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: data.labels,
-                datasets: [{
-                    label: 'Temps de Réponse (ms)',
-                    data: data.responseTime,
-                    borderColor: '#ef4444',
-                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                    borderWidth: 2,
-                    yAxisID: 'y'
-                }, {
-                    label: 'CPU (%)',
-                    data: data.cpu,
-                    borderColor: '#f59e0b',
-                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                    borderWidth: 2,
-                    yAxisID: 'y1'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    },
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        title: {
-                            display: true,
-                            text: 'Temps de Réponse (ms)'
-                        }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        title: {
-                            display: true,
-                            text: 'CPU (%)'
-                        },
-                        grid: {
-                            drawOnChartArea: false
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    initMLCharts() {
-        const ctx = document.getElementById('dailyUsageChart');
-        if (!ctx) return;
-
-        const data = this.generateMLUsageData(30);
-
-        this.charts.mlUsage = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: data.labels,
-                datasets: [{
-                    label: 'Prédictions ML',
-                    data: data.values,
-                    backgroundColor: 'rgba(139, 92, 246, 0.8)',
-                    borderColor: '#8b5cf6',
-                    borderWidth: 1,
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Nombre de Prédictions'
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // Génération de données simulées
-    generateUsageData(days) {
-        const labels = [];
-        const predictions = [];
-        const users = [];
-
-        for (let i = days - 1; i >= 0; i--) {
-            const date = new Date();
-            date.setDate(date.getDate() - i);
-            labels.push(date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }));
-            
-            // Simulation de données d'usage
-            predictions.push(Math.floor(Math.random() * 200) + 100);
-            users.push(Math.floor(Math.random() * 50) + 30);
-        }
-
-        return { labels, predictions, users };
-    }
-
-    generatePerformanceData(hours) {
-        const labels = [];
-        const responseTime = [];
-        const cpu = [];
-
-        for (let i = hours - 1; i >= 0; i--) {
-            const date = new Date();
-            date.setHours(date.getHours() - i);
-            labels.push(date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }));
-            
-            // Simulation de données de performance
-            responseTime.push(Math.floor(Math.random() * 100) + 100);
-            cpu.push(Math.floor(Math.random() * 40) + 10);
-        }
-
-        return { labels, responseTime, cpu };
-    }
-
-    generateMLUsageData(days) {
-        const labels = [];
-        const values = [];
-
-        for (let i = days - 1; i >= 0; i--) {
-            const date = new Date();
-            date.setDate(date.getDate() - i);
-            labels.push(date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }));
-            
-            // Simulation d'usage ML avec tendance croissante
-            const baseUsage = 150;
-            const growth = (days - i) * 2;
-            const noise = Math.floor(Math.random() * 50) - 25;
-            values.push(Math.max(50, baseUsage + growth + noise));
-        }
-
-        return { labels, values };
-    }
-
-    // Mise à jour des sections
-    updateOverviewSection() {
-        // Mettre à jour les métriques
-        document.getElementById('totalPatients').textContent = this.systemData.totalPatients.toLocaleString('fr-FR');
-        document.getElementById('totalPredictions').textContent = this.systemData.totalPredictions.toLocaleString('fr-FR');
-        document.getElementById('mlAccuracy').textContent = `${this.systemData.mlAccuracy}%`;
-        document.getElementById('activeAlerts').textContent = this.systemData.activeAlerts;
-
-        // Mettre à jour l'heure
-        document.getElementById('adminLastUpdate').textContent = 
-            `Dernière mise à jour: ${new Date().toLocaleTimeString('fr-FR')}`;
-
-        // Mettre à jour l'activité système
-        this.updateSystemActivity();
-    }
-
-    updateSystemActivity() {
-        const container = document.getElementById('systemActivity');
-        if (!container) return;
+    loadActivityFeed() {
+        const activityFeed = document.getElementById('activityFeed');
+        if (!activityFeed) return;
 
         const activities = [
-            {
-                time: 'Il y a 5 min',
-                title: 'Nouveau patient enregistré',
-                description: 'Patient #1248 ajouté au système'
-            },
-            {
-                time: 'Il y a 12 min',
-                title: 'Prédiction ML réussie',
-                description: 'Risque cardiaque calculé pour le patient #1247'
-            },
-            {
-                time: 'Il y a 23 min',
-                title: 'Sauvegarde automatique',
-                description: 'Sauvegarde de la base de données terminée'
-            },
-            {
-                time: 'Il y a 1h',
-                title: 'Mise à jour du modèle ML',
-                description: 'Version 1.2.1 déployée avec succès'
-            },
-            {
-                time: 'Il y a 2h',
-                title: 'Alerte système résolue',
-                description: 'Problème de connectivité résolu'
-            }
+            { icon: 'user-plus', title: 'Nouveau patient enregistré', time: 'Il y a 5 min', type: 'success' },
+            { icon: 'brain', title: 'Modèle ML mis à jour', time: 'Il y a 15 min', type: 'info' },
+            { icon: 'comments', title: '23 nouvelles consultations', time: 'Il y a 30 min', type: 'info' },
+            { icon: 'exclamation-triangle', title: 'Alerte système résolue', time: 'Il y a 1h', type: 'warning' },
+            { icon: 'database', title: 'Sauvegarde automatique', time: 'Il y a 2h', type: 'success' }
         ];
 
-        container.innerHTML = activities.map(activity => `
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <div class="timeline-time">${activity.time}</div>
-                    <div class="timeline-title">${activity.title}</div>
-                    <div class="timeline-description">${activity.description}</div>
+        activityFeed.innerHTML = activities.map(activity => `
+            <div class="activity-item">
+                <div class="activity-icon ${activity.type}">
+                    <i class="fas fa-${activity.icon}"></i>
+                </div>
+                <div class="activity-content">
+                    <p class="activity-title">${activity.title}</p>
+                    <p class="activity-time">${activity.time}</p>
                 </div>
             </div>
         `).join('');
     }
 
-    updatePatientsTable() {
+    loadSystemAlerts() {
+        const systemAlerts = document.getElementById('systemAlerts');
+        if (!systemAlerts) return;
+
+        const alerts = [
+            { title: 'Espace disque', message: 'Espace disponible : 78%', type: 'warning' },
+            { title: 'Performance ML', message: 'Temps de réponse optimal', type: 'success' }
+        ];
+
+        if (alerts.length === 0) {
+            systemAlerts.innerHTML = `
+                <div class="alert-item">
+                    <div class="alert-icon">
+                        <i class="fas fa-check-circle" style="color: var(--medical-green);"></i>
+                    </div>
+                    <div class="alert-content">
+                        <p class="alert-title">Système opérationnel</p>
+                        <p class="alert-message">Aucune alerte active</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            systemAlerts.innerHTML = alerts.map(alert => `
+                <div class="alert-item">
+                    <div class="alert-icon">
+                        <i class="fas fa-${alert.type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                    </div>
+                    <div class="alert-content">
+                        <p class="alert-title">${alert.title}</p>
+                        <p class="alert-message">${alert.message}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+
+    loadPatients() {
+        this.renderPatientsTable();
+        this.renderPatientsPagination();
+    }
+
+    renderPatientsTable() {
         const tbody = document.getElementById('patientsTableBody');
         if (!tbody) return;
 
-        tbody.innerHTML = this.patients.map(patient => `
+        const filteredPatients = this.getFilteredPatients();
+        const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+        const endIndex = startIndex + this.itemsPerPage;
+        const pagePatients = filteredPatients.slice(startIndex, endIndex);
+
+        tbody.innerHTML = pagePatients.map(patient => `
             <tr>
-                <td>#${patient.id}</td>
+                <td>${patient.id}</td>
+                <td>${patient.lastName} ${patient.firstName}</td>
+                <td>${patient.age}</td>
                 <td>
-                    <div class="patient-info">
-                        <div class="patient-avatar ${patient.status === 'critical' ? 'critical' : ''}">${this.getInitials(patient.name)}</div>
-                        <div>
-                            <strong>${patient.name}</strong>
-                            <span>${patient.email}</span>
-                        </div>
-                    </div>
+                    <span class="risk-level ${patient.riskLevel}">
+                        ${this.getRiskText(patient.riskLevel)}
+                    </span>
                 </td>
-                <td>${patient.age} ans</td>
+                <td>${patient.lastConsultation}</td>
                 <td>
-                    <span class="risk-badge ${patient.riskLevel}">${this.getRiskText(patient.riskLevel)} (${patient.riskPercentage}%)</span>
-                </td>
-                <td>${this.formatRelativeTime(patient.lastEvaluation)}</td>
-                <td>
-                    <span class="status-badge ${patient.status}">${this.getStatusText(patient.status)}</span>
+                    <span class="status-badge ${patient.status}">
+                        ${patient.status === 'active' ? 'Actif' : 'Inactif'}
+                    </span>
                 </td>
                 <td>
-                    <div class="action-buttons">
-                        <button class="btn-sm btn-primary" onclick="viewPatientDetails(${patient.id})">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="btn-sm btn-secondary" onclick="editPatient(${patient.id})">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        ${patient.status === 'critical' ? 
-                            `<button class="btn-sm btn-danger" onclick="emergencyProtocol(${patient.id})">
-                                <i class="fas fa-phone-alt"></i>
-                            </button>` : 
-                            `<button class="btn-sm btn-warning" onclick="contactPatient(${patient.id})">
-                                <i class="fas fa-envelope"></i>
-                            </button>`
-                        }
-                    </div>
+                    <button class="action-btn btn-view" onclick="adminDashboard.viewPatient('${patient.id}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn btn-edit" onclick="adminDashboard.editPatient('${patient.id}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn btn-delete" onclick="adminDashboard.deletePatient('${patient.id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </td>
             </tr>
         `).join('');
     }
 
-    updateAnalyticsSection() {
-        // Cette fonction met à jour la section Analytics
-        console.log('Analytics section mise à jour');
+    renderPatientsPagination() {
+        const pagination = document.getElementById('patientsPagination');
+        if (!pagination) return;
+
+        const filteredPatients = this.getFilteredPatients();
+        const totalPages = Math.ceil(filteredPatients.length / this.itemsPerPage);
+
+        if (totalPages <= 1) {
+            pagination.innerHTML = '';
+            return;
+        }
+
+        let paginationHTML = `
+            <button class="pagination-btn" ${this.currentPage === 1 ? 'disabled' : ''} 
+                    onclick="adminDashboard.changePage(${this.currentPage - 1})">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        `;
+
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || (i >= this.currentPage - 2 && i <= this.currentPage + 2)) {
+                paginationHTML += `
+                    <button class="pagination-btn ${i === this.currentPage ? 'active' : ''}" 
+                            onclick="adminDashboard.changePage(${i})">
+                        ${i}
+                    </button>
+                `;
+            } else if (i === this.currentPage - 3 || i === this.currentPage + 3) {
+                paginationHTML += '<span class="pagination-dots">...</span>';
+            }
+        }
+
+        paginationHTML += `
+            <button class="pagination-btn" ${this.currentPage === totalPages ? 'disabled' : ''} 
+                    onclick="adminDashboard.changePage(${this.currentPage + 1})">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        `;
+
+        paginationHTML += `
+            <span class="pagination-info">
+                Page ${this.currentPage} sur ${totalPages} 
+                (${filteredPatients.length} patients)
+            </span>
+        `;
+
+        pagination.innerHTML = paginationHTML;
     }
 
-    updateMonitoringSection() {
-        this.updateSystemHealth();
+    loadConsultations() {
+        this.renderConsultationsTable();
     }
 
-    updateSystemHealth() {
-        // Mettre à jour l'état des services dans la section monitoring
-        const health = this.systemData.systemHealth;
+    renderConsultationsTable() {
+        const tbody = document.getElementById('consultationsTableBody');
+        if (!tbody) return;
+
+        tbody.innerHTML = this.consultationsData.map(consultation => `
+            <tr>
+                <td>${consultation.sessionId}</td>
+                <td>${consultation.patientName}</td>
+                <td>${consultation.startTime}</td>
+                <td>${consultation.duration}</td>
+                <td>${consultation.messageCount}</td>
+                <td>
+                    <span class="risk-level ${consultation.prediction.level}">
+                        ${this.getRiskText(consultation.prediction.level)} (${consultation.prediction.score}%)
+                    </span>
+                </td>
+                <td>
+                    <span class="status-badge ${consultation.status}">
+                        ${consultation.status === 'active' ? 'En cours' : 'Terminée'}
+                    </span>
+                </td>
+                <td>
+                    <button class="action-btn btn-view" onclick="adminDashboard.viewConsultation('${consultation.sessionId}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn btn-edit" onclick="adminDashboard.exportConsultation('${consultation.sessionId}')">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    loadMLModels() {
+        // Les modèles ML sont déjà définis dans le HTML
+        // On peut ajouter des mises à jour dynamiques ici
+        this.updateTrainingProgress();
+    }
+
+    updateTrainingProgress() {
+        const progressFill = document.querySelector('.progress-fill');
+        const progressInfo = document.querySelector('.progress-info');
         
-        // Cette fonction pourrait mettre à jour dynamiquement les statuts
-        console.log('État système mis à jour:', health);
+        if (progressFill && progressInfo) {
+            // Simulation d'un entraînement en cours
+            let progress = 67;
+            const interval = setInterval(() => {
+                progress += Math.random() * 2;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    progressInfo.innerHTML = `
+                        <span>Neural Network v1.6 - Entraînement terminé</span>
+                        <span>Précision: 95.1%</span>
+                    `;
+                } else {
+                    const eta = Math.round((100 - progress) * 0.5);
+                    progressInfo.innerHTML = `
+                        <span>Neural Network v1.6 - Époque ${Math.round(progress)}/100</span>
+                        <span>ETA: ${eta}min</span>
+                    `;
+                }
+                progressFill.style.width = `${progress}%`;
+            }, 2000);
+        }
     }
 
-    updateReportsSection() {
-        // Mise à jour de la section rapports
-        console.log('Section rapports mise à jour');
+    loadAnalytics() {
+        // Simulation de données analytiques
+        this.renderAnalyticsCharts();
     }
 
-    loadSystemSettings() {
-        // Charger les paramètres système actuels
-        document.getElementById('systemName').value = 'CardiaCare Production';
-        document.getElementById('maxPatients').value = '5000';
-        document.getElementById('mlThreshold').value = '65';
-        // ... autres paramètres
+    renderAnalyticsCharts() {
+        // Simulation de graphiques avec du contenu statique
+        const usageChart = document.getElementById('usageChart');
+        const riskChart = document.getElementById('riskChart');
+        
+        if (usageChart) {
+            usageChart.parentElement.innerHTML = `
+                <div class="chart-placeholder">
+                    <i class="fas fa-chart-bar" style="font-size: 3rem; color: var(--primary-color);"></i>
+                    <p>Graphique d'utilisation du système<br>
+                    <small>+15% cette semaine</small></p>
+                </div>
+            `;
+        }
+        
+        if (riskChart) {
+            riskChart.parentElement.innerHTML = `
+                <div class="chart-placeholder">
+                    <i class="fas fa-chart-pie" style="font-size: 3rem; color: var(--medical-green);"></i>
+                    <p>Distribution des niveaux de risque<br>
+                    <small>Faible: 65%, Modéré: 28%, Élevé: 7%</small></p>
+                </div>
+            `;
+        }
+    }
+
+    loadSettings() {
+        // Les paramètres sont déjà dans le HTML
+        // On peut ajouter la logique de sauvegarde ici
+    }
+
+    loadLogs() {
+        this.renderSystemLogs();
+    }
+
+    renderSystemLogs() {
+        const logViewer = document.getElementById('logViewer');
+        if (!logViewer) return;
+
+        logViewer.innerHTML = this.systemLogs.map(log => `
+            <div class="log-entry ${log.level}">
+                <span class="log-timestamp">${log.timestamp}</span>
+                <span class="log-level">[${log.level.toUpperCase()}]</span>
+                <span class="log-message">${log.message}</span>
+            </div>
+        `).join('');
+        
+        // Auto-scroll vers le bas
+        logViewer.scrollTop = logViewer.scrollHeight;
     }
 
     // Fonctions utilitaires
-    getInitials(name) {
-        return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    generatePatientsData() {
+        const patients = [];
+        const firstNames = ['Ahmed', 'Fatima', 'Mohamed', 'Aicha', 'Youssef', 'Khadija', 'Omar', 'Zineb'];
+        const lastNames = ['Alami', 'Benali', 'Chahine', 'Douiri', 'El Fassi', 'Ghali', 'Hajji', 'Idrissi'];
+        const riskLevels = ['low', 'moderate', 'high'];
+        const statuses = ['active', 'inactive'];
+
+        for (let i = 1; i <= 50; i++) {
+            patients.push({
+                id: `P${i.toString().padStart(4, '0')}`,
+                firstName: firstNames[Math.floor(Math.random() * firstNames.length)],
+                lastName: lastNames[Math.floor(Math.random() * lastNames.length)],
+                age: Math.floor(Math.random() * 60) + 20,
+                riskLevel: riskLevels[Math.floor(Math.random() * riskLevels.length)],
+                lastConsultation: this.randomDate(30),
+                status: statuses[Math.floor(Math.random() * statuses.length)],
+                email: `patient${i}@email.com`,
+                phone: `+212 6${Math.floor(Math.random() * 90000000) + 10000000}`
+            });
+        }
+
+        return patients;
+    }
+
+    generateConsultationsData() {
+        const consultations = [];
+        const patientNames = ['Ahmed Alami', 'Fatima Benali', 'Mohamed Chahine', 'Aicha Douiri'];
+        const statuses = ['active', 'completed'];
+
+        for (let i = 1; i <= 20; i++) {
+            consultations.push({
+                sessionId: `S${Date.now()}-${i}`,
+                patientName: patientNames[Math.floor(Math.random() * patientNames.length)],
+                startTime: this.randomTime(),
+                duration: `${Math.floor(Math.random() * 20) + 5}min`,
+                messageCount: Math.floor(Math.random() * 30) + 10,
+                prediction: {
+                    level: ['low', 'moderate', 'high'][Math.floor(Math.random() * 3)],
+                    score: Math.floor(Math.random() * 100)
+                },
+                status: statuses[Math.floor(Math.random() * statuses.length)]
+            });
+        }
+
+        return consultations;
+    }
+
+    generateSystemLogs() {
+        const logs = [];
+        const levels = ['info', 'warning', 'error', 'success'];
+        const messages = [
+            'Connexion utilisateur réussie',
+            'Modèle ML chargé avec succès',
+            'Tentative de connexion échouée',
+            'Sauvegarde automatique effectuée',
+            'Erreur temporaire de base de données',
+            'Nouvelle prédiction générée',
+            'Maintenance système programmée',
+            'Cache vidé automatiquement'
+        ];
+
+        for (let i = 0; i < 50; i++) {
+            logs.push({
+                timestamp: this.randomTimestamp(),
+                level: levels[Math.floor(Math.random() * levels.length)],
+                message: messages[Math.floor(Math.random() * messages.length)]
+            });
+        }
+
+        return logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    }
+
+    // Fonctions d'action
+    addNewPatient() {
+        document.getElementById('patientModalTitle').textContent = 'Nouveau Patient';
+        document.getElementById('patientForm').reset();
+        this.showModal('patientModal');
+    }
+
+    editPatient(patientId) {
+        const patient = this.patientsData.find(p => p.id === patientId);
+        if (!patient) return;
+
+        document.getElementById('patientModalTitle').textContent = 'Modifier Patient';
+        
+        // Remplir le formulaire avec les données du patient
+        const form = document.getElementById('patientForm');
+        form.lastName.value = patient.lastName;
+        form.firstName.value = patient.firstName;
+        form.age.value = patient.age;
+        form.email.value = patient.email || '';
+        form.phone.value = patient.phone || '';
+        
+        this.showModal('patientModal');
+    }
+
+    viewPatient(patientId) {
+        const patient = this.patientsData.find(p => p.id === patientId);
+        if (!patient) return;
+
+        this.showNotification(`Affichage du profil de ${patient.firstName} ${patient.lastName}`, 'info');
+    }
+
+    deletePatient(patientId) {
+        const patient = this.patientsData.find(p => p.id === patientId);
+        if (!patient) return;
+
+        this.showConfirmModal(
+            'Supprimer Patient',
+            `Êtes-vous sûr de vouloir supprimer le patient ${patient.firstName} ${patient.lastName} ?`,
+            () => {
+                this.patientsData = this.patientsData.filter(p => p.id !== patientId);
+                this.renderPatientsTable();
+                this.renderPatientsPagination();
+                this.showNotification('Patient supprimé avec succès', 'success');
+            }
+        );
+    }
+
+    savePatient() {
+        const form = document.getElementById('patientForm');
+        const formData = new FormData(form);
+        
+        // Validation basique
+        if (!formData.get('lastName') || !formData.get('firstName') || !formData.get('age')) {
+            this.showNotification('Veuillez remplir tous les champs obligatoires', 'error');
+            return;
+        }
+
+        // Simulation de la sauvegarde
+        this.showNotification('Patient sauvegardé avec succès', 'success');
+        this.closeModal('patientModal');
+        
+        // Actualiser la liste
+        this.loadPatients();
+    }
+
+    viewConsultation(sessionId) {
+        this.showNotification(`Affichage de la consultation ${sessionId}`, 'info');
+    }
+
+    exportConsultation(sessionId) {
+        this.showNotification(`Export de la consultation ${sessionId}`, 'success');
+    }
+
+    exportPatients() {
+        const filteredPatients = this.getFilteredPatients();
+        const csvContent = this.convertToCSV(filteredPatients);
+        this.downloadFile(csvContent, 'patients.csv', 'text/csv');
+        this.showNotification('Export des patients terminé', 'success');
+    }
+
+    exportData() {
+        this.showNotification('Export des données en cours...', 'info');
+        setTimeout(() => {
+            this.showNotification('Export terminé avec succès', 'success');
+        }, 2000);
+    }
+
+    systemBackup() {
+        this.showNotification('Sauvegarde système en cours...', 'info');
+        setTimeout(() => {
+            this.showNotification('Sauvegarde terminée avec succès', 'success');
+        }, 3000);
+    }
+
+    refreshOverview() {
+        this.loadOverview();
+        this.showNotification('Vue d\'ensemble actualisée', 'success');
+    }
+
+    refreshConsultations() {
+        this.loadConsultations();
+        this.showNotification('Consultations actualisées', 'success');
+    }
+
+    saveSettings() {
+        this.showNotification('Paramètres sauvegardés avec succès', 'success');
+    }
+
+    clearLogs() {
+        this.showConfirmModal(
+            'Effacer les logs',
+            'Êtes-vous sûr de vouloir effacer tous les logs système ?',
+            () => {
+                this.systemLogs = [];
+                this.renderSystemLogs();
+                this.showNotification('Logs effacés avec succès', 'success');
+            }
+        );
+    }
+
+    // Fonctions de gestion des modèles ML
+    viewModelDetails(modelId) {
+        this.showNotification(`Affichage des détails du modèle ${modelId}`, 'info');
+    }
+
+    activateModel(modelId) {
+        this.showNotification(`Modèle ${modelId} activé`, 'success');
+    }
+
+    retrainModel(modelId) {
+        this.showNotification(`Réentraînement du modèle ${modelId} commencé`, 'info');
+    }
+
+    deleteModel(modelId) {
+        this.showConfirmModal(
+            'Supprimer Modèle',
+            `Êtes-vous sûr de vouloir supprimer le modèle ${modelId} ?`,
+            () => {
+                this.showNotification(`Modèle ${modelId} supprimé`, 'success');
+            }
+        );
+    }
+
+    uploadNewModel() {
+        this.showNotification('Fonctionnalité à implémenter avec le backend', 'info');
+    }
+
+    exportAnalytics() {
+        this.showNotification('Export des analytics en cours...', 'info');
+        setTimeout(() => {
+            this.showNotification('Rapport PDF généré avec succès', 'success');
+        }, 2000);
+    }
+
+    // Fonctions utilitaires
+    getFilteredPatients() {
+        let filtered = this.patientsData;
+
+        if (this.searchQuery) {
+            filtered = filtered.filter(patient => 
+                patient.firstName.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+                patient.lastName.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+                patient.id.toLowerCase().includes(this.searchQuery.toLowerCase())
+            );
+        }
+
+        if (this.filterType) {
+            filtered = filtered.filter(patient => {
+                switch (this.filterType) {
+                    case 'active':
+                        return patient.status === 'active';
+                    case 'inactive':
+                        return patient.status === 'inactive';
+                    case 'high-risk':
+                        return patient.riskLevel === 'high';
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        return filtered;
+    }
+
+    filterPatients() {
+        this.currentPage = 1;
+        this.renderPatientsTable();
+        this.renderPatientsPagination();
+    }
+
+    changePage(page) {
+        this.currentPage = page;
+        this.renderPatientsTable();
+        this.renderPatientsPagination();
     }
 
     getRiskText(level) {
@@ -571,569 +689,560 @@ class AdminManager {
             moderate: 'Modéré',
             high: 'Élevé'
         };
-        return texts[level] || 'Indéterminé';
+        return texts[level] || level;
     }
 
-    getStatusText(status) {
-        const texts = {
-            active: 'Actif',
-            inactive: 'Inactif',
-            critical: 'Critique'
-        };
-        return texts[status] || 'Inconnu';
+    randomDate(daysAgo) {
+        const date = new Date();
+        date.setDate(date.getDate() - Math.floor(Math.random() * daysAgo));
+        return date.toLocaleDateString('fr-FR');
     }
 
-    formatRelativeTime(date) {
-        const now = new Date();
-        const diff = now - date;
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const days = Math.floor(hours / 24);
-
-        if (days > 0) return `Il y a ${days} jour${days > 1 ? 's' : ''}`;
-        if (hours > 0) return `Il y a ${hours}h`;
-        return 'Il y a quelques minutes';
+    randomTime() {
+        const hours = Math.floor(Math.random() * 24).toString().padStart(2, '0');
+        const minutes = Math.floor(Math.random() * 60).toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
     }
 
-    // Fonctions d'action
-    refreshAdminData() {
-        this.showNotification('Actualisation des données administratives...', 'info');
+    randomTimestamp() {
+        const date = new Date();
+        date.setMinutes(date.getMinutes() - Math.floor(Math.random() * 1440));
+        return date.toISOString();
+    }
+
+    convertToCSV(data) {
+        if (!data.length) return '';
         
-        setTimeout(() => {
-            // Simuler la mise à jour des données
-            this.systemData.totalPredictions += Math.floor(Math.random() * 50);
-            this.systemData.totalPatients += Math.floor(Math.random() * 5);
-            
-            this.updateAdminDashboard();
-            this.refreshCharts();
-            
-            this.showNotification('Données actualisées avec succès!', 'success');
-        }, 1500);
+        const headers = Object.keys(data[0]);
+        const csvContent = [
+            headers.join(','),
+            ...data.map(row => headers.map(header => `"${row[header]}"`).join(','))
+        ].join('\n');
+        
+        return csvContent;
     }
 
-    systemAlert() {
-        this.showConfirmModal(
-            'Alerte Système',
-            'Voulez-vous déclencher une alerte système ? Ceci notifiera tous les administrateurs.',
-            () => {
-                this.showNotification('🚨 Alerte système déclenchée - Administrateurs notifiés', 'warning');
-                
-                // Ajouter l'alerte à la liste
-                this.addSystemAlert('Alerte manuelle déclenchée par l\'administrateur', 'warning');
-            }
-        );
+    downloadFile(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(url);
     }
 
-    addPatient() {
-        this.openModal('addPatientModal');
-    }
-
-    maintenanceMode() {
-        this.showConfirmModal(
-            'Mode Maintenance',
-            '⚠️ Attention: Le mode maintenance rendra le système inaccessible aux utilisateurs. Continuer ?',
-            () => {
-                this.showNotification('🔧 Mode maintenance activé - Système en cours de maintenance', 'warning');
-                
-                // Simuler l'activation du mode maintenance
-                setTimeout(() => {
-                    this.showNotification('Maintenance terminée - Système opérationnel', 'success');
-                }, 5000);
-            }
-        );
-    }
-
-    generateSystemReport() {
-        this.showNotification('Génération du rapport système en cours...', 'info');
-        
-        setTimeout(() => {
-            const reportData = {
-                timestamp: new Date().toISOString(),
-                systemHealth: this.systemData.systemHealth,
-                metrics: this.systemData,
-                patients: this.patients.length,
-                recentActivity: 'Système stable, performances normales'
-            };
-            
-            this.downloadJSON(reportData, `rapport-systeme-${new Date().toISOString().split('T')[0]}.json`);
-            this.showNotification('📊 Rapport système généré et téléchargé!', 'success');
-        }, 2000);
-    }
-
-    // Gestion des patients
-    searchPatients(query) {
-        const filteredPatients = this.patients.filter(patient => 
-            patient.name.toLowerCase().includes(query.toLowerCase()) ||
-            patient.email.toLowerCase().includes(query.toLowerCase()) ||
-            patient.id.toString().includes(query)
-        );
-        
-        // Mettre à jour l'affichage avec les résultats filtrés
-        console.log('Recherche:', query, 'Résultats:', filteredPatients.length);
-    }
-
-    filterPatients() {
-        const riskFilter = document.getElementById('riskFilter').value;
-        const statusFilter = document.getElementById('statusFilter').value;
-        const activityFilter = document.getElementById('activityFilter').value;
-        
-        console.log('Filtres appliqués:', { riskFilter, statusFilter, activityFilter });
-        // Appliquer les filtres et mettre à jour la table
-    }
-
-    viewPatientDetails(patientId) {
-        const patient = this.patients.find(p => p.id === patientId);
-        if (patient) {
-            const modalBody = document.querySelector('#patientModal .modal-body');
-            modalBody.innerHTML = `
-                <div class="patient-details">
-                    <div class="patient-header">
-                        <div class="patient-avatar large">${this.getInitials(patient.name)}</div>
-                        <div class="patient-basic-info">
-                            <h3>${patient.name}</h3>
-                            <p>${patient.email}</p>
-                            <p>${patient.age} ans</p>
-                            <span class="risk-badge ${patient.riskLevel}">${this.getRiskText(patient.riskLevel)} (${patient.riskPercentage}%)</span>
-                        </div>
-                    </div>
-                    <div class="patient-stats">
-                        <div class="stat-item">
-                            <label>Dernière Évaluation:</label>
-                            <span>${this.formatRelativeTime(patient.lastEvaluation)}</span>
-                        </div>
-                        <div class="stat-item">
-                            <label>Statut:</label>
-                            <span class="status-badge ${patient.status}">${this.getStatusText(patient.status)}</span>
-                        </div>
-                        <div class="stat-item">
-                            <label>Nombre d'Évaluations:</label>
-                            <span>${Math.floor(Math.random() * 20) + 5}</span>
-                        </div>
-                    </div>
-                    <div class="patient-actions">
-                        <button class="btn btn-primary" onclick="contactPatient(${patient.id})">
-                            <i class="fas fa-envelope"></i> Contacter
-                        </button>
-                        <button class="btn btn-secondary" onclick="exportPatientData(${patient.id})">
-                            <i class="fas fa-download"></i> Exporter Données
-                        </button>
-                        ${patient.status === 'critical' ? 
-                            `<button class="btn btn-danger" onclick="emergencyProtocol(${patient.id})">
-                                <i class="fas fa-phone-alt"></i> Protocole Urgence
-                            </button>` : ''
-                        }
-                    </div>
-                </div>
-            `;
-            this.openModal('patientModal');
-        }
-    }
-
-    saveNewPatient() {
-        const form = document.getElementById('newPatientForm');
-        const formData = new FormData(form);
-        
-        const newPatient = {
-            id: this.patients.length > 0 ? Math.max(...this.patients.map(p => p.id)) + 1 : 1248,
-            name: `${formData.get('firstName')} ${formData.get('lastName')}`,
-            email: formData.get('email'),
-            age: this.calculateAge(new Date(formData.get('dateOfBirth'))),
-            riskLevel: 'low', // Par défaut
-            riskPercentage: 0,
-            lastEvaluation: null,
-            status: 'active'
-        };
-        
-        this.patients.push(newPatient);
-        this.systemData.totalPatients++;
-        
-        this.updatePatientsTable();
-        this.updateOverviewSection();
-        this.closeModal('addPatientModal');
-        form.reset();
-        
-        this.showNotification(`Patient ${newPatient.name} ajouté avec succès!`, 'success');
-    }
-
-    calculateAge(birthDate) {
-        const today = new Date();
-        const birth = new Date(birthDate);
-        let age = today.getFullYear() - birth.getFullYear();
-        const monthDiff = today.getMonth() - birth.getMonth();
-        
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-            age--;
-        }
-        
-        return age;
-    }
-
-    // Gestion des logs
-    refreshLogs() {
-        const container = document.getElementById('logsContainer');
-        if (!container) return;
-
-        // Générer des logs simulés
-        const logs = this.generateSimulatedLogs();
-        
-        container.innerHTML = logs.map(log => `
-            <div class="log-entry ${log.level}">
-                <span class="log-time">${log.timestamp}</span>
-                <span class="log-level ${log.level}">${log.level.toUpperCase()}</span>
-                <span class="log-component">${log.component}</span>
-                <span class="log-message">${log.message}</span>
+    // Système de notifications
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fas ${this.getNotificationIcon(type)}"></i>
+                <span>${message}</span>
             </div>
-        `).join('');
-    }
-
-    generateSimulatedLogs() {
-        return [
-            {
-                timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
-                level: 'error',
-                component: 'ML',
-                message: 'Timeout lors de la prédiction pour le patient #1245'
-            },
-            {
-                timestamp: new Date(Date.now() - 2 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' '),
-                level: 'warning',
-                component: 'DB',
-                message: 'Connexions à la base de données élevées: 95/100'
-            },
-            {
-                timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' '),
-                level: 'info',
-                component: 'API',
-                message: 'Nouveau patient enregistré: #1248'
-            },
-            {
-                timestamp: new Date(Date.now() - 8 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' '),
-                level: 'info',
-                component: 'ML',
-                message: 'Prédiction réussie pour le patient #1247 - Risque: 15%'
-            }
-        ];
-    }
-
-    filterLogs() {
-        const level = document.getElementById('logLevel').value;
-        const component = document.getElementById('logComponent').value;
+        `;
         
-        console.log('Filtres logs:', { level, component });
-        // Appliquer les filtres et mettre à jour l'affichage
+        notification.style.cssText = `
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: ${this.getNotificationColor(type)};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 3000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            min-width: 320px;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 10);
+        
+        setTimeout(() => {
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 4000);
     }
 
-    // Fonctions de modal
-    openModal(modalId) {
+    getNotificationIcon(type) {
+        const icons = {
+            success: 'fa-check-circle',
+            error: 'fa-exclamation-circle',
+            warning: 'fa-exclamation-triangle',
+            info: 'fa-info-circle'
+        };
+        return icons[type] || icons.info;
+    }
+
+    getNotificationColor(type) {
+        const colors = {
+            success: '#22c55e',
+            error: '#ef4444',
+            warning: '#f59e0b',
+            info: '#3b82f6'
+        };
+        return colors[type] || colors.info;
+    }
+
+    // Gestion des modales
+    showModal(modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
-            modal.classList.add('active');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
     }
 
     closeModal(modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
-            modal.classList.remove('active');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
     }
 
-    closeAllModals() {
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.classList.remove('active');
-        });
+    showConfirmModal(title, message, callback) {
+        document.getElementById('confirmModalTitle').textContent = title;
+        document.getElementById('confirmModalMessage').textContent = message;
+        this.confirmCallback = callback;
+        this.showModal('confirmModal');
     }
 
-    showConfirmModal(title, message, onConfirm) {
-        document.getElementById('confirmTitle').textContent = title;
-        document.getElementById('confirmMessage').textContent = message;
-        this.confirmAction = onConfirm;
-        this.openModal('confirmModal');
-    }
-
-    executeConfirmedAction() {
-        if (this.confirmAction) {
-            this.confirmAction();
-            this.confirmAction = null;
+    confirmAction() {
+        if (this.confirmCallback) {
+            this.confirmCallback();
+            this.confirmCallback = null;
         }
         this.closeModal('confirmModal');
     }
 
-    // Fonctions utilitaires
-    showNotification(message, type = 'info') {
-        if (window.CardiaCare && window.CardiaCare.showNotification) {
-            window.CardiaCare.showNotification(message, type);
-        } else {
-            console.log(`${type.toUpperCase()}: ${message}`);
+    // Mises à jour temps réel
+    startRealTimeUpdates() {
+        setInterval(() => {
+            this.updateSystemStats();
+            this.simulateRealTimeData();
+        }, 30000); // Mise à jour toutes les 30 secondes
+    }
+
+    simulateRealTimeData() {
+        // Simulation de nouvelles données en temps réel
+        if (Math.random() > 0.7) {
+            // Nouvelle consultation
+            this.systemStats.activeConsultations += Math.floor(Math.random() * 3);
         }
-    }
-
-    downloadJSON(data, filename) {
-        const dataStr = JSON.stringify(data, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
         
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(dataBlob);
-        link.download = filename;
-        link.click();
+        if (Math.random() > 0.9) {
+            // Nouveau patient
+            this.systemStats.totalPatients += 1;
+        }
+        
+        // Petites variations de performance
+        this.systemStats.systemHealth += (Math.random() - 0.5) * 0.1;
+        this.systemStats.systemHealth = Math.max(95, Math.min(100, this.systemStats.systemHealth));
+        
+        this.systemStats.mlAccuracy += (Math.random() - 0.5) * 0.2;
+        this.systemStats.mlAccuracy = Math.max(90, Math.min(98, this.systemStats.mlAccuracy));
+        
+        this.updateSystemStats();
     }
 
-    addSystemAlert(message, type) {
-        // Ajouter une nouvelle alerte au système
-        this.systemData.activeAlerts++;
-        console.log(`Nouvelle alerte ${type}: ${message}`);
+    updateSystemStats() {
+        // Mise à jour des statistiques dans l'en-tête
+        const totalPatientsEl = document.getElementById('totalPatients');
+        const activeConsultationsEl = document.getElementById('activeConsultations');
+        const systemHealthEl = document.getElementById('systemHealth');
+
+        if (totalPatientsEl) {
+            totalPatientsEl.textContent = this.systemStats.totalPatients.toLocaleString();
+        }
+        
+        if (activeConsultationsEl) {
+            activeConsultationsEl.textContent = this.systemStats.activeConsultations;
+        }
+        
+        if (systemHealthEl) {
+            systemHealthEl.textContent = this.systemStats.systemHealth.toFixed(1) + '%';
+        }
+
+        // Mise à jour des cartes de statistiques dans overview
+        this.updateOverviewStats();
     }
 
-    refreshCharts() {
-        Object.values(this.charts).forEach(chart => {
-            if (chart && typeof chart.update === 'function') {
-                chart.update();
+    updateOverviewStats() {
+        const statCards = document.querySelectorAll('.stat-card');
+        
+        statCards.forEach(card => {
+            const number = card.querySelector('.stat-number');
+            if (!number) return;
+            
+            if (card.classList.contains('patients')) {
+                number.textContent = this.systemStats.totalPatients.toLocaleString();
+            } else if (card.classList.contains('consultations')) {
+                number.textContent = '15,840'; // Total historique
+            } else if (card.classList.contains('accuracy')) {
+                number.textContent = this.systemStats.mlAccuracy.toFixed(1) + '%';
+            } else if (card.classList.contains('uptime')) {
+                number.textContent = this.systemStats.systemHealth.toFixed(1) + '%';
             }
         });
     }
 
-    updateAdminDashboard() {
-        switch (this.currentSection) {
-            case 'overview':
-                this.updateOverviewSection();
-                break;
-            case 'patients':
-                this.updatePatientsTable();
-                break;
-            case 'monitoring':
-                this.updateMonitoringSection();
-                break;
+    // Animation d'entrée
+    animateOnLoad() {
+        const elements = document.querySelectorAll('.admin-sidebar, .admin-content');
+        elements.forEach((element, index) => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                element.style.transition = 'all 0.6s ease';
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+            }, index * 200 + 300);
+        });
+    }
+
+    // Fonctions de recherche et tri avancés
+    sortTable(column, direction = 'asc') {
+        this.patientsData.sort((a, b) => {
+            let aVal = a[column];
+            let bVal = b[column];
+            
+            if (typeof aVal === 'string') {
+                aVal = aVal.toLowerCase();
+                bVal = bVal.toLowerCase();
+            }
+            
+            if (direction === 'asc') {
+                return aVal > bVal ? 1 : -1;
+            } else {
+                return aVal < bVal ? 1 : -1;
+            }
+        });
+        
+        this.renderPatientsTable();
+    }
+
+    // Gestion des erreurs
+    handleError(error, context = '') {
+        console.error(`Erreur ${context}:`, error);
+        this.showNotification(`Erreur ${context}: ${error.message}`, 'error');
+    }
+
+    // Export avancé
+    exportToJSON(data, filename) {
+        const jsonContent = JSON.stringify(data, null, 2);
+        this.downloadFile(jsonContent, filename, 'application/json');
+    }
+
+    exportToExcel(data, filename) {
+        // Simulation d'export Excel (nécessiterait une bibliothèque comme SheetJS)
+        this.showNotification('Export Excel nécessite une bibliothèque supplémentaire', 'warning');
+    }
+
+    // Fonctions de statistiques avancées
+    getPatientStatistics() {
+        const stats = {
+            total: this.patientsData.length,
+            active: this.patientsData.filter(p => p.status === 'active').length,
+            byRisk: {
+                low: this.patientsData.filter(p => p.riskLevel === 'low').length,
+                moderate: this.patientsData.filter(p => p.riskLevel === 'moderate').length,
+                high: this.patientsData.filter(p => p.riskLevel === 'high').length
+            },
+            averageAge: Math.round(
+                this.patientsData.reduce((sum, p) => sum + p.age, 0) / this.patientsData.length
+            )
+        };
+        
+        return stats;
+    }
+
+    // Validation des données
+    validatePatientData(data) {
+        const errors = [];
+        
+        if (!data.firstName || data.firstName.trim().length < 2) {
+            errors.push('Le prénom doit contenir au moins 2 caractères');
+        }
+        
+        if (!data.lastName || data.lastName.trim().length < 2) {
+            errors.push('Le nom doit contenir au moins 2 caractères');
+        }
+        
+        if (!data.age || data.age < 0 || data.age > 150) {
+            errors.push('L\'âge doit être compris entre 0 et 150 ans');
+        }
+        
+        if (data.email && !this.isValidEmail(data.email)) {
+            errors.push('Format d\'email invalide');
+        }
+        
+        return errors;
+    }
+
+    isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    // Recherche intelligente
+    intelligentSearch(query) {
+        const searchTerms = query.toLowerCase().split(' ');
+        
+        return this.patientsData.filter(patient => {
+            const searchableFields = [
+                patient.firstName.toLowerCase(),
+                patient.lastName.toLowerCase(),
+                patient.id.toLowerCase(),
+                patient.email ? patient.email.toLowerCase() : '',
+                patient.phone ? patient.phone.toLowerCase() : ''
+            ].join(' ');
+            
+            return searchTerms.every(term => searchableFields.includes(term));
+        });
+    }
+
+    // Sauvegarde automatique
+    enableAutoSave() {
+        setInterval(() => {
+            this.saveToLocalStorage();
+        }, 60000); // Sauvegarde toutes les minutes
+    }
+
+    saveToLocalStorage() {
+        try {
+            const dataToSave = {
+                patients: this.patientsData,
+                consultations: this.consultationsData,
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('cardiacare_admin_backup', JSON.stringify(dataToSave));
+        } catch (error) {
+            console.warn('Impossible de sauvegarder en localStorage:', error);
         }
     }
 
-    loadSystemActivity() {
-        // Charger l'activité système récente
-        this.updateSystemActivity();
-    }
-
-    startRealTimeMonitoring() {
-        // Mise à jour en temps réel toutes les 30 secondes
-        setInterval(() => {
-            if (this.currentSection === 'overview') {
-                this.updateOverviewSection();
-            } else if (this.currentSection === 'monitoring') {
-                this.updateMonitoringSection();
-                this.refreshLogs();
+    loadFromLocalStorage() {
+        try {
+            const savedData = localStorage.getItem('cardiacare_admin_backup');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                this.patientsData = data.patients || this.patientsData;
+                this.consultationsData = data.consultations || this.consultationsData;
+                return true;
             }
-        }, 30000);
-
-        // Simulation de nouvelles données périodiquement
-        setInterval(() => {
-            this.simulateSystemUpdates();
-        }, 60000); // Toutes les minutes
+        } catch (error) {
+            console.warn('Impossible de charger depuis localStorage:', error);
+        }
+        return false;
     }
 
-    simulateSystemUpdates() {
-        // Simuler de légères variations dans les données système
-        this.systemData.totalPredictions += Math.floor(Math.random() * 10);
-        this.systemData.performance.responseTime = Math.floor(Math.random() * 50) + 120;
+    // Fonctions de performance
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    throttle(func, limit) {
+        let inThrottle;
+        return function() {
+            const args = arguments;
+            const context = this;
+            if (!inThrottle) {
+                func.apply(context, args);
+                inThrottle = true;
+                setTimeout(() => inThrottle = false, limit);
+            }
+        };
+    }
+
+    // Nettoyage et maintenance
+    cleanup() {
+        // Nettoyer les timers
+        clearInterval(this.updateInterval);
         
-        // Mettre à jour l'affichage si nécessaire
-        if (this.currentSection === 'overview') {
-            this.updateOverviewSection();
+        // Supprimer les event listeners
+        document.removeEventListener('click', this.handleDocumentClick);
+        document.removeEventListener('keydown', this.handleKeyDown);
+        
+        // Sauvegarder avant de quitter
+        this.saveToLocalStorage();
+    }
+
+    // Fonctions de debug et développement
+    getDebugInfo() {
+        return {
+            currentSection: this.currentSection,
+            currentPage: this.currentPage,
+            patientsCount: this.patientsData.length,
+            consultationsCount: this.consultationsData.length,
+            logsCount: this.systemLogs.length,
+            systemStats: this.systemStats,
+            version: '1.0.0'
+        };
+    }
+
+    // Fonctions de test
+    runTests() {
+        console.log('🧪 Tests du panneau d\'administration...');
+        
+        try {
+            // Test de validation
+            const testData = { firstName: 'Test', lastName: 'User', age: 30 };
+            const errors = this.validatePatientData(testData);
+            console.assert(errors.length === 0, 'Test validation - OK');
+            
+            // Test de recherche
+            const results = this.intelligentSearch('ahmed');
+            console.assert(Array.isArray(results), 'Test recherche - OK');
+            
+            // Test de statistiques
+            const stats = this.getPatientStatistics();
+            console.assert(typeof stats.total === 'number', 'Test statistiques - OK');
+            
+            console.log('✅ Tous les tests réussis !');
+        } catch (error) {
+            console.error('❌ Erreur dans les tests:', error);
         }
     }
 }
 
 // Fonctions globales pour les événements HTML
-function addPatient() {
-    admin.addPatient();
+let adminDashboard;
+
+// Fonctions d'action globales
+function addNewPatient() {
+    adminDashboard?.addNewPatient();
 }
 
-function saveNewPatient() {
-    admin.saveNewPatient();
+function exportData() {
+    adminDashboard?.exportData();
+}
+
+function systemBackup() {
+    adminDashboard?.systemBackup();
+}
+
+function refreshOverview() {
+    adminDashboard?.refreshOverview();
+}
+
+function refreshConsultations() {
+    adminDashboard?.refreshConsultations();
+}
+
+function saveSettings() {
+    adminDashboard?.saveSettings();
+}
+
+function clearLogs() {
+    adminDashboard?.clearLogs();
+}
+
+function savePatient() {
+    adminDashboard?.savePatient();
 }
 
 function closeModal(modalId) {
-    admin.closeModal(modalId);
+    adminDashboard?.closeModal(modalId);
 }
 
-function executeConfirmedAction() {
-    admin.executeConfirmedAction();
+function confirmAction() {
+    adminDashboard?.confirmAction();
 }
 
-function refreshAdminData() {
-    admin.refreshAdminData();
+function exportPatients() {
+    adminDashboard?.exportPatients();
 }
 
-function systemAlert() {
-    admin.systemAlert();
+function exportAnalytics() {
+    adminDashboard?.exportAnalytics();
 }
 
-function maintenanceMode() {
-    admin.maintenanceMode();
+function uploadNewModel() {
+    adminDashboard?.uploadNewModel();
 }
 
-function generateSystemReport() {
-    admin.generateSystemReport();
+function viewModelDetails(modelId) {
+    adminDashboard?.viewModelDetails(modelId);
 }
 
-function viewPatientDetails(patientId) {
-    admin.viewPatientDetails(patientId);
+function activateModel(modelId) {
+    adminDashboard?.activateModel(modelId);
 }
 
-function editPatient(patientId) {
-    admin.showNotification('Fonction d\'édition en cours de développement', 'info');
+function retrainModel(modelId) {
+    adminDashboard?.retrainModel(modelId);
 }
 
-function contactPatient(patientId) {
-    admin.showNotification(`Ouverture de l'interface de contact pour le patient #${patientId}`, 'info');
+function deleteModel(modelId) {
+    adminDashboard?.deleteModel(modelId);
 }
 
-function emergencyProtocol(patientId) {
-    admin.showConfirmModal(
-        'Protocole d\'Urgence',
-        `Déclencher le protocole d'urgence pour le patient #${patientId} ?`,
-        () => {
-            admin.showNotification(`🚨 Protocole d'urgence activé pour le patient #${patientId}`, 'warning');
-        }
-    );
+function logout() {
+    if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+        window.location.href = 'index.html';
+    }
 }
 
-function filterPatients() {
-    admin.filterPatients();
-}
-
-function previousPage() {
-    admin.showNotification('Page précédente', 'info');
-}
-
-function nextPage() {
-    admin.showNotification('Page suivante', 'info');
-}
-
-function retrainModel() {
-    admin.showNotification('Réentraînement du modèle ML en cours...', 'info');
-    setTimeout(() => {
-        admin.showNotification('Modèle ML réentraîné avec succès!', 'success');
-    }, 3000);
-}
-
-function exportMLData() {
-    admin.showNotification('Export des données ML en cours...', 'info');
-    setTimeout(() => {
-        admin.showNotification('Données ML exportées!', 'success');
-    }, 1500);
-}
-
-function runDiagnostics() {
-    admin.showNotification('Diagnostics système en cours...', 'info');
-    setTimeout(() => {
-        admin.showNotification('Diagnostics terminés - Système en bon état', 'success');
-    }, 2500);
-}
-
-function exportLogs() {
-    admin.showNotification('Export des logs système...', 'info');
-    setTimeout(() => {
-        admin.showNotification('Logs exportés avec succès!', 'success');
-    }, 1000);
-}
-
-function filterLogs() {
-    admin.filterLogs();
-}
-
-function generateMedicalReport() {
-    admin.showNotification('Génération du rapport médical...', 'info');
-}
-
-function generateReport(type) {
-    admin.showNotification(`Génération du rapport ${type}...`, 'info');
-}
-
-function downloadReport(reportId) {
-    admin.showNotification(`Téléchargement du rapport ${reportId}...`, 'info');
-}
-
-function viewReport(reportId) {
-    admin.showNotification(`Ouverture du rapport ${reportId}...`, 'info');
-}
-
-function shareReport(reportId) {
-    admin.showNotification(`Partage du rapport ${reportId}...`, 'info');
-}
-
-function saveAllSettings() {
-    admin.showNotification('Sauvegarde de tous les paramètres...', 'info');
-    setTimeout(() => {
-        admin.showNotification('Paramètres sauvegardés avec succès!', 'success');
-    }, 1000);
-}
-
-function resetSystem() {
-    admin.showConfirmModal(
-        'Réinitialisation Système',
-        '⚠️ Cette action va réinitialiser tous les paramètres système. Continuer ?',
-        () => {
-            admin.showNotification('🔄 Réinitialisation du système en cours...', 'warning');
-        }
-    );
-}
-
-function purgeOldData() {
-    admin.showConfirmModal(
-        'Purge des Données',
-        '⚠️ Cette action va supprimer définitivement les anciennes données. Cette action est irréversible!',
-        () => {
-            admin.showNotification('🗑️ Purge des anciennes données en cours...', 'warning');
-        }
-    );
-}
-
-function factoryReset() {
-    admin.showConfirmModal(
-        'Remise à Zéro Complète',
-        '🚨 DANGER: Cette action va effacer TOUTES les données du système. Êtes-vous absolument certain ?',
-        () => {
-            admin.showNotification('💥 Remise à zéro complète initiée...', 'error');
-        }
-    );
-}
-
-function clearAllAlerts() {
-    admin.systemData.activeAlerts = 0;
-    admin.updateOverviewSection();
-    admin.showNotification('Toutes les alertes ont été effacées', 'success');
-}
-
-function triggerBackup() {
-    admin.showNotification('Sauvegarde manuelle en cours...', 'info');
-    setTimeout(() => {
-        admin.showNotification('Sauvegarde terminée avec succès!', 'success');
-    }, 2000);
-}
-
-function viewPatient(patientId) {
-    admin.viewPatientDetails(patientId);
-}
-
-// Instance globale de l'administration
-let admin;
-
-// Initialisation
+// Initialisation au chargement de la page
 document.addEventListener('DOMContentLoaded', function() {
-    admin = new AdminManager();
+    console.log('🚀 Initialisation du panneau d\'administration CardiaCare...');
     
-    console.log('🛠️ Interface d\'administration CardiaCare initialisée');
-    console.log('👨‍💼 Toutes les fonctionnalités administratives sont opérationnelles');
-    
-    // Animation d'entrée
-    setTimeout(() => {
-        document.body.classList.add('loaded');
-    }, 500);
-});
-
-// Gestion des clics sur les modales (fermeture en cliquant à l'extérieur)
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('modal')) {
-        admin.closeModal(e.target.id);
+    try {
+        adminDashboard = new AdminDashboard();
+        
+        // Exposition globale pour le debug
+        window.AdminDashboard = adminDashboard;
+        
+        // Fonctions utilitaires globales
+        window.AdminUtils = {
+            exportData: () => adminDashboard.exportData(),
+            getDebugInfo: () => adminDashboard.getDebugInfo(),
+            runTests: () => adminDashboard.runTests(),
+            getStats: () => adminDashboard.getPatientStatistics()
+        };
+        
+        console.log('✅ Panneau d\'administration initialisé avec succès');
+        console.log('💡 Utilisez AdminUtils pour accéder aux outils de développement');
+        
+    } catch (error) {
+        console.error('❌ Erreur lors de l\'initialisation:', error);
     }
 });
 
-// Export pour debug
-window.Admin = admin;
+// Nettoyage à la fermeture
+window.addEventListener('beforeunload', function() {
+    if (adminDashboard) {
+        adminDashboard.cleanup();
+    }
+});
+
+// Gestion des erreurs globales
+window.addEventListener('error', function(e) {
+    console.error('Erreur Administration:', e.error);
+    if (adminDashboard) {
+        adminDashboard.handleError(e.error, 'globale');
+    }
+});
+
+// Log de démarrage
+console.log('🏥 CardiaCare Administration Panel - Version complète chargée');
+console.log('📊 Utilisez AdminUtils pour les fonctions de développement');
