@@ -1,4 +1,186 @@
-[
+{% extends "base.html" %}
+
+{% block title %}CardioBot - Assistant de Santé Cardiaque{% endblock %}
+
+{% block styles %}
+<style>
+    .chat-window {
+        height: 400px;
+        overflow-y: auto;
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+    }
+
+    .typing-dots {
+        display: inline-flex;
+        align-items: center;
+        height: 20px;
+    }
+
+    .typing-dots span {
+        width: 8px;
+        height: 8px;
+        margin: 0 2px;
+        background-color: #6c757d;
+        border-radius: 50%;
+        display: inline-block;
+        animation: bounce 1.4s infinite ease-in-out both;
+    }
+
+    .typing-dots span:nth-child(1) {
+        animation-delay: -0.32s;
+    }
+
+    .typing-dots span:nth-child(2) {
+        animation-delay: -0.16s;
+    }
+
+    @keyframes bounce {
+        0%, 80%, 100% { 
+            transform: scale(0);
+        } 
+        40% { 
+            transform: scale(1);
+        }
+    }
+
+    .card {
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .max-w-75 {
+        max-width: 75%;
+    }
+
+    .message-user {
+        background-color: #0d6efd;
+        color: white;
+        margin-left: auto;
+        max-width: 75%;
+    }
+
+    .message-bot {
+        background-color: white;
+        border: 1px solid #dee2e6;
+    }
+
+    .auth-prompt-message {
+        max-width: 75%;
+        margin-right: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Hero Section -->
+    <div class="row align-items-center mb-5">
+        <div class="col-md-6">
+            <h1 class="display-4 fw-bold">CardioBot</h1>
+            <p class="lead text-muted">Votre assistant de santé cardiaque intelligent</p>
+            <p class="mb-4">Obtenez des réponses instantanées à vos questions sur la santé cardiaque et accédez à des outils d'évaluation avancés.</p>
+            
+            <div class="d-flex gap-3">
+                <a href="#chatbot-section" class="btn btn-primary btn-lg px-4">Chatbot Public</a>
+                <button class="btn btn-outline-primary btn-lg px-4" onclick="showAuthModal()">
+                    Test Cardiaque
+                </button>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="placeholder-image bg-light rounded shadow d-flex align-items-center justify-content-center" style="height: 300px;">
+                <i class="fas fa-heartbeat fa-5x text-primary"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-comments fa-3x text-primary mb-3"></i>
+                    <h5>Chatbot 24/7</h5>
+                    <p>Réponses immédiates à vos questions de santé générale, accessible à tout moment.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-heart-pulse fa-3x text-danger mb-3"></i>
+                    <h5>Analyse Cardiaque</h5>
+                    <p>Évaluation personnalisée de votre santé cardiovasculaire (compte requis).</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+                    <h5>Suivi Médical</h5>
+                    <p>Historique de vos consultations et résultats pour un meilleur suivi.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbot Section -->
+    <div id="chatbot-section" class="card shadow mt-5">
+        <div class="card-header bg-primary text-white py-3">
+            <h3 class="mb-0"><i class="fas fa-robot me-2"></i> Chatbot CardioBot</h3>
+        </div>
+        <div class="card-body">
+            <div id="chat-container" class="chat-window mb-3 p-3 bg-light rounded"></div>
+            <div class="input-group">
+                <input type="text" 
+                       id="user-input" 
+                       class="form-control form-control-lg" 
+                       placeholder="Posez votre question médicale..."
+                       aria-label="Question médicale">
+                <button id="send-btn" class="btn btn-primary px-4">
+                    <i class="fas fa-paper-plane me-1"></i> Envoyer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Auth Modal -->
+<div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Accès Premium Requis</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-lock fa-4x text-primary mb-4"></i>
+                <p class="lead">Le test cardiaque complet nécessite un compte utilisateur.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button class="btn btn-primary px-4 me-2" onclick="login()">Connexion</button>
+                <button class="btn btn-outline-primary px-4" onclick="register()">Inscription</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let chatContainer, userInput, sendBtn;
+    let isAuthenticated = false; // Simuler l'état d'authentification
+    let authModal;
+
+    // Base de connaissances complète
+    const knowledgeBase = [
+       [
   {
     "question": "Quels sont les symptômes des maladies cardiaques ?",
     "answer": "Les symptômes incluent douleurs thoraciques, essoufflement, fatigue, palpitations, vertiges et gonflement des jambes."
@@ -325,10 +507,10 @@
   },
   {
     "question": "Quand utilise-t-on un défibrillateur implantable ?",
-    "answer": "En cas de risque élevé d’arythmies graves ou de mort subite."
+    "answer": "En cas de risque élevé d'arythmies graves ou de mort subite."
   },
   {
-    "question": "Qu’est-ce qu’un pacemaker ?",
+    "question": "Qu'est-ce qu'un pacemaker ?",
     "answer": "Un petit appareil implanté pour réguler le rythme cardiaque."
   },
   {
@@ -336,16 +518,16 @@
     "answer": "Environ 3 à 6 heures selon la complexité."
   },
   {
-    "question": "Le traitement de l’insuffisance cardiaque est-il à vie ?",
+    "question": "Le traitement de l'insuffisance cardiaque est-il à vie ?",
     "answer": "Souvent oui, mais il permet de bien vivre avec la maladie."
   },
   {
-    "question": "Quels sont les effets d’un stent ?",
-    "answer": "Il maintient l’artère ouverte après une angioplastie."
+    "question": "Quels sont les effets d'un stent ?",
+    "answer": "Il maintient l'artère ouverte après une angioplastie."
   },
   {
     "question": "Quelles sont les complications possibles après une angioplastie ?",
-    "answer": "Hématome, rétrécissement à nouveau de l’artère, saignements."
+    "answer": "Hématome, rétrécissement à nouveau de l'artère, saignements."
   },
   {
     "question": "Quel est le rôle des statines ?",
@@ -393,7 +575,7 @@
   },
   {
     "question": "Comment gérer le stress après un infarctus ?",
-    "answer": "Par le soutien psychologique, la relaxation, l’activité physique douce."
+    "answer": "Par le soutien psychologique, la relaxation, l'activité physique douce."
   },
   {
     "question": "Les médecines douces peuvent-elles aider ?",
@@ -403,3 +585,294 @@
 
 
 ]
+    ];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialiser les éléments DOM
+        chatContainer = document.getElementById('chat-container');
+        userInput = document.getElementById('user-input');
+        sendBtn = document.getElementById('send-btn');
+        authModal = new bootstrap.Modal(document.getElementById('authModal'));
+        
+        // Messages de bienvenue
+        const welcomeMessages = [
+            "Bonjour ! Je suis CardioBot, votre assistant médical spécialisé en santé cardiaque.",
+            "Posez-moi vos questions sur les symptômes, la prévention ou les traitements des maladies cardiovasculaires.",
+            "Je peux vous orienter mais ne remplace pas un avis médical professionnel. En cas d'urgence, appelez le 15."
+        ];
+        
+        welcomeMessages.forEach((message, index) => {
+            setTimeout(() => {
+                addMessage('CardioBot', message);
+            }, index * 800);
+        });
+
+        // Event listeners
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    });
+
+    function addMessage(sender, message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'd-flex mb-3';
+        
+        if (sender === 'CardioBot') {
+            messageDiv.innerHTML = `
+                <div class="flex-shrink-0 me-3">
+                    <i class="fas fa-robot text-primary fa-2x"></i>
+                </div>
+                <div class="message-bot p-3 rounded shadow-sm flex-grow-1">
+                    <strong>${sender}:</strong> ${escapeHtml(message)}
+                </div>`;
+        } else {
+            messageDiv.className += ' justify-content-end';
+            messageDiv.innerHTML = `
+                <div class="message-user p-3 rounded shadow-sm">
+                    <strong>${sender}:</strong> ${escapeHtml(message)}
+                </div>`;
+        }
+        
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    // Fonction pour trouver la réponse la plus pertinente
+    function findBestAnswer(userQuestion) {
+        const lowerQuestion = userQuestion.toLowerCase();
+        
+        // D'abord chercher une correspondance exacte
+        const exactMatch = knowledgeBase.find(item => 
+            item.question.toLowerCase() === lowerQuestion
+        );
+        if (exactMatch) return exactMatch.answer;
+        
+        // Ensuite chercher des mots-clés
+        const keywords = {
+            "symptôme": knowledgeBase[0],
+            "facteur de risque": knowledgeBase[1],
+            "prévenir": knowledgeBase[2],
+            "type": knowledgeBase[3],
+            "crise cardiaque": knowledgeBase[4],
+            "cholestérol": knowledgeBase[5],
+            "tension": knowledgeBase[6],
+            "pression": knowledgeBase[6],
+            "exercice": knowledgeBase[7],
+            "aliment": knowledgeBase[8],
+            "consulter": knowledgeBase[9],
+            "héréditaire": knowledgeBase[10],
+            "avc": knowledgeBase[11],
+            "stress": knowledgeBase[12],
+            "examen": knowledgeBase[13],
+            "guérir": knowledgeBase[14],
+            "traitement": knowledgeBase[15],
+            "jeune": knowledgeBase[16],
+            "alcool": knowledgeBase[17],
+            "femme": knowledgeBase[18],
+            "médecine douce": knowledgeBase[19]
+        };
+        
+        for (const [keyword, qa] of Object.entries(keywords)) {
+            if (lowerQuestion.includes(keyword)) {
+                return qa.answer;
+            }
+        }
+        
+        // Enfin, utiliser une similarité de texte basique
+        for (const qa of knowledgeBase) {
+            const questionWords = qa.question.toLowerCase().split(/\s+/);
+            const matchingWords = questionWords.filter(word => 
+                lowerQuestion.includes(word) && word.length > 3
+            );
+            
+            if (matchingWords.length >= 2) {
+                return qa.answer;
+            }
+        }
+        
+        return null;
+    }
+
+    function sendMessage() {
+        const message = userInput.value.trim();
+        if (!message) return;
+
+        addMessage('Vous', message);
+        userInput.value = '';
+        
+        const typingIndicator = addTypingIndicator();
+        
+        setTimeout(() => {
+            removeTypingIndicator(typingIndicator);
+            
+            // Chercher une réponse dans la base de connaissances
+            const foundAnswer = findBestAnswer(message);
+            
+            let response;
+            if (foundAnswer) {
+                response = foundAnswer;
+            } else {
+                // Réponse par défaut si aucune correspondance trouvée
+                const lowerMessage = message.toLowerCase();
+                
+                if (lowerMessage.includes('coeur') || lowerMessage.includes('cardiaque')) {
+                    if (!isAuthenticated && (lowerMessage.includes('test') || lowerMessage.includes('analyse'))) {
+                        addAuthPrompt("Pour accéder aux tests cardiaques personnalisés, vous devez vous connecter.");
+                        return;
+                    }
+                    response = "Les problèmes cardiaques peuvent être complexes. Je recommande de consulter un cardiologue pour un examen approfondi.";
+                } else if (lowerMessage.includes('douleur') || lowerMessage.includes('douleurs')) {
+                    response = "Si vous ressentez des douleurs thoraciques intenses, consultez immédiatement un médecin ou appelez les urgences (15 en France).";
+                } else if (lowerMessage.includes('urgence') || lowerMessage.includes('urgent')) {
+                    response = "En cas d'urgence médicale, composez immédiatement le 15 (SAMU) ou le 112 (numéro d'urgence européen).";
+                } else {
+                    response = "Je n'ai pas trouvé d'information précise sur ce sujet. Pour des conseils médicaux personnalisés, veuillez consulter un professionnel de santé.";
+                }
+            }
+            
+            addMessage('CardioBot', response);
+        }, 1500);
+    }
+
+    function addAuthPrompt(message) {
+        const authDiv = document.createElement('div');
+        authDiv.className = 'auth-prompt-message mb-3';
+        authDiv.innerHTML = `
+            <div class="alert alert-warning">
+                <p>${escapeHtml(message)}</p>
+                <div class="d-flex gap-2 mt-2">
+                    <button class="btn btn-sm btn-primary" onclick="login()">Se connecter</button>
+                    <button class="btn btn-sm btn-secondary" onclick="register()">S'inscrire</button>
+                </div>
+            </div>`;
+        chatContainer.appendChild(authDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function addTypingIndicator() {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'd-flex mb-3 typing-indicator';
+        typingDiv.innerHTML = `
+            <div class="flex-shrink-0 me-3">
+                <i class="fas fa-robot text-primary fa-2x"></i>
+            </div>
+            <div class="bg-white p-3 rounded shadow-sm">
+                <div class="typing-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>`;
+        chatContainer.appendChild(typingDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        return typingDiv;
+    }
+
+    function removeTypingIndicator(indicator) {
+        if (indicator && indicator.parentNode) {
+            chatContainer.removeChild(indicator);
+        }
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function showAuthModal() {
+        login();
+    }
+
+    function login() {
+        const existingModal = document.getElementById('loginModal');
+        if (existingModal) {
+            document.body.removeChild(existingModal);
+        }
+        
+        // Créer une modal de connexion similaire à login.html
+        const loginModal = document.createElement('div');
+        loginModal.className = 'modal fade';
+        loginModal.id = 'loginModal';
+        loginModal.setAttribute('tabindex', '-1');
+        loginModal.setAttribute('aria-hidden', 'true');
+        loginModal.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Connexion - Test Cardiaque</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-heartbeat fa-4x text-primary"></i>
+                            <p class="mt-2">Accédez à votre test cardiaque personnalisé</p>
+                        </div>
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label for="loginEmail" class="form-label">Adresse Email</label>
+                                <input type="email" class="form-control" id="loginEmail" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="loginPassword" class="form-label">Mot de passe</label>
+                                <input type="password" class="form-control" id="loginPassword" required>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="loginRemember">
+                                <label class="form-check-label" for="loginRemember">Se souvenir de moi</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+                            </button>
+                        </form>
+                        <div class="text-center mt-3">
+                            <p>Pas encore de compte ? <a href="#" onclick="register()">S'inscrire</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(loginModal);
+        
+        const bsLoginModal = new bootstrap.Modal(loginModal);
+        bsLoginModal.show();
+        
+        // Gestion de la soumission du formulaire
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            
+            // Validation simple
+            if (!email || !password) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+            
+            if (!email.includes('@')) {
+                alert('Veuillez entrer une adresse email valide');
+                return;
+            }
+            
+            // Simulation de connexion réussie
+            isAuthenticated = true;
+            bsLoginModal.hide();
+            
+            // Supprimer la modal du DOM après fermeture
+                loginModal.addEventListener('hidden.bs.modal', function() {
+            document.body.removeChild(loginModal);
+            // Redirection vers la page de test cardiaque
+            window.location.href = 'D:/CHATBOTMEDICAL2/PFA/templates/cardiac_test.html';
+        });
+        });
+    
+    }
+
+    function register() {
+        window.location.href = 'register.html';
+    }
+</script>
+{% endblock %}

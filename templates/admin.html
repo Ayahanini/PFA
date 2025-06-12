@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - CardiaCare</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="/static/js/admin.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>CardiaCare Admin</span>
+            </div>
+            <div class="nav-actions">
+                <div class="admin-user">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Admin</span>
+                </div>
+                <a href="chat.html" class="nav-btn">
+                    <i class="fas fa-comments"></i>
+                    Chat
+                </a>
+                <a href="dashbord.html" class="nav-btn">
+                    <i class="fas fa-chart-line"></i>
+                    Dashboard
+                </a>
+                <a href="index.html" class="nav-btn">
+                    <i class="fas fa-home"></i>
+                    Accueil
+                </a>
+                <button class="nav-btn logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Déconnexion
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="admin-container">
+        <!-- Header -->
+        <div class="admin-header">
+            <div class="admin-title">
+                <h1><i class="fas fa-user-cog"></i> Administration CardiaCare</h1>
+                <p class="admin-subtitle">Gestion des patients, système et analytics</p>
+            </div>
+            <div class="admin-stats-mini">
+                <div class="mini-stat">
+                    <span class="mini-stat-value" id="totalPatients">1,247</span>
+                    <span class="mini-stat-label">Patients</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="mini-stat-value" id="activeConsultations">87</span>
+                    <span class="mini-stat-label">Consultations</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="mini-stat-value" id="systemHealth">99.8%</span>
+                    <span class="mini-stat-label">Uptime</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-grid">
+            <!-- Sidebar -->
+            <div class="admin-sidebar">
+                <div class="sidebar-section">
+                    <h3>Navigation</h3>
+                    <ul class="admin-nav">
+                        <li><a href="#" class="nav-link active" data-section="overview">
+                            <i class="fas fa-tachometer-alt"></i> Vue d'ensemble
+                        </a></li>
+                        <li><a href="#" class="nav-link" data-section="patients">
+                            <i class="fas fa-users"></i> Patients <span class="badge">1,247</span>
+                        </a></li>
+                        <li><a href="#" class="nav-link" data-section="consultations">
+                            <i class="fas fa-comments-medical"></i> Consultations <span class="badge">87</span>
+                        </a></li>
+                        <li><a href="#" class="nav-link" data-section="ml-models">
+                            <i class="fas fa-brain"></i> Modèles ML
+                        </a></li>
+                        <li><a href="#" class="nav-link" data-section="analytics">
+                            <i class="fas fa-chart-bar"></i> Analytics
+                        </a></li>
+                        <li><a href="#" class="nav-link" data-section="settings">
+                            <i class="fas fa-cog"></i> Paramètres
+                        </a></li>
+                        <li><a href="#" class="nav-link" data-section="logs">
+                            <i class="fas fa-file-alt"></i> Logs Système
+                        </a></li>
+                    </ul>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Actions Rapides</h3>
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="addNewPatient()">
+                            <i class="fas fa-user-plus"></i>
+                            Nouveau Patient
+                        </button>
+                        <button class="quick-btn" onclick="exportData()">
+                            <i class="fas fa-download"></i>
+                            Export Données
+                        </button>
+                        <button class="quick-btn" onclick="systemBackup()">
+                            <i class="fas fa-save"></i>
+                            Sauvegarde
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Statut Système</h3>
+                    <div class="system-status">
+                        <div class="status-item">
+                            <span class="status-label">Base de données</span>
+                            <span class="status-indicator online"></span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Modèle ML</span>
+                            <span class="status-indicator online"></span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">API ChatBot</span>
+                            <span class="status-indicator online"></span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Serveur Web</span>
+                            <span class="status-indicator online"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="admin-content">
+                <!-- Overview Section -->
+                <div class="content-section active" id="overview">
+                    <div class="section-header">
+                        <h2>Vue d'ensemble du système</h2>
+                        <button class="refresh-btn" onclick="refreshOverview()">
+                            <i class="fas fa-sync"></i> Actualiser
+                        </button>
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        Système opérationnel - Tous les services fonctionnent normalement
+                    </div>
+
+                    <div class="stats-overview">
+                        <div class="stat-card patients">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number">1,247</div>
+                                <div class="stat-label">Patients Actifs</div>
+                                <div class="stat-change positive">+23 cette semaine</div>
+                            </div>
+                        </div>
+                        <div class="stat-card consultations">
+                            <div class="stat-icon">
+                                <i class="fas fa-comments-medical"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number">15,840</div>
+                                <div class="stat-label">Consultations Total</div>
+                                <div class="stat-change positive">+156 aujourd'hui</div>
+                            </div>
+                        </div>
+                        <div class="stat-card accuracy">
+                            <div class="stat-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number">94.2%</div>
+                                <div class="stat-label">Précision ML</div>
+                                <div class="stat-change positive">+0.3% ce mois</div>
+                            </div>
+                        </div>
+                        <div class="stat-card uptime">
+                            <div class="stat-icon">
+                                <i class="fas fa-server"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number">99.8%</div>
+                                <div class="stat-label">Uptime Système</div>
+                                <div class="stat-change neutral">24h sans incident</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overview-grid">
+                        <div class="overview-card">
+                            <h3>Activité récente</h3>
+                            <div class="activity-feed" id="activityFeed">
+                                <!-- Activités générées dynamiquement -->
+                            </div>
+                        </div>
+
+                        <div class="overview-card">
+                            <h3>Alertes système</h3>
+                            <div class="alerts-list" id="systemAlerts">
+                                <!-- Alertes générées dynamiquement -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Patients Section -->
+                <div class="content-section" id="patients">
+                    <div class="section-header">
+                        <h2>Gestion des Patients</h2>
+                        <button class="add-btn" onclick="addNewPatient()">
+                            <i class="fas fa-plus"></i> Nouveau Patient
+                        </button>
+                    </div>
+
+                    <div class="search-filter">
+                        <input type="text" class="search-input" placeholder="Rechercher un patient..." id="patientSearch">
+                        <select class="filter-select" id="patientFilter">
+                            <option value="">Tous les patients</option>
+                            <option value="active">Actifs</option>
+                            <option value="inactive">Inactifs</option>
+                            <option value="high-risk">Risque élevé</option>
+                        </select>
+                        <button class="filter-btn" onclick="exportPatients()">
+                            <i class="fas fa-download"></i> Exporter
+                        </button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table" id="patientsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nom</th>
+                                    <th>Âge</th>
+                                    <th>Risque</th>
+                                    <th>Dernière Consultation</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patientsTableBody">
+                                <!-- Patients générés dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination" id="patientsPagination">
+                        <!-- Pagination générée dynamiquement -->
+                    </div>
+                </div>
+
+                <!-- Consultations Section -->
+                <div class="content-section" id="consultations">
+                    <div class="section-header">
+                        <h2>Consultations IA</h2>
+                        <div class="section-actions">
+                            <select class="filter-select" id="consultationPeriod">
+                                <option value="today">Aujourd'hui</option>
+                                <option value="week">Cette semaine</option>
+                                <option value="month">Ce mois</option>
+                            </select>
+                            <button class="refresh-btn" onclick="refreshConsultations()">
+                                <i class="fas fa-sync"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="consultations-stats">
+                        <div class="consultation-metric">
+                            <span class="metric-value">87</span>
+                            <span class="metric-label">En cours</span>
+                        </div>
+                        <div class="consultation-metric">
+                            <span class="metric-value">1,234</span>
+                            <span class="metric-label">Terminées</span>
+                        </div>
+                        <div class="consultation-metric">
+                            <span class="metric-value">4.2min</span>
+                            <span class="metric-label">Durée moyenne</span>
+                        </div>
+                        <div class="consultation-metric">
+                            <span class="metric-value">96.8%</span>
+                            <span class="metric-label">Satisfaction</span>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID Session</th>
+                                    <th>Patient</th>
+                                    <th>Début</th>
+                                    <th>Durée</th>
+                                    <th>Messages</th>
+                                    <th>Prédiction</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="consultationsTableBody">
+                                <!-- Consultations générées dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ML Models Section -->
+                <div class="content-section" id="ml-models">
+                    <div class="section-header">
+                        <h2>Modèles Machine Learning</h2>
+                        <button class="add-btn" onclick="uploadNewModel()">
+                            <i class="fas fa-upload"></i> Nouveau Modèle
+                        </button>
+                    </div>
+
+                    <div class="models-grid">
+                        <div class="model-card active">
+                            <div class="model-header">
+                                <h3>Random Forest v2.1</h3>
+                                <span class="model-status active">Actif</span>
+                            </div>
+                            <div class="model-metrics">
+                                <div class="metric">
+                                    <span class="metric-label">Précision</span>
+                                    <span class="metric-value">94.2%</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">Rappel</span>
+                                    <span class="metric-value">93.8%</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">F1-Score</span>
+                                    <span class="metric-value">94.0%</span>
+                                </div>
+                            </div>
+                            <div class="model-actions">
+                                <button class="model-btn" onclick="viewModelDetails('rf-v21')">Détails</button>
+                                <button class="model-btn" onclick="retrainModel('rf-v21')">Réentraîner</button>
+                            </div>
+                        </div>
+
+                        <div class="model-card">
+                            <div class="model-header">
+                                <h3>Neural Network v1.5</h3>
+                                <span class="model-status standby">En attente</span>
+                            </div>
+                            <div class="model-metrics">
+                                <div class="metric">
+                                    <span class="metric-label">Précision</span>
+                                    <span class="metric-value">92.7%</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">Rappel</span>
+                                    <span class="metric-value">91.3%</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">F1-Score</span>
+                                    <span class="metric-value">92.0%</span>
+                                </div>
+                            </div>
+                            <div class="model-actions">
+                                <button class="model-btn" onclick="viewModelDetails('nn-v15')">Détails</button>
+                                <button class="model-btn primary" onclick="activateModel('nn-v15')">Activer</button>
+                            </div>
+                        </div>
+
+                        <div class="model-card">
+                            <div class="model-header">
+                                <h3>SVM v1.0</h3>
+                                <span class="model-status testing">Test</span>
+                            </div>
+                            <div class="model-metrics">
+                                <div class="metric">
+                                    <span class="metric-label">Précision</span>
+                                    <span class="metric-value">89.4%</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">Rappel</span>
+                                    <span class="metric-value">88.9%</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">F1-Score</span>
+                                    <span class="metric-value">89.1%</span>
+                                </div>
+                            </div>
+                            <div class="model-actions">
+                                <button class="model-btn" onclick="viewModelDetails('svm-v10')">Détails</button>
+                                <button class="model-btn" onclick="deleteModel('svm-v10')">Supprimer</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="training-section">
+                        <h3>Entraînement en cours</h3>
+                        <div class="training-progress" id="trainingProgress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 67%"></div>
+                            </div>
+                            <div class="progress-info">
+                                <span>Neural Network v1.6 - Époque 67/100</span>
+                                <span>ETA: 23min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Section -->
+                <div class="content-section" id="analytics">
+                    <div class="section-header">
+                        <h2>Analytics & Rapports</h2>
+                        <div class="section-actions">
+                            <select class="filter-select" id="analyticsTimeframe">
+                                <option value="week">7 derniers jours</option>
+                                <option value="month">30 derniers jours</option>
+                                <option value="quarter">3 derniers mois</option>
+                            </select>
+                            <button class="export-btn" onclick="exportAnalytics()">
+                                <i class="fas fa-file-pdf"></i> Export PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <h3>Utilisation du système</h3>
+                            <div class="chart-container">
+                                <canvas id="usageChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card">
+                            <h3>Prédictions par risque</h3>
+                            <div class="chart-container">
+                                <canvas id="riskChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card">
+                            <h3>Performance modèles</h3>
+                            <div class="performance-metrics">
+                                <div class="performance-item">
+                                    <span class="performance-label">Temps de réponse moyen</span>
+                                    <span class="performance-value">1.2s</span>
+                                </div>
+                                <div class="performance-item">
+                                    <span class="performance-label">Prédictions/jour</span>
+                                    <span class="performance-value">2,847</span>
+                                </div>
+                                <div class="performance-item">
+                                    <span class="performance-label">Taux d'erreur</span>
+                                    <span class="performance-value">0.3%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card">
+                            <h3>Tendances patients</h3>
+                            <div class="trends-list">
+                                <div class="trend-item">
+                                    <span class="trend-label">Nouveaux patients</span>
+                                    <span class="trend-value positive">+12%</span>
+                                </div>
+                                <div class="trend-item">
+                                    <span class="trend-label">Rétention</span>
+                                    <span class="trend-value positive">+5%</span>
+                                </div>
+                                <div class="trend-item">
+                                    <span class="trend-label">Satisfaction</span>
+                                    <span class="trend-value positive">+8%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <div class="content-section" id="settings">
+                    <div class="section-header">
+                        <h2>Paramètres Système</h2>
+                        <button class="save-btn" onclick="saveSettings()">
+                            <i class="fas fa-save"></i> Sauvegarder
+                        </button>
+                    </div>
+
+                    <div class="settings-grid">
+                        <div class="settings-card">
+                            <h3>Configuration ML</h3>
+                            <form class="settings-form">
+                                <div class="form-group">
+                                    <label>Seuil de confiance minimum (%)</label>
+                                    <input type="number" value="85" min="0" max="100">
+                                </div>
+                                <div class="form-group">
+                                    <label>Fréquence de réentraînement</label>
+                                    <select>
+                                        <option value="weekly">Hebdomadaire</option>
+                                        <option value="monthly" selected>Mensuel</option>
+                                        <option value="quarterly">Trimestriel</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Auto-validation des modèles</label>
+                                    <input type="checkbox" checked>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="settings-card">
+                            <h3>Sécurité</h3>
+                            <form class="settings-form">
+                                <div class="form-group">
+                                    <label>Durée de session (minutes)</label>
+                                    <input type="number" value="120" min="30" max="480">
+                                </div>
+                                <div class="form-group">
+                                    <label>Authentification 2FA</label>
+                                    <input type="checkbox" checked>
+                                </div>
+                                <div class="form-group">
+                                    <label>Chiffrement des données</label>
+                                    <select>
+                                        <option value="aes256" selected>AES-256</option>
+                                        <option value="aes128">AES-128</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="settings-card">
+                            <h3>Notifications</h3>
+                            <form class="settings-form">
+                                <div class="form-group">
+                                    <label>Alertes système</label>
+                                    <input type="checkbox" checked>
+                                </div>
+                                <div class="form-group">
+                                    <label>Rapports automatiques</label>
+                                    <input type="checkbox" checked>
+                                </div>
+                                <div class="form-group">
+                                    <label>Email de sauvegarde</label>
+                                    <input type="email" value="admin@cardiacare.ma">
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="settings-card">
+                            <h3>Performance</h3>
+                            <form class="settings-form">
+                                <div class="form-group">
+                                    <label>Cache Redis (MB)</label>
+                                    <input type="number" value="512" min="128" max="2048">
+                                </div>
+                                <div class="form-group">
+                                    <label>Limite de connexions simultanées</label>
+                                    <input type="number" value="1000" min="100" max="5000">
+                                </div>
+                                <div class="form-group">
+                                    <label>Compression des données</label>
+                                    <input type="checkbox" checked>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logs Section -->
+                <div class="content-section" id="logs">
+                    <div class="section-header">
+                        <h2>Logs Système</h2>
+                        <div class="section-actions">
+                            <select class="filter-select" id="logLevel">
+                                <option value="">Tous les niveaux</option>
+                                <option value="error">Erreurs</option>
+                                <option value="warning">Avertissements</option>
+                                <option value="info">Information</option>
+                            </select>
+                            <button class="clear-btn" onclick="clearLogs()">
+                                <i class="fas fa-trash"></i> Effacer
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="logs-container">
+                        <div class="log-viewer" id="logViewer">
+                            <!-- Logs générés dynamiquement -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="patientModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="patientModalTitle">Nouveau Patient</h3>
+                <button class="close-modal" onclick="closeModal('patientModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="patientForm" class="patient-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nom</label>
+                            <input type="text" name="lastName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Prénom</label>
+                            <input type="text" name="firstName" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Âge</label>
+                            <input type="number" name="age" min="18" max="120" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Sexe</label>
+                            <select name="gender" required>
+                                <option value="">Sélectionner</option>
+                                <option value="M">Homme</option>
+                                <option value="F">Femme</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label>Téléphone</label>
+                        <input type="tel" name="phone">
+                    </div>
+                    <div class="form-group">
+                        <label>Antécédents médicaux</label>
+                        <textarea name="medicalHistory" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('patientModal')">Annuler</button>
+                <button class="btn btn-primary" onclick="savePatient()">Sauvegarder</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="confirmModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="confirmModalTitle">Confirmation</h3>
+                <button class="close-modal" onclick="closeModal('confirmModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmModalMessage">Êtes-vous sûr de vouloir effectuer cette action ?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('confirmModal')">Annuler</button>
+                <button class="btn btn-danger" onclick="confirmAction()">Confirmer</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

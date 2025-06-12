@@ -5,7 +5,11 @@
     <h2>Chatbot Médical</h2>
     <div class="card">
         <div class="card-header">
-            Bonjour {{ current_user.first_name|default(current_user.email) }}, posez votre question médicale
+            {% if current_user.is_authenticated %}
+                Bonjour {{ current_user.first_name|default(current_user.email) }}, posez votre question médicale
+            {% else %}
+                Assistant Médical - <a href="{{ url_for('auth.login') }}">Connectez-vous</a> pour sauvegarder votre historique
+            {% endif %}
         </div>
         <div class="card-body">
             <div id="chat-container" class="chat-window">
@@ -15,6 +19,15 @@
                 <input type="text" id="user-input" class="form-control" placeholder="Posez votre question..." autofocus>
                 <button id="send-btn" class="btn btn-primary">Envoyer</button>
             </div>
+            {% if not current_user.is_authenticated %}
+                <div class="mt-2 text-center">
+                    <small class="text-muted">
+                        Pour accéder à l'historique et aux analyses personnalisées, 
+                        <a href="{{ url_for('auth.register') }}">créez un compte</a> ou 
+                        <a href="{{ url_for('auth.login') }}">connectez-vous</a>.
+                    </small>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -33,13 +46,33 @@ document.addEventListener('DOMContentLoaded', function() {
             csrfToken = data.csrf_token;
         });
 
-    // Message de bienvenue
-    addMessage('MedBot', 'Bonjour! Je suis votre assistant médical. Posez-moi vos questions.');
+    // Message de bienvenue adapté
+    const isAuthenticated = ((current_user.is_authenticated)|tojson );
+    
+    const welcomeMessage = isAuthenticated ? 
+        'Bonjour! Je suis votre assistant médical. Posez-moi vos questions.' :
+        'Bonjour! Je suis un assistant médical. Posez-moi vos questions générales. Pour des conseils personnalisés, veuillez vous connecter.';
+    
+    addMessage('MedBot', welcomeMessage);
 
-    function addMessage(sender, message) {
+    function addMessage(sender, message, isAuthRequired = false) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('chat-message', sender === 'MedBot' ? 'bot-message' : 'user-message');
-        messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+        
+        if (isAuthRequired) {
+            messageDiv.innerHTML = `
+                <div class="auth-required-message">
+                    <p>${message}</p>
+                    <div class="auth-prompt">
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-sm btn-primary">Se connecter</a>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-sm btn-secondary">S'inscrire</a>
+                    </div>
+                </div>
+            `;
+        } else {
+            messageDiv.innerHTML = `<strong>${sender}:</strong> ${message}`;
+        }
+        
         chatContainer.appendChild(messageDiv);
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }
@@ -67,15 +100,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || "Erreur inconnue");
             
-            addMessage('MedBot', data.text || data.response);
+            if (data.requires_auth && !isAuthenticated) {
+                addMessage('MedBot', data.text, true);
+            } else {
+                addMessage('MedBot', data.text || data.response);
+            }
         } catch (error) {
             console.error('Erreur:', error);
-            addMessage('MedBot', `Erreur: ${error.message}`);
+            addMessage('MedBot', `Désolé, une erreur est survenue: ${error.message}`);
         }
     }
 
     sendBtn.addEventListener('click', sendMessage);
-    userInput.addEventListener('keypress', (e) => {
+    userInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') sendMessage();
     });
 });
@@ -107,6 +144,18 @@ document.addEventListener('DOMContentLoaded', function() {
     background-color: #e9ecef;
     margin-right: auto;
     border: 1px solid #ddd;
+}
+.auth-required-message {
+    background-color: #fff3cd;
+    padding: 10px;
+    border-radius: 5px;
+    border-left: 4px solid #ffc107;
+}
+.auth-prompt {
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
 }
 </style>
 {% endblock %}

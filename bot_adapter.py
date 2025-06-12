@@ -6,7 +6,7 @@ from botbuilder.core import (
     ConversationState,
     UserState,
 )
-from bot import MedicalBot
+from PFA.medical_bot_new import MedicalBot
 from knowledge_base import KnowledgeBase
 
 APP_ID = os.environ.get("MicrosoftAppId", "")

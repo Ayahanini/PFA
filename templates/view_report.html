@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport Cardiaque Complet</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            color: #e74c3c;
+        }
+        
+        .patient-info, .results-section, .recommendations {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #2c3e50;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .info-item {
+            margin-bottom: 10px;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        
+        .risk-indicator {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .risk-bar {
+            height: 30px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            flex-grow: 1;
+            margin: 0 10px;
+            overflow: hidden;
+        }
+        
+        .risk-fill {
+        height: 100%;
+        background-color: #e74c3c;
+        width: var(--risk-percent, 0%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        }
+    
+        .risk-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        
+        .recommendations ul {
+            padding-left: 20px;
+        }
+        
+        .recommendations li {
+            margin-bottom: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #7f8c8d;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        
+        .btn-download {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-download:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Rapport Cardiaque Complet</h1>
+        <p>Date du rapport : {{ report_date }}</p>
+    </div>
+    
+    <div class="patient-info">
+        <h2>Informations Patient</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Âge:</span>
+                <span>{{ age }} ans</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Sexe:</span>
+                <span>{{ sex }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Pression artérielle:</span>
+                <span>{{ trestbps }} mm Hg</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Cholestérol:</span>
+                <span>{{ chol }} mg/dl</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="results-section">
+        <h2>Résultats de l'Analyse</h2>
+        
+        <div class="risk-indicator">
+            <span>Risque:</span>
+            <div class="risk-bar">
+                <div class="risk-fill">{{ risk_percent }}%</div>
+            </div>
+            <span class="risk-value">{{ risk_percent }}%</span>
+        </div>
+        
+        <p><strong>Conclusion:</strong> {{ conclusion }}</p>
+        
+        <h3>Détails des Paramètres</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Type de douleur thoracique:</span>
+                <span>{{ cp_type }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Glycémie à jeun:</span>
+                <span>{{ fbs_result }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Résultat ECG:</span>
+                <span>{{ restecg_result }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Fréquence cardiaque max:</span>
+                <span>{{ thalach }} bpm</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Angine à l'effort:</span>
+                <span>{{ exang_result }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Dépression ST:</span>
+                <span>{{ oldpeak }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="recommendations">
+        <h2>Recommandations Médicales</h2>
+        <ul>
+            {% for recommendation in recommendations %}
+            <li>{{ recommendation }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+    <div class="footer">
+        <p>Ce rapport est généré automatiquement et ne remplace pas une consultation médicale professionnelle.</p>
+        <p>© 2023 - Évaluation Cardiaque</p>
+        
+        <a href="{{ download_url }}" class="btn-download" download>
+            Télécharger ce rapport en PDF
+        </a>
+    </div>
+</body>
+</html>

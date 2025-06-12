@@ -1,102 +1,182 @@
-{% extends "base.html" %}
-
-{% block title %}Inscription{% endblock %}
-
-{% block styles %}
-<style>
-    .auth-form {
-        max-width: 400px;
-        margin: 2rem auto;
-        padding: 2rem;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .form-group {
-        margin-bottom: 1rem;
-    }
-    label {
-        display: block;
-        margin-bottom: 0.5rem;
-    }
-    input[type="email"],
-    input[type="password"],
-    input[type="text"] {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-    }
-    button {
-        background: #0078d4;
-        color: white;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 4px;
-        cursor: pointer;
-        width: 100%;
-    }
-    button:hover {
-        background: #005a9e;
-    }
-    .form-footer {
-        margin-top: 1rem;
-        text-align: center;
-    }
-    .password-hint {
-        font-size: 0.8rem;
-        color: #666;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="auth-form">
-    <h2>Inscription</h2>
-    <form id="registerForm" method="POST">
-        <div class="form-group">
-            <label for="email">Adresse Email</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-        <div class="form-group">
-            <label for="first_name">Prénom</label>
-            <input type="text" id="first_name" name="first_name">
-        </div>
-        <div class="form-group">
-            <label for="last_name">Nom</label>
-            <input type="text" id="last_name" name="last_name">
-        </div>
-        <div class="form-group">
-            <label for="password">Mot de passe</label>
-            <input type="password" id="password" name="password" required>
-            <p class="password-hint">Minimum 8 caractères</p>
-        </div>
-        <div class="form-group">
-            <label for="confirm_password">Confirmer le mot de passe</label>
-            <input type="password" id="confirm_password" name="confirm_password" required>
-        </div>
-        <button type="submit">S'inscrire</button>
-    </form>
-    <div class="form-footer">
-        <a href="{{ url_for('auth.login') }}">Déjà un compte? Connectez-vous</a>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.5;
+            color: #212529;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .auth-form {
+            max-width: 400px;
+            margin: 2rem auto;
+            padding: 2rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: white;
+        }
+        
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        input[type="email"],
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.15s ease-in-out;
+        }
+        
+        input:focus {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        button {
+            background: #0078d4;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.15s ease-in-out;
+        }
+        
+        button:hover {
+            background: #005a9e;
+        }
+        
+        .form-footer {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .form-footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .password-hint {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+        
+        .alert {
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+        }
+        
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-form">
+        <h2>Inscription</h2>
+        
+        <!-- Affichage des messages flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form id="registerForm" method="POST" action="{{ url_for('auth.register') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    
+    <div class="form-group">
+        <label for="email">Adresse Email</label>
+        <input type="email" id="email" name="email" autocomplete="username" required>
     </div>
-</div>
+    
+    <div class="form-group">
+        <label for="first_name">Prénom</label>
+        <input type="text" id="first_name" name="first_name" autocomplete="given-name">
+    </div>
+    
+    <div class="form-group">
+        <label for="last_name">Nom</label>
+        <input type="text" id="last_name" name="last_name" autocomplete="family-name">
+    </div>
+    
+    <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" name="password" autocomplete="new-password" required>
+        <p class="password-hint">Minimum 8 caractères</p>
+    </div>
+    
+    <div class="form-group">
+        <label for="confirm_password">Confirmer le mot de passe</label>
+        <input type="password" id="confirm_password" name="confirm_password" autocomplete="new-password" required>
+    </div>
+            
+           
+            <button type="submit">S'inscrire</button>
+        </form>
+        
+        <div class="form-footer">
+            <a href="{{ url_for('auth.login') }}">Déjà un compte? Connectez-vous</a>
+        </div>
+    </div>
 
-<script>
-    document.getElementById('registerForm').addEventListener('submit', function(e) {
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirm_password').value;
-        
-        if (password.length < 8) {
-            e.preventDefault();
-            alert('Le mot de passe doit contenir au moins 8 caractères');
-            return;
-        }
-        
-        if (password !== confirmPassword) {
-            e.preventDefault();
-            alert('Les mots de passe ne correspondent pas');
-        }
-    });
-</script>
-{% endblock %}
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            
+            if (password.length < 8) {
+                e.preventDefault();
+                alert('Le mot de passe doit contenir au moins 8 caractères');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Les mots de passe ne correspondent pas');
+            }
+        });
+    </script>
+</body>
+</html>

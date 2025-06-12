@@ -1,0 +1,832 @@
+.nav-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+    background: var(--dark-color);
+    transform: translateY(-1px);
+}
+
+
+
+/* Test Cardiaque IA - Styles CSS */
+
+/* Variables spécifiques au test */
+:root {
+    --test-primary: #2563eb;
+    --test-secondary: #10b981;
+    --test-accent: #f59e0b;
+    --test-danger: #ef4444;
+    --test-success: #22c55e;
+    --test-background: #f8fafc;
+    --test-card-bg: #ffffff;
+    --test-border: #e5e7eb;
+    --test-text: #1f2937;
+    --test-text-secondary: #6b7280;
+    --test-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --test-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    --test-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+}
+
+/* Base du container */
+.test-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--test-background) 0%, #e0f2fe 50%, var(--test-background) 100%);
+    padding-top: 80px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.test-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 20%, rgba(37, 99, 235, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+/* Header du test */
+.test-header {
+    background: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    box-shadow: var(--test-shadow);
+    position: relative;
+    z-index: 10;
+}
+
+.header-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    text-align: left;
+}
+
+.header-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--test-primary), #1d4ed8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2.5rem;
+    flex-shrink: 0;
+    animation: pulse 2s infinite;
+}
+
+.header-text h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--test-text);
+    margin: 0 0 0.5rem 0;
+    background: linear-gradient(135deg, var(--test-primary), var(--test-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.header-text p {
+    font-size: 1.1rem;
+    color: var(--test-text-secondary);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Barre de progression */
+.progress-bar {
+    max-width: 600px;
+    margin: 2rem auto 0;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--test-primary), var(--test-secondary));
+    border-radius: 4px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+.progress-text {
+    text-align: center;
+    margin-top: 1rem;
+    font-weight: 600;
+    color: var(--test-text);
+    font-size: 0.9rem;
+}
+
+/* Contenu principal du test */
+.test-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+    position: relative;
+    z-index: 10;
+}
+
+/* Étapes du test */
+.test-step {
+    display: none;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.test-step.active {
+    display: block;
+}
+
+.step-card, .results-card {
+    background: var(--test-card-bg);
+    border-radius: 20px;
+    box-shadow: var(--test-shadow-lg);
+    overflow: hidden;
+    border: 1px solid var(--test-border);
+    backdrop-filter: blur(10px);
+    position: relative;
+}
+
+.step-card::before, .results-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--test-primary), var(--test-secondary), var(--test-accent));
+}
+
+/* Header des étapes */
+.step-header, .results-header {
+    padding: 2.5rem 2.5rem 1.5rem;
+    text-align: center;
+    border-bottom: 1px solid var(--test-border);
+    background: linear-gradient(135deg, #fafbfc 0%, #f8fafc 100%);
+}
+
+.step-header h2, .results-header h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--test-text);
+    margin: 0 0 0.8rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
+.step-header h2 i, .results-header h2 i {
+    color: var(--test-primary);
+    font-size: 1.6rem;
+}
+
+.step-header p, .results-header p {
+    color: var(--test-text-secondary);
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* Grille de formulaire */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--test-text);
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+}
+
+.form-group input {
+    padding: 1rem 1.2rem;
+    border: 2px solid var(--test-border);
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+    color: var(--test-text);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--test-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    transform: translateY(-1px);
+}
+
+.field-help {
+    font-size: 0.85rem;
+    color: var(--test-text-secondary);
+    margin-top: 0.5rem;
+    line-height: 1.4;
+}
+
+/* Options de genre */
+.gender-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.gender-options input[type="radio"] {
+    display: none;
+}
+
+.gender-card {
+    padding: 1.5rem;
+    border: 2px solid var(--test-border);
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.gender-card:hover {
+    border-color: var(--test-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--test-shadow);
+}
+
+.gender-card i {
+    font-size: 2rem;
+    color: var(--test-primary);
+}
+
+.gender-card span {
+    font-weight: 600;
+    color: var(--test-text);
+}
+
+.gender-options input[type="radio"]:checked + .gender-card {
+    border-color: var(--test-primary);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(37, 99, 235, 0.1));
+    box-shadow: var(--test-shadow);
+}
+
+/* Facteurs de risque */
+.risk-factors {
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.risk-factor-card {
+    border: 2px solid var(--test-border);
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.risk-factor-card:hover {
+    border-color: var(--test-primary);
+    box-shadow: var(--test-shadow);
+    transform: translateY(-2px);
+}
+
+.risk-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--test-primary), #1d4ed8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.risk-content {
+    flex: 1;
+}
+
+.risk-content h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--test-text);
+    margin: 0 0 0.5rem 0;
+}
+
+.risk-content p {
+    color: var(--test-text-secondary);
+    margin: 0 0 1rem 0;
+    line-height: 1.5;
+}
+
+/* Groupes radio */
+.radio-group {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.radio-group input[type="radio"] {
+    display: none;
+}
+
+.radio-group label {
+    padding: 0.8rem 1.5rem;
+    border: 2px solid var(--test-border);
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    background: white;
+    color: var(--test-text);
+}
+
+.radio-group label:hover {
+    border-color: var(--test-primary);
+    transform: translateY(-1px);
+}
+
+.radio-group input[type="radio"]:checked + label {
+    background: var(--test-primary);
+    color: white;
+    border-color: var(--test-primary);
+    box-shadow: var(--test-shadow);
+}
+
+/* Section symptômes */
+.symptoms-section, .lifestyle-section {
+    padding: 2.5rem;
+    border-bottom: 1px solid var(--test-border);
+}
+
+.symptoms-section:last-child, .lifestyle-section:last-child {
+    border-bottom: none;
+}
+
+.symptoms-section h3, .lifestyle-section h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--test-text);
+    margin: 0 0 1.5rem 0;
+    text-align: center;
+}
+
+.symptoms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.symptom-checkbox {
+    position: relative;
+    cursor: pointer;
+    display: block;
+}
+
+.symptom-checkbox input[type="checkbox"] {
+    display: none;
+}
+
+.symptom-checkbox .checkmark {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--test-border);
+    border-radius: 6px;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.symptom-checkbox input[type="checkbox"]:checked ~ .checkmark {
+    background: var(--test-success);
+    border-color: var(--test-success);
+}
+
+.symptom-checkbox input[type="checkbox"]:checked ~ .checkmark::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.symptom-content {
+    padding: 1.5rem;
+    border: 2px solid var(--test-border);
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.symptom-content i {
+    font-size: 2rem;
+    color: var(--test-primary);
+}
+
+.symptom-content span {
+    font-weight: 500;
+    color: var(--test-text);
+}
+
+.symptom-checkbox:hover .symptom-content {
+    border-color: var(--test-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--test-shadow);
+}
+
+.symptom-checkbox input[type="checkbox"]:checked ~ .symptom-content {
+    border-color: var(--test-success);
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), rgba(34, 197, 94, 0.1));
+}
+
+/* Options d'activité */
+.activity-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.activity-options input[type="radio"] {
+    display: none;
+}
+
+.activity-card {
+    padding: 2rem 1.5rem;
+    border: 2px solid var(--test-border);
+    border-radius: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.activity-card:hover {
+    border-color: var(--test-primary);
+    transform: translateY(-4px);
+    box-shadow: var(--test-shadow-lg);
+}
+
+.activity-card i {
+    font-size: 2.5rem;
+    color: var(--test-primary);
+}
+
+.activity-card span {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--test-text);
+}
+
+.activity-card small {
+    font-size: 0.9rem;
+    color: var(--test-text-secondary);
+}
+
+.activity-options input[type="radio"]:checked + .activity-card {
+    border-color: var(--test-primary);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(37, 99, 235, 0.1));
+    box-shadow: var(--test-shadow-lg);
+}
+
+/* Actions des étapes */
+.step-actions, .results-actions {
+    padding: 2rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fafbfc;
+    gap: 1rem;
+}
+
+.step-actions button, .results-actions button {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1rem;
+    min-width: 140px;
+    justify-content: center;
+}
+
+.btn-back {
+    background: var(--test-border);
+    color: var(--test-text);
+}
+
+.btn-back:hover {
+    background: #d1d5db;
+    transform: translateY(-2px);
+}
+
+.btn-next, .btn-analyze {
+    background: linear-gradient(135deg, var(--test-primary), #1d4ed8);
+    color: white;
+    margin-left: auto;
+}
+
+.btn-next:hover, .btn-analyze:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--test-shadow-lg);
+}
+
+.btn-analyze {
+    background: linear-gradient(135deg, var(--test-success), #059669);
+    font-size: 1.1rem;
+    padding: 1.2rem 2.5rem;
+}
+
+/* Boutons des résultats */
+.results-actions {
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-restart {
+    background: var(--test-accent);
+    color: white;
+}
+
+.btn-save {
+    background: var(--test-success);
+    color: white;
+}
+
+.btn-chat {
+    background: var(--test-primary);
+    color: white;
+}
+
+.btn-restart:hover, .btn-save:hover, .btn-chat:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--test-shadow);
+}
+
+/* =================== STYLES POUR LES RÉSULTATS =================== */
+
+.risk-result {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: var(--test-shadow-lg);
+    border: 2px solid var(--test-border);
+}
+
+.risk-level {
+    text-align: center;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.risk-level.success {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+}
+
+.risk-level.warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.risk-level.danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+.risk-percentage {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.risk-label {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.risk-progress {
+    background: #f3f4f6;
+    border-radius: 10px;
+    height: 12px;
+    overflow: hidden;
+    margin: 1.5rem 0;
+}
+
+.risk-progress .progress-bar {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 1s ease-in-out;
+    position: relative;
+}
+
+.risk-progress .progress-bar.success {
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+}
+
+.risk-progress .progress-bar.warning {
+    background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.risk-progress .progress-bar.danger {
+    background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.risk-factors {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-top: 1.5rem;
+}
+
+.risk-factors h4 {
+    color: var(--test-text);
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.risk-factors ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.risk-factors li {
+    padding: 0.5rem 0;
+    color: var(--test-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.risk-factors li::before {
+    content: "⚠️";
+    font-size: 0.9rem;
+}
+
+.recommendations {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    border-left: 4px solid var(--test-secondary);
+    margin-top: 1.5rem;
+}
+
+.recommendations h4 {
+    color: var(--test-text);
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.recommendations-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.recommendations-list li {
+    padding: 0.75rem 0;
+    color: var(--test-text);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.recommendations-list li:last-child {
+    border-bottom: none;
+}
+
+.recommendations-list li::before {
+    content: "💡";
+    font-size: 0.9rem;
+    margin-top: 0.1rem;
+}
+
+/* Animations pour les résultats */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.risk-result, .recommendations {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.risk-level {
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.risk-progress {
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+/* =================== RESPONSIVE POUR LES RÉSULTATS =================== */
+
+@media (max-width: 768px) {
+    .risk-percentage {
+        font-size: 2.5rem;
+    }
+    
+    .risk-label {
+        font-size: 1.2rem;
+    }
+    
+    .risk-result {
+        padding: 1.5rem;
+        margin: 1rem 0;
+    }
+    
+    .recommendations {
+        padding: 1rem;
+    }
+}
+
+/* Fin du fichier CSS */

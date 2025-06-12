@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test PDF CardiaCare - Version Professionnelle</title>
+    
+    <!-- Styles pour la démo -->
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 40px;
+            min-height: 100vh;
+        }
+        
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .demo-header {
+            background: linear-gradient(135deg, #2980b9, #3498db);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .demo-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        
+        .demo-header p {
+            margin: 0;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .demo-content {
+            padding: 40px;
+        }
+        
+        .test-section {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .test-section h3 {
+            color: #2c3e50;
+            margin: 0 0 20px 0;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px 5px 5px 0;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .status-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px solid #ecf0f1;
+            min-height: 100px;
+        }
+        
+        .status-panel h4 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .log-entry {
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin: 5px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .log-success { background: #d5edda; color: #155724; }
+        .log-error { background: #f8d7da; color: #721c24; }
+        .log-warning { background: #fff3cd; color: #856404; }
+        .log-info { background: #d1ecf1; color: #0c5460; }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid #ecf0f1;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            border-color: #3498db;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h4 {
+            color: #2c3e50;
+            margin: 0 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .feature-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .feature-card li {
+            padding: 5px 0;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .feature-card li::before {
+            content: "✓";
+            color: #27ae60;
+            font-weight: bold;
+        }
+    </style>
+    
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>🫀 CardiaCare PDF Test</h1>
+            <p>Système de génération PDF professionnel pour l'évaluation cardiaque</p>
+        </div>
+        
+        <div class="demo-content">
+            <!-- Section Tests Rapides -->
+            <div class="test-section">
+                <h3>🚀 Tests Rapides</h3>
+                <p>Testez rapidement les différents profils de risque et la génération PDF:</p>
+                <button class="btn btn-success" onclick="testLowRisk()">
+                    📊 Test Risque Faible
+                </button>
+                <button class="btn btn-warning" onclick="testModerateRisk()">
+                    📊 Test Risque Modéré
+                </button>
+                <button class="btn btn-danger" onclick="testHighRisk()">
+                    📊 Test Risque Élevé
+                </button>
+                <button class="btn" onclick="testPDFOnly()">
+                    📄 Test PDF Direct
+                </button>
+            </div>
+            
+            <!-- Section Fonctionnalités -->
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>📋 Structure Professionnelle</h4>
+                    <ul>
+                        <li>Page de couverture avec branding</li>
+                        <li>Table des matières détaillée</li>
+                        <li>Sections structurées et colorées</li>
+                        <li>En-têtes et pieds de page</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>🎨 Design Médical</h4>
+                    <ul>
+                        <li>Couleurs selon le niveau de risque</li>
+                        <li>Icônes et indicateurs visuels</li>
+                        <li>Barres de progression interactives</li>
+                        <li>Mise en page professionnelle</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>📊 Contenu Complet</h4>
+                    <ul>
+                        <li>Informations patient détaillées</li>
+                        <li>Données vitales et facteurs de risque</li>
+                        <li>Résultats d'analyse IA</li>
+                        <li>Recommandations personnalisées</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>🔒 Sécurité & Conformité</h4>
+                    <ul>
+                        <li>Avertissements médicaux</li>
+                        <li>Mentions de confidentialité</li>
+                        <li>Numérotation des rapports</li>
+                        <li>Horodatage précis</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Panel de Status -->
+            <div class="status-panel">
+                <h4>📈 Status & Logs</h4>
+                <div id="statusLogs">
+                    <div class="log-info">🔄 Système PDF CardiaCare initialisé</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simuler la classe CardiacTest pour les tests
+        class TestCardiacSystem {
+            constructor() {
+                this.testData = {};
+                this.testResults = null;
+            }
+            
+            generateTestData(riskLevel) {
+                const profiles = {
+                    low: {
+                        age: 35,
+                        gender: 'F',
+                        bloodPressure: 115,
+                        cholesterol: 180,
+                        heartRate: 65,
+                        smoking: 'false',
+                        diabetes: 'false',
+                        familyHistory: 'false',
+                        activity: 'high',
+                        symptoms: []
+                    },
+                    moderate: {
+                        age: 55,
+                        gender: 'M',
+                        bloodPressure: 135,
+                        cholesterol: 220,
+                        heartRate: 75,
+                        smoking: 'false',
+                        diabetes: 'false',
+                        familyHistory: 'true',
+                        activity: 'moderate',
+                        symptoms: ['fatigue']
+                    },
+                    high: {
+                        age: 65,
+                        gender: 'M',
+                        bloodPressure: 165,
+                        cholesterol: 280,
+                        heartRate: 85,
+                        smoking: 'true',
+                        diabetes: 'true',
+                        familyHistory: 'true',
+                        activity: 'low',
+                        symptoms: ['chest_pain', 'shortness_breath', 'fatigue']
+                    }
+                };
+                
+                this.testData = profiles[riskLevel];
+                
+                // Générer les résultats correspondants
+                const results = {
+                    low: {
+                        percentage: 25,
+                        riskLevel: 'low',
+                        factors: ['Aucun facteur de risque majeur'],
+                        recommendations: [
+                            'Continuez vos bonnes habitudes de vie',
+                            'Contrôle médical annuel recommandé',
+                            'Maintenez votre activité physique régulière'
+                        ]
+                    },
+                    moderate: {
+                        percentage: 55,
+                        riskLevel: 'moderate',
+                        factors: ['Âge > 50 ans', 'Antécédents familiaux', 'Cholestérol limite'],
+                        recommendations: [
+                            'Consultez votre médecin dans les 3 mois',
+                            'Surveillez régulièrement votre tension et cholestérol',
+                            'Adoptez une alimentation équilibrée',
+                            'Pratiquez une activité physique régulière'
+                        ]
+                    },
+                    high: {
+                        percentage: 85,
+                        riskLevel: 'high',
+                        factors: [
+                            'Âge > 65 ans',
+                            'Hypertension modérée',
+                            'Cholestérol élevé',
+                            'Tabagisme',
+                            'Diabète',
+                            'Antécédents familiaux',
+                            '3 symptôme(s) présent(s)'
+                        ],
+                        recommendations: [
+                            'Consultation médicale URGENTE recommandée',
+                            'Surveillance médicale rapprochée nécessaire',
+                            'Modification immédiate du style de vie',
+                            'Traitement médicamenteux possible',
+                            'Arrêt du tabac IMMÉDIAT'
+                        ]
+                    }
+                };
+                
+                this.testResults = {
+                    ...results[riskLevel],
+                    analysisDate: new Date().toISOString()
+                };
+            }
+            
+            // Copier la méthode de génération PDF de la classe principale
+            generateProfessionalPDF(saveData) {
+                let jsPDFConstructor = null;
+                
+                if (typeof window.jsPDF !== 'undefined') {
+                    jsPDFConstructor = window.jsPDF;
+                    addLog('✅ jsPDF trouvé via window.jsPDF', 'success');
+                } else if (typeof jsPDF !== 'undefined') {
+                    jsPDFConstructor = jsPDF;
+                    addLog('✅ jsPDF trouvé via jsPDF global', 'success');
+                } else if (window.jspdf && window.jspdf.jsPDF) {
+                    jsPDFConstructor = window.jspdf.jsPDF;
+                    addLog('✅ jsPDF trouvé via window.jspdf.jsPDF', 'success');
+                }
+                
+                if (jsPDFConstructor) {
+                    try {
+                        addLog('🔄 Génération du PDF professionnel en cours...', 'info');
+                        this.createProfessionalPDF(jsPDFConstructor, saveData);
+                        addLog('✅ PDF généré avec succès!', 'success');
+                    } catch (error) {
+                        addLog(`❌ Erreur lors de la génération PDF: ${error.message}`, 'error');
+                        console.error('Erreur PDF:', error);
+                    }
+                } else {
+                    addLog('⚠️ jsPDF non disponible', 'warning');
+                }
+            }
+            
+            createProfessionalPDF(jsPDFConstructor, saveData) {
+                const doc = new jsPDFConstructor();
+                
+                const reportDate = new Date().toLocaleDateString('fr-FR', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                const reportNumber = `RAP-${Date.now().toString().slice(-6)}`;
+                
+                // Page de couverture
+                this.createCoverPage(doc, reportDate, reportNumber);
+                
+                // Table des matières
+                doc.addPage();
+                this.createTableOfContents(doc);
+                
+                // Contenu principal
+                doc.addPage();
+                this.createMainContent(doc, reportDate, reportNumber);
+                
+                // Recommandations
+                doc.addPage();
+                this.createRecommendationsPage(doc);
+                
+                // Sauvegarder
+                const fileName = `test-cardiacare-${this.testResults.riskLevel}-${new Date().toISOString().split('T')[0]}.pdf`;
+                doc.save(fileName);
+                
+                addLog(`📄 PDF sauvegardé: ${fileName}`, 'success');
+            }
+            
+            createCoverPage(doc, reportDate, reportNumber) {
+                // Arrière-plan
+                doc.setFillColor(240, 248, 255);
+                doc.rect(0, 0, 210, 297, 'F');
+                
+                // En-tête bleu
+                doc.setFillColor(41, 128, 185);
+                doc.rect(0, 0, 210, 60, 'F');
+                
+                // Titre principal
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(28);
+                doc.setFont("helvetica", "bold");
+                doc.text("CARDIACARE", 105, 25, { align: 'center' });
+                
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "normal");
+                doc.text("Intelligence Artificielle Médicale", 105, 35, { align: 'center' });
+                
+                doc.setFontSize(18);
+                doc.setFont("helvetica", "bold");
+                doc.text("RAPPORT D'ÉVALUATION CARDIAQUE", 105, 50, { align: 'center' });
+                
+                // Informations centrales
+                doc.setTextColor(52, 73, 94);
+                doc.setFontSize(16);
+                doc.setFont("helvetica", "bold");
+                doc.text("ANALYSE PERSONNALISÉE DU RISQUE CARDIOVASCULAIRE", 105, 100, { align: 'center' });
+                
+                // Encadré patient
+                doc.setFillColor(255, 255, 255);
+                doc.setDrawColor(41, 128, 185);
+                doc.setLineWidth(2);
+                doc.rect(40, 120, 130, 50, 'FD');
+                
+                doc.setTextColor(52, 73, 94);
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.text("INFORMATIONS PATIENT", 105, 135, { align: 'center' });
+                
+                doc.setFontSize(11);
+                doc.setFont("helvetica", "normal");
+                doc.text(`Patient: ${this.testData.gender === 'M' ? 'Homme' : 'Femme'}, ${this.testData.age} ans`, 
+                         105, 150, { align: 'center' });
+                doc.text(`Date d'évaluation: ${reportDate}`, 105, 160, { align: 'center' });
+                doc.text(`Numéro de rapport: ${reportNumber}`, 105, 170, { align: 'center' });
+                
+                // Résultat principal coloré
+                const riskColors = {
+                    low: [34, 139, 34],
+                    moderate: [255, 165, 0],
+                    high: [231, 76, 60]
+                };
+                
+                const riskTexts = {
+                    low: 'RISQUE FAIBLE',
+                    moderate: 'RISQUE MODÉRÉ',
+                    high: 'RISQUE ÉLEVÉ'
+                };
+                
+                const riskColor = riskColors[this.testResults.riskLevel];
+                doc.setFillColor(...riskColor);
+                doc.rect(50, 200, 110, 30, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(18);
+                doc.setFont("helvetica", "bold");
+                doc.text(riskTexts[this.testResults.riskLevel], 105, 215, { align: 'center' });
+                doc.setFontSize(14);
+                doc.text(`Score: ${this.testResults.percentage}%`, 105, 225, { align: 'center' });
+                
+                // Footer
+                doc.setTextColor(128, 128, 128);
+                doc.setFontSize(10);
+                doc.setFont("helvetica", "italic");
+                doc.text("Ce rapport est confidentiel et destiné uniquement au patient concerné", 105, 260, { align: 'center' });
+                doc.text("Consultation médicale recommandée pour toute décision thérapeutique", 105, 270, { align: 'center' });
+            }
+            
+            createTableOfContents(doc) {
+                // En-tête
+                doc.setFillColor(52, 73, 94);
+                doc.rect(0, 0, 210, 25, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(16);
+                doc.setFont("helvetica", "bold");
+                doc.text("TABLE DES MATIÈRES", 105, 15, { align: 'center' });
+                
+                // Contenu
+                let yPos = 50;
+                doc.setTextColor(52, 73, 94);
+                doc.setFontSize(12);
+                doc.setFont("helvetica", "normal");
+                
+                const tocItems = [
+                    "1. Informations Patient ......................................................... 3",
+                    "2. Données Vitales ............................................................. 3",
+                    "3. Facteurs de Risque .......................................................... 3",
+                    "4. Symptômes Déclarés ........................................................ 3",
+                    "5. Activité Physique ........................................................... 3",
+                    "6. Résultats de l'Évaluation .................................................. 3",
+                    "7. Recommandations Personnalisées ........................................ 4",
+                    "8. Avertissement Médical ..................................................... 4"
+                ];
+                
+                tocItems.forEach(item => {
+                    doc.text(item, 30, yPos);
+                    yPos += 12;
+                });
+                
+                // Note importante
+                doc.setFillColor(255, 249, 196);
+                doc.rect(20, yPos + 20, 170, 40, 'F');
+                doc.setTextColor(184, 134, 11);
+                doc.setFontSize(11);
+                doc.setFont("helvetica", "bold");
+                doc.text("NOTE IMPORTANTE", 30, yPos + 35);
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(10);
+                doc.text("Cette évaluation utilise l'intelligence artificielle pour analyser vos données", 30, yPos + 45);
+                doc.text("et estimer votre risque cardiovasculaire de manière indicative.", 30, yPos + 52);
+            }
+            
+            createMainContent(doc, reportDate, reportNumber) {
+                // En-tête
+                doc.setFillColor(41, 128, 185);
+                doc.rect(0, 0, 210, 35, 'F');
+                
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(24);
+                doc.setFont("helvetica", "bold");
+                doc.text("CARDIACARE", 20, 22);
+                
+                doc.setFontSize(12);
+                doc.setFont("helvetica", "normal");
+                doc.text("Rapport d'Évaluation Cardiaque IA", 20, 30);
+                
+                doc.setFontSize(10);
+                doc.text(`Rapport N°: ${reportNumber}`, 150, 22);
+                doc.text(`Date: ${new Date().toLocaleDateString('fr-FR')}`, 150, 30);
+                
+                const lightGray = [236, 240, 241];
+                const grayColor = [52, 73, 94];
+                let yPosition = 50;
+                
+                // Informations patient
+                this.addSection(doc, "📋 INFORMATIONS PATIENT", yPosition, lightGray, grayColor);
+                yPosition += 20;
+                
+                const patientInfo = [
+                    [`Âge:`, `${this.testData.age} ans`],
+                    [`Sexe:`, `${this.testData.gender === 'M' ? 'Masculin' : 'Féminin'}`]
+                ];
+                
+                yPosition = this.addInfoTable(doc, patientInfo, yPosition, grayColor);
+                
+                // Données vitales
+                this.addSection(doc, "💓 DONNÉES VITALES", yPosition, lightGray, grayColor);
+                yPosition += 20;
+                
+                const vitalSigns = [
+                    ['Tension artérielle:', `${this.testData.bloodPressure} mmHg`],
+                    ['Cholestérol total:', `${this.testData.cholesterol} mg/dL`],
+                    ['Fréquence cardiaque:', `${this.testData.heartRate} bpm`]
+                ];
+                
+                yPosition = this.addInfoTable(doc, vitalSigns, yPosition, grayColor);
+                
+                // Facteurs de risque
+                this.addSection(doc, "⚠️ FACTEURS DE RISQUE", yPosition, lightGray, grayColor);
+                yPosition += 20;
+                
+                const riskFactors = [
+                    ['Tabagisme:', this.testData.smoking === 'true' ? '✓ Oui' : '✗ Non'],
+                    ['Diabète:', this.testData.diabetes === 'true' ? '✓ Oui' : '✗ Non'],
+                    ['Antécédents familiaux:', this.testData.familyHistory === 'true' ? '✓ Oui' : '✗ Non']
+                ];
+                
+                yPosition = this.addRiskTable(doc, riskFactors, yPosition, grayColor);
+                
+                // Résultats
+                doc.setFillColor(41, 128, 185);
+                doc.rect(15, yPosition - 5, 180, 15, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(16);
+                doc.setFont("helvetica", "bold");
+                doc.text("📊 RÉSULTATS DE L'ÉVALUATION", 20, yPosition + 7);
+                
+                yPosition += 25;
+                this.addResultsSection(doc, yPosition, grayColor);
+            }
+            
+            createRecommendationsPage(doc) {
+                // En-tête
+                doc.setFillColor(41, 128, 185);
+                doc.rect(0, 0, 210, 35, 'F');
+                
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(20);
+                doc.setFont("helvetica", "bold");
+                doc.text("RECOMMANDATIONS & AVERTISSEMENTS", 105, 22, { align: 'center' });
+                
+                let yPosition = 60;
+                
+                // Recommandations
+                doc.setFillColor(34, 139, 34);
+                doc.rect(15, yPosition - 5, 180, 15, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.text("💡 RECOMMANDATIONS PERSONNALISÉES", 20, yPosition + 7);
+                
+                yPosition += 25;
+                doc.setTextColor(52, 73, 94);
+                doc.setFontSize(11);
+                doc.setFont("helvetica", "normal");
+                
+                this.testResults.recommendations.forEach(recommendation => {
+                    doc.text(`• ${recommendation}`, 25, yPosition);
+                    yPosition += 8;
+                });
+                
+                yPosition += 20;
+                
+                // Avertissements
+                doc.setFillColor(231, 76, 60);
+                doc.rect(15, yPosition - 5, 180, 15, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.text("⚠️ AVERTISSEMENT MÉDICAL", 20, yPosition + 7);
+                
+                yPosition += 25;
+                doc.setTextColor(52, 73, 94);
+                doc.setFontSize(10);
+                doc.setFont("helvetica", "normal");
+                
+                const disclaimers = [
+                    "• Cette évaluation est uniquement indicative et ne remplace pas un diagnostic médical",
+                    "• Les résultats sont basés sur un algorithme d'intelligence artificielle",
+                    "• Une consultation médicale est toujours recommandée pour une évaluation complète",
+                    "• En cas de symptômes aigus, consultez immédiatement un professionnel de santé",
+                    "• Ce rapport ne constitue pas une prescription médicale"
+                ];
+                
+                disclaimers.forEach(disclaimer => {
+                    doc.text(disclaimer, 25, yPosition);
+                    yPosition += 8;
+                });
+                
+                // Footer
+                yPosition = 260;
+                doc.setTextColor(128, 128, 128);
+                doc.setFontSize(9);
+                doc.setFont("helvetica", "italic");
+                doc.text("CardiaCare - Intelligence Artificielle Médicale", 105, yPosition, { align: 'center' });
+                doc.text(`Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}`, 
+                         105, yPosition + 8, { align: 'center' });
+                doc.text("Ce document est confidentiel et protégé par le secret médical", 105, yPosition + 16, { align: 'center' });
+            }
+            
+            // Méthodes utilitaires
+            addSection(doc, title, yPosition, lightGray, grayColor) {
+                doc.setFillColor(...lightGray);
+                doc.rect(15, yPosition - 5, 180, 12, 'F');
+                doc.setTextColor(...grayColor);
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.text(title, 20, yPosition + 3);
+            }
+            
+            addInfoTable(doc, data, yPosition, grayColor) {
+                doc.setTextColor(...grayColor);
+                doc.setFontSize(11);
+                
+                data.forEach(([label, value]) => {
+                    doc.setFont("helvetica", "bold");
+                    doc.text(label, 25, yPosition);
+                    doc.setFont("helvetica", "normal");
+                    doc.text(value, 80, yPosition);
+                    yPosition += 8;
+                });
+                
+                return yPosition + 10;
+            }
+            
+            addRiskTable(doc, data, yPosition, grayColor) {
+                doc.setFontSize(11);
+                
+                data.forEach(([label, value]) => {
+                    doc.setFont("helvetica", "bold");
+                    doc.setTextColor(...grayColor);
+                    doc.text(label, 25, yPosition);
+                    doc.setFont("helvetica", "normal");
+                    
+                    if (value.includes('✓')) {
+                        doc.setTextColor(231, 76, 60);
+                    } else {
+                        doc.setTextColor(34, 139, 34);
+                    }
+                    doc.text(value, 80, yPosition);
+                    yPosition += 8;
+                });
+                
+                return yPosition + 10;
+            }
+            
+            addResultsSection(doc, yPosition, grayColor) {
+                const riskColors = {
+                    low: [34, 139, 34],
+                    moderate: [255, 165, 0],
+                    high: [231, 76, 60]
+                };
+                
+                const riskTexts = {
+                    low: ['RISQUE FAIBLE', 'Votre profil présente un risque cardiovasculaire faible'],
+                    moderate: ['RISQUE MODÉRÉ', 'Surveillance recommandée - Consultez votre médecin'],
+                    high: ['RISQUE ÉLEVÉ', 'Consultation médicale urgente recommandée']
+                };
+                
+                const [riskLabel, riskDescription] = riskTexts[this.testResults.riskLevel];
+                const riskColor = riskColors[this.testResults.riskLevel];
+                
+                // Encadré coloré
+                doc.setFillColor(...riskColor);
+                doc.rect(20, yPosition - 3, 170, 20, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.text(riskLabel, 25, yPosition + 5);
+                doc.setFontSize(12);
+                doc.text(`Score: ${this.testResults.percentage}%`, 25, yPosition + 13);
+                
+                // Barre de progression
+                yPosition += 30;
+                doc.setTextColor(...grayColor);
+                doc.setFontSize(10);
+                doc.text("Score de risque cardiovasculaire:", 25, yPosition);
+                yPosition += 8;
+                
+                // Fond de la barre
+                doc.setFillColor(220, 220, 220);
+                doc.rect(25, yPosition, 160, 8, 'F');
+                
+                // Barre colorée
+                const progressWidth = (this.testResults.percentage / 100) * 160;
+                doc.setFillColor(...riskColor);
+                doc.rect(25, yPosition, progressWidth, 8, 'F');
+                
+                // Graduations
+                doc.setTextColor(128, 128, 128);
+                doc.setFontSize(8);
+                doc.text("0%", 23, yPosition + 12);
+                doc.text("50%", 100, yPosition + 12);
+                doc.text("100%", 180, yPosition + 12);
+                
+                yPosition += 20;
+                doc.setTextColor(...grayColor);
+                doc.setFontSize(11);
+                doc.setFont("helvetica", "normal");
+                doc.text(riskDescription, 25, yPosition);
+            }
+        }
+        
+        // Instance globale pour les tests
+        const testSystem = new TestCardiacSystem();
+        
+        // Fonctions de test
+        function testLowRisk() {
+            addLog('🔄 Test du profil Risque Faible...', 'info');
+            testSystem.generateTestData('low');
+            
+            const saveData = {
+                timestamp: new Date().toISOString(),
+                testData: testSystem.testData,
+                results: testSystem.testResults,
+                version: '1.0'
+            };
+            
+            testSystem.generateProfessionalPDF(saveData);
+        }
+        
+        function testModerateRisk() {
+            addLog('🔄 Test du profil Risque Modéré...', 'info');
+            testSystem.generateTestData('moderate');
+            
+            const saveData = {
+                timestamp: new Date().toISOString(),
+                testData: testSystem.testData,
+                results: testSystem.testResults,
+                version: '1.0'
+            };
+            
+            testSystem.generateProfessionalPDF(saveData);
+        }
+        
+        function testHighRisk() {
+            addLog('🔄 Test du profil Risque Élevé...', 'info');
+            testSystem.generateTestData('high');
+            
+            const saveData = {
+                timestamp: new Date().toISOString(),
+                testData: testSystem.testData,
+                results: testSystem.testResults,
+                version: '1.0'
+            };
+            
+            testSystem.generateProfessionalPDF(saveData);
+        }
+        
+        function testPDFOnly() {
+            addLog('🔄 Test direct de génération PDF...', 'info');
+            
+            // Vérifier jsPDF
+            if (typeof window.jsPDF !== 'undefined' || typeof jsPDF !== 'undefined' || (window.jspdf && window.jspdf.jsPDF)) {
+                addLog('✅ jsPDF détecté', 'success');
+                
+                try {
+                    const jsPDFConstructor = window.jsPDF || jsPDF || window.jspdf.jsPDF;
+                    const doc = new jsPDFConstructor();
+                    
+                    doc.setFontSize(20);
+                    doc.text('Test PDF CardiaCare', 20, 20);
+                    
+                    doc.setFontSize(12);
+                    doc.text('Ce PDF a été généré pour tester le système', 20, 40);
+                    doc.text(`Date: ${new Date().toLocaleString('fr-FR')}`, 20, 60);
+                    
+                    doc.save('test-simple-cardiacare.pdf');
+                    addLog('✅ PDF simple généré avec succès', 'success');
+                } catch (error) {
+                    addLog(`❌ Erreur lors du test PDF: ${error.message}`, 'error');
+                }
+            } else {
+                addLog('❌ jsPDF non disponible', 'error');
+            }
+        }
+        
+        // Fonction pour ajouter des logs
+        function addLog(message, type = 'info') {
+            const logsContainer = document.getElementById('statusLogs');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.textContent = `${new Date().toLocaleTimeString('fr-FR')} - ${message}`;
+            
+            logsContainer.appendChild(logEntry);
+            
+            // Garder seulement les 10 derniers logs
+            while (logsContainer.children.length > 10) {
+                logsContainer.removeChild(logsContainer.firstChild);
+            }
+            
+            // Scroll vers le bas
+            logEntry.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🚀 Système de test PDF CardiaCare initialisé', 'success');
+            
+            // Vérifier jsPDF après un délai
+            setTimeout(() => {
+                if (typeof window.jsPDF !== 'undefined' || typeof jsPDF !== 'undefined' || (window.jspdf && window.jspdf.jsPDF)) {
+                    addLog('✅ jsPDF chargé et disponible', 'success');
+                } else {
+                    addLog('⚠️ jsPDF non détecté - vérifiez le chargement', 'warning');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -5,6 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Cardiaque Simplifié</title>
     <style>
+        .btn-download {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .btn-download:hover {
+            background-color: #2980b9;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-4 {
+            margin-top: 20px;
+        }
         * {
             box-sizing: border-box;
             margin: 0;
@@ -489,7 +512,18 @@
                     <li>Limitez votre consommation d'alcool et évitez le tabac</li>
                 `;
             }
-            
+            // Ajouter le lien de téléchargement si disponible
+            if (data.report_url) {
+                const downloadDiv = document.createElement('div');
+                downloadDiv.className = 'text-center mt-4';
+                downloadDiv.innerHTML = `
+                    <a href="${data.report_url}" class="btn-download" download>
+                        <i class="bi bi-download"></i> Télécharger le rapport complet
+                    </a>
+                `;
+                resultContainer.appendChild(downloadDiv);
+            }
+        
             // Mettre à jour la barre de progression
             riskBar.style.width = `${riskPercent}%`;
             riskBar.textContent = `${riskPercent}%`;
@@ -519,5 +553,12 @@
         document.getElementById('ca').value = 2;
         document.getElementById('thal').value = 3;
     </script>
+    {% if report_url %}
+<div class="text-center mt-4">
+    <a href="{{ report_url }}" class="btn btn-primary" download>
+        <i class="bi bi-download"></i> Télécharger le rapport complet
+    </a>
+</div>
+{% endif %}
 </body>
 </html>
