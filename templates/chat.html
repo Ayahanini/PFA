@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Médical - CardiaCare</title>
+    <link rel="stylesheet" href="/PFA/static/css/style.css">
+    <link rel="stylesheet" href="/PFA/static/css/chat.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="/PFA/static/js/chat.js"></script>
+    <script src="/PFA/static/js/ml-integration.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>CardiaCare</span>
+            </div>
+            <div class="nav-actions">
+                <a href="dashbord.html" class="nav-btn">
+                    <i class="fas fa-chart-line"></i>
+                    Dashboard
+                </a>
+                <a href="index.html" class="nav-btn">
+                    <i class="fas fa-home"></i>
+                    Accueil
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Chat Container -->
+    <div class="chat-container">
+        <!-- Sidebar -->
+        <aside class="chat-sidebar">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <h3>Patient</h3>
+                    <span class="status online">En ligne</span>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <h4>Actions Rapides</h4>
+                <button class="quick-btn" onclick="startHealthAssessment()">
+                    <i class="fas fa-heart"></i>
+                    Évaluation Cardiaque
+                </button>
+                <button class="quick-btn" onclick="showMedicationReminder()">
+                    <i class="fas fa-pills"></i>
+                    Rappel Médicaments
+                </button>
+                <button class="quick-btn" onclick="emergencyContact()">
+                    <i class="fas fa-phone-alt"></i>
+                    Contact Urgence
+                </button>
+            </div>
+
+            <div class="health-summary">
+                <h4>Résumé Santé</h4>
+                <div class="health-metric">
+                    <span class="metric-label">Risque Actuel</span>
+                    <span class="metric-value low">Faible</span>
+                </div>
+                <div class="health-metric">
+                    <span class="metric-label">Dernière Analyse</span>
+                    <span class="metric-value">Il y a 2h</span>
+                </div>
+                <div class="health-metric">
+                    <span class="metric-label">Prochains Médicaments</span>
+                    <span class="metric-value">Dans 30min</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-main">
+            <div class="chat-header">
+                <div class="doctor-info">
+                    <div class="doctor-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div>
+                        <h3>Dr. IA CardiaCare</h3>
+                        <span class="doctor-status">Assistant médical intelligent</span>
+                    </div>
+                </div>
+                <div class="chat-controls">
+                    <button class="control-btn" onclick="clearChat()">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="control-btn" onclick="exportChat()">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages du bot de bienvenue -->
+                <div class="message bot">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <p>Bonjour ! Je suis votre assistant médical intelligent. Comment puis-je vous aider aujourd'hui ?</p>
+                        <span class="message-time">Maintenant</span>
+                    </div>
+                </div>
+
+                <div class="message bot">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <p>Vous pouvez me poser des questions sur votre santé cardiaque, demander une évaluation de risque, ou simplement discuter de vos préoccupations médicales.</p>
+                        <div class="message-suggestions">
+                            <button class="suggestion-btn" onclick="sendSuggestion('Évaluer mon risque cardiaque')">
+                                Évaluer mon risque cardiaque
+                            </button>
+                            <button class="suggestion-btn" onclick="sendSuggestion('Symptômes inhabituels')">
+                                Symptômes inhabituels
+                            </button>
+                            <button class="suggestion-btn" onclick="sendSuggestion('Conseils préventifs')">
+                                Conseils préventifs
+                            </button>
+                        </div>
+                        <span class="message-time">Maintenant</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <div class="input-actions">
+                    <button class="action-btn" onclick="attachFile()">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <button class="action-btn" onclick="voiceInput()">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" id="messageInput" placeholder="Tapez votre message..." maxlength="500">
+                    <button class="send-btn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+
+    
+</body>
+</html>
