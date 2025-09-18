@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Patient - Chatbot Cardiaque</title>
+    <link rel="stylesheet" href="/PFA/static/css/styles-profile.css">
+    <script src="/PFA/static/js/profile.js"></script>
+
+    <style>
+        /* Styles spécifiques au profil */
+        .risk-meter {
+            height: 15px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .risk-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #FFC107, #F44336);
+            width: var(--risk-level);
+        }
+        .hidden { display: none; }
+        .edit-form { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- En-tête -->
+        <header class="profile-header">
+            <div class="user-info">
+                <img id="patient-avatar" src="/static/images/default-avatar.png" class="avatar">
+                <div>
+                    <h1 id="patient-name">Chargement...</h1>
+                    <p id="patient-details">Âge: • Sexe: • Groupe sanguin: </p>
+                </div>
+            </div>
+            <button id="logout-btn" class="logout-btn">
+                <i class="icon-logout"></i> Déconnexion
+            </button>
+        </header>
+
+        <!-- Contenu principal -->
+        <main class="profile-content">
+            <!-- Carte des données médicales -->
+            <section class="medical-data card">
+                <div class="section-header">
+                    <h2><i class="icon-heart"></i> Données Vitales</h2>
+                    <button id="edit-btn" class="text-btn">Modifier</button>
+                </div>
+                
+                <div class="data-grid">
+                    <div class="data-item">
+                        <label>Tension artérielle</label>
+                        <div id="blood-pressure" class="value">--/-- mmHg</div>
+                    </div>
+                    <div class="data-item">
+                        <label>Fréquence cardiaque</label>
+                        <div id="heart-rate" class="value">-- bpm</div>
+                    </div>
+                    <div class="data-item">
+                        <label>Cholestérol LDL</label>
+                        <div id="cholesterol" class="value">-- g/L</div>
+                    </div>
+                    <div class="data-item">
+                        <label>Poids</label>
+                        <div id="weight" class="value">-- kg</div>
+                    </div>
+                </div>
+
+                <!-- Formulaire caché pour l'édition -->
+                <form id="medical-form" class="edit-form hidden">
+                    <div class="form-row">
+                        <label>Tension (mmHg)
+                            <input type="text" id="edit-bp" placeholder="120/80" required>
+                        </label>
+                        <label>FC (bpm)
+                            <input type="number" id="edit-hr" min="40" max="120" required>
+                        </label>
+                    </div>
+                    <div class="form-row">
+                        <label>Cholestérol (g/L)
+                            <input type="number" step="0.1" id="edit-chol" required>
+                        </label>
+                        <label>Poids (kg)
+                            <input type="number" id="edit-weight" required>
+                        </label>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" id="cancel-edit" class="outline-btn">Annuler</button>
+                        <button type="submit" class="primary-btn">Enregistrer</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Évaluation du risque -->
+            <section class="risk-card card">
+                <h2><i class="icon-alert"></i> Évaluation du Risque Cardiaque</h2>
+                <div class="risk-level">
+                    <div class="risk-meter">
+                        <div class="risk-fill" style="--risk-level: 65%;"></div>
+                    </div>
+                    <div id="risk-text" class="risk-label">Risque: Chargement...</div>
+                </div>
+                <div id="recommendations" class="recommendation">
+                    <p>Veuillez patienter pendant le calcul de votre évaluation...</p>
+                </div>
+            </section>
+
+            <!-- Rappels médicaux -->
+            <section class="reminders card">
+                <h2><i class="icon-bell"></i> Rappels et Alertes</h2>
+                <ul id="reminders-list" class="reminder-list">
+                    <!-- Rempli dynamiquement -->
+                </ul>
+            </section>
+        </main>
+
+        <!-- Navigation -->
+        <nav class="bottom-nav">
+            <a href="/profile" class="nav-btn active">
+                <i class="icon-profile"></i>
+                <span>Profil</span>
+            </a>
+            <a href="/chat" class="nav-btn">
+                <i class="icon-chat"></i>
+                <span>Chatbot</span>
+            </a>
+            <a href="/history" class="nav-btn">
+                <i class="icon-history"></i>
+                <span>Historique</span>
+            </a>
+        </nav>
+    </div>
+
+</body>
+</html>
